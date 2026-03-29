@@ -1,0 +1,51 @@
+<% content_for :title, @exercise.name %>
+
+<section class="card panel-card exercise-detail">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Exercise library</p>
+      <h1><%= @exercise.name %></h1>
+      <p class="supporting-text">Reference metadata for planning and logging upcoming workouts.</p>
+      <% if @exercise.archived? %>
+        <p class="status-pill status-pill-muted">Archived from the active library</p>
+      <% end %>
+    </div>
+
+    <div class="button-row">
+      <%= link_to "Back to library", exercises_path, class: "button button-ghost" %>
+      <%= link_to "Edit", edit_exercise_path(@exercise), class: "button" %>
+      <% if @exercise.archived? %>
+        <%= button_to "Restore", restore_exercise_path(@exercise), method: :patch, class: "button button-ghost" %>
+      <% else %>
+        <%= button_to "Archive", exercise_path(@exercise), method: :delete, class: "button button-ghost" %>
+      <% end %>
+    </div>
+  </div>
+
+  <dl class="detail-grid">
+    <div>
+      <dt>Movement category</dt>
+      <dd><%= @exercise.movement_category.presence || "-" %></dd>
+    </div>
+
+    <div>
+      <dt>Primary muscle group</dt>
+      <dd><%= @exercise.primary_muscle_group.presence || "-" %></dd>
+    </div>
+
+    <div>
+      <dt>Equipment type</dt>
+      <dd><%= @exercise.equipment_type.presence || "-" %></dd>
+    </div>
+
+    <div>
+      <dt>Identifier</dt>
+      <dd><code><%= @exercise.public_id %></code></dd>
+    </div>
+  </dl>
+
+  <div>
+    <p class="panel-label">Notes</p>
+    <p class="supporting-text"><%= @exercise.notes.presence || "No notes yet." %></p>
+  </div>
+</section>

@@ -1,0 +1,130 @@
+# Progress
+
+## Current Status
+
+Milestones 1 through 3 are complete, and Milestone 4 has started with the first planned-set slice in place.
+
+## Completed So Far
+
+### Project Skeleton
+
+- Rails 8 app scaffolded in the existing repository
+- SQLite configured as the development database
+- Base Rails structure, routes, test setup, and default tooling generated
+- Local bundler workflow set up using `vendor/bundle`
+
+### Authentication
+
+- Rails authentication generator added session and password reset flows
+- Sign-up flow added with `RegistrationsController`
+- Sign-in and sign-out wired through session handling
+- Password reset views restyled to match the app shell
+- Root layout updated to show auth actions based on session state
+
+### Base Layout and Design System
+
+- Global app shell added with top navigation and flash messaging
+- Notebook-inspired landing page added at the root route
+- Shared design tokens added for color, spacing, typography, borders, and elevation
+- Reusable button, card, form, status, and responsive layout styles added
+- Authentication pages updated to use the shared visual system
+
+### Exercise Library
+
+- Added canonical `Exercise` model with globally unique public identifiers
+- Built authenticated exercise CRUD flows with search and metadata filtering
+- Added text-based bulk import with duplicate detection
+- Added archive and restore behavior so the active library stays clean without losing records
+- Seeded 10 starter exercises for local development
+
+### Workout CRUD
+
+- Added user-owned `Workout` model with title, date, notes, status, total difficulty, and soft-delete fields
+- Built workout CRUD flows with list, detail, create, edit, and archive behavior
+- Added draft / in-progress / completed lifecycle validation rules
+- Enforced a single in-progress workout per user
+- Added active workout surfacing on the workout index
+
+### Planned Sets
+
+- Added `WorkoutSet` records to attach exercises to workouts
+- Added planned target reps, target weight, ordering, and coach notes
+- Built nested planned-set create, edit, and remove flows from the workout detail page
+- Surfaced workout structure on the workout detail view
+- Added a grouped exercise planner on the workout form so common patterns like `3 x 8 @ weight` or `9,9,8` can be entered quickly
+
+### Configuration and Developer Experience
+
+- Added `.gitignore` entries for local bundle output, temp files, SQLite files, and secrets
+- Dev server default port changed to `3001` in `config/puma.rb`
+- Verified database setup and tests with `bin/rails db:prepare test`
+- Verified linting with `bin/rubocop`
+
+## Key Files Added or Updated
+
+- `Gemfile`
+- `config/routes.rb`
+- `config/puma.rb`
+- `app/views/layouts/application.html.erb`
+- `app/assets/stylesheets/application.css`
+- `app/controllers/concerns/authentication.rb`
+- `app/controllers/home_controller.rb`
+- `app/controllers/exercises_controller.rb`
+- `app/controllers/registrations_controller.rb`
+- `app/controllers/workouts_controller.rb`
+- `app/models/exercise.rb`
+- `app/models/workout.rb`
+- `app/views/home/index.html.erb`
+- `app/views/exercises/index.html.erb`
+- `app/views/workouts/index.html.erb`
+- `app/views/workouts/show.html.erb`
+- `app/views/registrations/new.html.erb`
+- `app/views/sessions/new.html.erb`
+- `app/views/passwords/new.html.erb`
+- `app/views/passwords/edit.html.erb`
+- `db/seeds.rb`
+- `.gitignore`
+
+## Notes
+
+- `vendor/.keep` is still untracked; `vendor/bundle` is ignored correctly
+- `bin/dev` now starts Puma on port `3001` by default
+- The repository started nearly empty, so most current project files were created as part of Milestone 1 setup
+
+## Milestone 2 Progress
+
+- Exercise library implementation has started
+- Planned scope for the first slice:
+  - canonical `Exercise` model with unique identifier and metadata fields
+  - authenticated CRUD flows
+  - search and metadata filtering on the library index
+  - text-based bulk import with duplicate detection
+- Current slice now also supports archiving and restoring exercises so the active library stays clean without losing canonical records
+
+## Milestone 3 Progress
+
+- Workout CRUD has started with the core model, validations, routes, and authenticated pages in place
+- Current slice includes:
+  - workout list and detail pages
+  - create and edit flows for title, date, notes, and status
+  - soft-delete style archiving
+  - active workout detection
+  - lifecycle guards for `draft`, `in_progress`, and `completed`
+
+## Milestone 4 Progress
+
+- Planned sets are now attached to workouts with exercise selection, ordering, target reps, target weight, and coach notes
+- Current slice includes:
+  - nested planned-set CRUD routes under workouts
+  - workout detail rendering for the planned structure
+  - automatic ordering for newly added sets
+  - position reordering after set removal
+  - grouped set planning with set count plus flexible reps patterns
+
+## Recommended Next Step
+
+Continue Milestone 5 by layering in execution logging:
+
+- add actual reps, actual weight, and RPE fields
+- allow in-progress workouts to record performed results
+- support adding extra sets and quick exercise additions during execution

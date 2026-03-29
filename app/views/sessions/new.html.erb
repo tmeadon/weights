@@ -1,0 +1,32 @@
+<% content_for :title, "Sign in" %>
+
+<section class="auth-layout">
+  <div class="auth-intro">
+    <p class="eyebrow">Welcome back</p>
+    <h1>Pick up your next training session without friction.</h1>
+    <p class="supporting-text">Sign in to access your workout history and continue building a structured log.</p>
+  </div>
+
+  <div class="card auth-card">
+    <h2>Sign in</h2>
+
+    <%= form_with url: session_path, class: "stack-form" do |form| %>
+      <div class="field">
+        <%= form.label :email_address, "Email" %>
+        <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "you@example.com", value: params[:email_address] %>
+      </div>
+
+      <div class="field">
+        <%= form.label :password, "Password" %>
+        <%= form.password_field :password, required: true, autocomplete: "current-password", placeholder: "Enter your password", maxlength: 72 %>
+      </div>
+
+      <%= form.submit "Sign in", class: "button" %>
+    <% end %>
+
+    <div class="form-footer-row">
+      <%= link_to "Forgot password?", new_password_path %>
+      <span>New here? <%= link_to "Create an account", new_registration_path %></span>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,22 @@
+<% content_for :title, "Update password" %>
+
+<section class="auth-layout auth-layout-compact">
+  <div class="card auth-card">
+    <p class="eyebrow">Password reset</p>
+    <h1>Update your password</h1>
+
+    <%= form_with url: password_path(params[:token]), method: :put, class: "stack-form" do |form| %>
+      <div class="field">
+        <%= form.label :password, "New password" %>
+        <%= form.password_field :password, required: true, autocomplete: "new-password", placeholder: "Enter new password", maxlength: 72 %>
+      </div>
+
+      <div class="field">
+        <%= form.label :password_confirmation, "Confirm password" %>
+        <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", placeholder: "Repeat new password", maxlength: 72 %>
+      </div>
+
+      <%= form.submit "Save password", class: "button" %>
+    <% end %>
+  </div>
+</section>

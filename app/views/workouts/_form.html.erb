@@ -1,0 +1,79 @@
+<%= form_with model: workout, class: "stack-form" do |form| %>
+  <% if workout.errors.any? %>
+    <div class="flash flash-alert">
+      <%= workout.errors.full_messages.to_sentence %>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :title, "Workout title" %>
+    <%= form.text_field :title, required: true, autofocus: true, placeholder: "Upper body strength" %>
+  </div>
+
+  <div class="form-grid-two">
+    <div class="field">
+      <%= form.label :workout_on, "Workout date" %>
+      <%= form.date_field :workout_on, required: true %>
+    </div>
+
+    <div class="field">
+      <%= form.label :status, "Status" %>
+      <%= form.select :status, options_for_select(Workout::STATUSES.map { |value| [ value.humanize, value ] }, workout.status) %>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= form.label :notes, "Notes" %>
+    <%= form.text_area :notes, rows: 6, placeholder: "Session intent, reminders, or observations" %>
+  </div>
+
+  <section class="builder-panel">
+    <div class="builder-heading">
+      <div>
+        <p class="panel-label">Planned sets</p>
+        <h2>Add sets in one pass</h2>
+      </div>
+      <p class="field-hint">Choose exercises and targets across a few rows, then save once.</p>
+    </div>
+
+    <div class="set-builder-table">
+      <div class="set-builder-header">Exercise</div>
+      <div class="set-builder-header">Sets</div>
+      <div class="set-builder-header">Reps</div>
+      <div class="set-builder-header">Weight</div>
+      <div class="set-builder-header">Notes</div>
+      <div class="set-builder-header">Example</div>
+
+      <% planned_entries.each_with_index do |entry, index| %>
+        <div class="set-builder-cell">
+          <%= select_tag "workout[planned_entries][#{index}][exercise_id]", options_from_collection_for_select(exercises, :id, :name, entry["exercise_id"]), include_blank: "Choose" %>
+        </div>
+
+        <div class="set-builder-cell">
+          <%= number_field_tag "workout[planned_entries][#{index}][set_count]", entry["set_count"], min: 1, placeholder: "3" %>
+        </div>
+
+        <div class="set-builder-cell">
+          <%= text_field_tag "workout[planned_entries][#{index}][rep_pattern]", entry["rep_pattern"], placeholder: "8 or 9,9,8" %>
+        </div>
+
+        <div class="set-builder-cell">
+          <%= number_field_tag "workout[planned_entries][#{index}][target_weight]", entry["target_weight"], min: 0, step: 0.5, placeholder: "30" %>
+        </div>
+
+        <div class="set-builder-cell">
+          <%= text_field_tag "workout[planned_entries][#{index}][coach_notes]", entry["coach_notes"], placeholder: "Tempo or cues" %>
+        </div>
+
+        <div class="set-builder-cell set-builder-example">
+          <span>`3` + `8` => `3 x 8`</span>
+        </div>
+      <% end %>
+    </div>
+  </section>
+
+  <div class="button-row">
+    <%= form.submit class: "button" %>
+    <%= link_to "Cancel", workouts_path, class: "button button-ghost" %>
+  </div>
+<% end %>

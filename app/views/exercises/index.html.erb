@@ -1,0 +1,119 @@
+<% content_for :title, "Exercise library" %>
+
+<section class="page-header card">
+  <div>
+    <p class="eyebrow">Milestone 2</p>
+    <h1>Exercise library</h1>
+    <p class="supporting-text">Build a clean movement list with searchable metadata and a lightweight import flow.</p>
+  </div>
+
+  <div class="hero-actions page-header-actions">
+    <%= link_to "Add exercise", new_exercise_path, class: "button" %>
+  </div>
+</section>
+
+<section class="library-grid">
+  <div class="card panel-card">
+    <p class="panel-label">Search and filter</p>
+
+    <%= form_with url: exercises_path, method: :get, class: "stack-form", scope: nil do |form| %>
+      <div class="field">
+        <%= form.label :query, "Search" %>
+        <%= form.search_field :query, value: @filters[:query], placeholder: "Search names or metadata" %>
+      </div>
+
+      <div class="field">
+        <%= form.label :movement_category, "Movement category" %>
+        <%= form.select :movement_category, options_for_select([["All", ""]] + @movement_categories.map { |value| [value, value] }, @filters[:movement_category]) %>
+      </div>
+
+      <div class="field">
+        <%= form.label :primary_muscle_group, "Primary muscle group" %>
+        <%= form.select :primary_muscle_group, options_for_select([["All", ""]] + @primary_muscle_groups.map { |value| [value, value] }, @filters[:primary_muscle_group]) %>
+      </div>
+
+      <div class="field">
+        <%= form.label :equipment_type, "Equipment type" %>
+        <%= form.select :equipment_type, options_for_select([["All", ""]] + @equipment_types.map { |value| [value, value] }, @filters[:equipment_type]) %>
+      </div>
+
+      <div class="field">
+        <%= form.label :status, "Status" %>
+        <%= form.select :status, options_for_select([["Active", "active"], ["All", "all"], ["Archived", "archived"]], @filters[:status].presence || "active") %>
+      </div>
+
+      <div class="button-row">
+        <%= form.submit "Apply filters", class: "button" %>
+        <%= link_to "Clear", exercises_path, class: "button button-ghost" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="card panel-card">
+    <p class="panel-label">Bulk import</p>
+    <p class="supporting-text">Paste one exercise per line in `name | movement | muscle | equipment | notes` format.</p>
+
+    <% if @import_result.present? %>
+      <div class="import-summary">
+        <p><strong><%= @import_result["created_count"] %></strong> created</p>
+
+        <% if @import_result["duplicate_names"].present? %>
+          <p>Duplicates: <%= @import_result["duplicate_names"].join(", ") %></p>
+        <% end %>
+
+        <% if @import_result["invalid_rows"].present? %>
+          <p>Needs attention: <%= @import_result["invalid_rows"].join(" ") %></p>
+        <% end %>
+      </div>
+    <% end %>
+
+    <%= form_with url: import_exercises_path, class: "stack-form", scope: :import do |form| %>
+      <div class="field">
+        <%= form.label :text, "Import text" %>
+        <%= form.text_area :text, rows: 8, placeholder: "Dumbbell Bench Press | Press | Chest | Dumbbell | Neutral grip\nLat Pulldown | Pull | Back | Cable | Wide grip" %>
+      </div>
+
+      <%= form.submit "Import exercises", class: "button" %>
+    <% end %>
+  </div>
+</section>
+
+<section class="card panel-card">
+  <div class="section-heading">
+    <div>
+      <p class="panel-label">Library</p>
+      <h2><%= pluralize(@exercises.count, "exercise") %></h2>
+    </div>
+  </div>
+
+  <% if @exercises.any? %>
+    <div class="exercise-list">
+      <% @exercises.each do |exercise| %>
+        <article class="exercise-row">
+          <div class="exercise-heading">
+            <h3>
+              <%= link_to exercise.name, exercise_path(exercise) %>
+              <% if exercise.archived? %>
+                <span class="status-pill status-pill-muted">Archived</span>
+              <% end %>
+            </h3>
+
+            <%= link_to "Edit", edit_exercise_path(exercise), class: "exercise-edit-link" %>
+          </div>
+
+          <p class="exercise-meta">
+            <%= [exercise.movement_category, exercise.primary_muscle_group, exercise.equipment_type].compact.join(" / ").presence || "Metadata optional" %>
+          </p>
+
+          <% if exercise.archived? %>
+            <div class="row-actions">
+              <%= button_to "Restore", restore_exercise_path(exercise), method: :patch, class: "button button-ghost button-small" %>
+            </div>
+          <% end %>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="supporting-text">No exercises match the current filters yet.</p>
+  <% end %>
+</section>

@@ -1,0 +1,11 @@
+<% content_for :title, "Add exercise" %>
+
+<section class="auth-layout auth-layout-compact">
+  <div class="card auth-card">
+    <p class="eyebrow">Exercise library</p>
+    <h1>Add an exercise</h1>
+    <p class="supporting-text">Capture a canonical movement name and the metadata you want available for planning later.</p>
+
+    <%= render "form", exercise: @exercise %>
+  </div>
+</section>

@@ -1,0 +1,39 @@
+<%= form_with model: [ workout, workout_set ], class: "stack-form" do |form| %>
+  <% if workout_set.errors.any? %>
+    <div class="flash flash-alert">
+      <%= workout_set.errors.full_messages.to_sentence %>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :exercise_id, "Exercise" %>
+    <%= form.select :exercise_id, options_from_collection_for_select(exercises, :id, :name, workout_set.exercise_id), { prompt: "Choose an exercise" }, required: true %>
+  </div>
+
+  <div class="form-grid-three">
+    <div class="field">
+      <%= form.label :position, "Order" %>
+      <%= form.number_field :position, min: 1, placeholder: workout.workout_sets.size + (workout_set.new_record? ? 1 : 0) %>
+    </div>
+
+    <div class="field">
+      <%= form.label :target_reps, "Target reps" %>
+      <%= form.number_field :target_reps, min: 1, placeholder: "8" %>
+    </div>
+
+    <div class="field">
+      <%= form.label :target_weight, "Target weight" %>
+      <%= form.number_field :target_weight, min: 0, step: 0.5, placeholder: "60" %>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= form.label :coach_notes, "Coach notes" %>
+    <%= form.text_area :coach_notes, rows: 4, placeholder: "Tempo, cues, or setup notes" %>
+  </div>
+
+  <div class="button-row">
+    <%= form.submit class: "button" %>
+    <%= link_to "Back to workout", workout_path(workout), class: "button button-ghost" %>
+  </div>
+<% end %>

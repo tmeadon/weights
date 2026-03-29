@@ -1,0 +1,39 @@
+<%= form_with model: exercise, class: "stack-form" do |form| %>
+  <% if exercise.errors.any? %>
+    <div class="flash flash-alert">
+      <%= exercise.errors.full_messages.to_sentence %>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :name, "Exercise name" %>
+    <%= form.text_field :name, required: true, autofocus: true, placeholder: "Dumbbell Bench Press" %>
+  </div>
+
+  <div class="form-grid-two">
+    <div class="field">
+      <%= form.label :movement_category, "Movement category" %>
+      <%= form.text_field :movement_category, placeholder: "Press" %>
+    </div>
+
+    <div class="field">
+      <%= form.label :primary_muscle_group, "Primary muscle group" %>
+      <%= form.text_field :primary_muscle_group, placeholder: "Chest" %>
+    </div>
+
+    <div class="field">
+      <%= form.label :equipment_type, "Equipment type" %>
+      <%= form.text_field :equipment_type, placeholder: "Dumbbell" %>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= form.label :notes, "Notes" %>
+    <%= form.text_area :notes, rows: 5, placeholder: "Optional setup or coaching notes" %>
+  </div>
+
+  <div class="button-row">
+    <%= form.submit class: "button" %>
+    <%= link_to "Cancel", exercises_path, class: "button button-ghost" %>
+  </div>
+<% end %>

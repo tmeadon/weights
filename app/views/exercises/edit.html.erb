@@ -1,0 +1,11 @@
+<% content_for :title, "Edit exercise" %>
+
+<section class="auth-layout auth-layout-compact">
+  <div class="card auth-card">
+    <p class="eyebrow">Exercise library</p>
+    <h1>Edit <%= @exercise.name %></h1>
+    <p class="supporting-text">Keep the movement library clean so workouts can reuse reliable exercise definitions.</p>
+
+    <%= render "form", exercise: @exercise %>
+  </div>
+</section>

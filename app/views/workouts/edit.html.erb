@@ -1,0 +1,11 @@
+<% content_for :title, "Edit workout" %>
+
+<section class="auth-layout auth-layout-compact">
+  <div class="card auth-card">
+    <p class="eyebrow">Workout notebook</p>
+    <h1>Edit <%= @workout.title %></h1>
+    <p class="supporting-text">Update workout details and revise multiple planned sets from one compact editor.</p>
+
+    <%= render "form", workout: @workout, exercises: @exercises, planned_entries: @planned_entries %>
+  </div>
+</section>

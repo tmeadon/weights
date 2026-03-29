@@ -1,0 +1,54 @@
+<% content_for :title, "Weights" %>
+
+<section class="hero card">
+  <div class="hero-copy">
+    <p class="eyebrow">Milestone 3</p>
+    <h1>Strength tracking that feels like a calm training notebook.</h1>
+    <p class="hero-text">
+      Capture workouts with a simple structure, durable history, and fast session logging.
+      The foundation is in place so the next milestones can layer on exercise management and workout flows.
+    </p>
+
+    <div class="hero-actions">
+      <% if authenticated? %>
+        <span class="status-pill">Signed in</span>
+        <p class="supporting-text">Your authenticated shell is ready for exercise and workout features.</p>
+        <%= link_to "Open workouts", workouts_path, class: "button button-ghost" %>
+        <%= link_to "Open exercise library", exercises_path, class: "button" %>
+      <% else %>
+        <%= link_to "Create account", new_registration_path, class: "button" %>
+        <%= link_to "Sign in", new_session_path, class: "button button-ghost" %>
+      <% end %>
+    </div>
+  </div>
+
+  <aside class="hero-panel notebook-panel">
+    <p class="panel-label">Product principles</p>
+    <ul class="feature-list">
+      <li>Fast logging over dashboard complexity</li>
+      <li>Plan and execution stay separate</li>
+      <li>Historical workouts remain durable</li>
+      <li>Structured data stays portable</li>
+    </ul>
+  </aside>
+</section>
+
+<section class="milestone-grid">
+  <article class="card">
+    <p class="panel-label">Authentication</p>
+    <h2>Account creation, sign in, and password reset.</h2>
+    <p class="supporting-text">Rails authentication is wired into the app shell so later milestones can protect workout data by default.</p>
+  </article>
+
+  <article class="card">
+    <p class="panel-label">Design system</p>
+    <h2>Shared tokens, form styles, buttons, and card patterns.</h2>
+    <p class="supporting-text">The UI now has a calm visual language tuned for a personal notebook instead of a glossy fitness dashboard.</p>
+  </article>
+
+  <article class="card">
+    <p class="panel-label">Next up</p>
+    <h2>Workout CRUD is ready for planning layers.</h2>
+    <p class="supporting-text">Milestone 3 adds user-owned workouts with dates, status, notes, and an active workout concept for the next set-planning slice.</p>
+  </article>
+</section>

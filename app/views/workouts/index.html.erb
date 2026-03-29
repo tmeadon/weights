@@ -1,0 +1,55 @@
+<% content_for :title, "Workouts" %>
+
+<section class="page-header card">
+  <div>
+    <p class="eyebrow">Milestone 3</p>
+    <h1>Workouts</h1>
+    <p class="supporting-text">Create a session, track its lifecycle, and keep a readable notebook of what is planned next.</p>
+  </div>
+
+  <div class="hero-actions page-header-actions">
+    <%= link_to "New workout", new_workout_path, class: "button" %>
+  </div>
+</section>
+
+<% if @active_workout.present? %>
+  <section class="card panel-card active-workout-card">
+    <div>
+      <p class="panel-label">Active workout</p>
+      <h2><%= link_to @active_workout.title, workout_path(@active_workout) %></h2>
+      <p class="supporting-text"><%= @active_workout.workout_on.to_fs(:long) %> · In progress</p>
+    </div>
+  </section>
+<% end %>
+
+<section class="card panel-card">
+  <div class="section-heading">
+    <div>
+      <p class="panel-label">Notebook</p>
+      <h2><%= pluralize(@workouts.count, "workout") %></h2>
+    </div>
+  </div>
+
+  <% if @workouts.any? %>
+    <div class="exercise-list workout-list">
+      <% @workouts.each do |workout| %>
+        <article class="workout-row">
+          <div class="exercise-heading">
+            <h3><%= link_to workout.title, workout_path(workout) %></h3>
+            <%= link_to "Edit", edit_workout_path(workout), class: "exercise-edit-link" %>
+          </div>
+
+          <p class="exercise-meta">
+            <%= workout.workout_on.to_fs(:long) %> / <%= workout.status.humanize %> / Difficulty <%= number_with_precision(workout.total_difficulty, precision: 1) %>
+          </p>
+
+          <% if workout.notes.present? %>
+            <p class="supporting-text workout-note-preview"><%= workout.notes %></p>
+          <% end %>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="supporting-text">No workouts yet. Start with a title, date, and a few notes for the session.</p>
+  <% end %>
+</section>

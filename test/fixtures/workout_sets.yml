@@ -1,0 +1,15 @@
+draft_bench:
+  workout: draft_session
+  exercise: bench_press
+  position: 1
+  target_weight: 30
+  target_reps: 8
+  coach_notes: Smooth eccentric.
+
+draft_row:
+  workout: draft_session
+  exercise: lat_pulldown
+  position: 2
+  target_weight: 45
+  target_reps: 10
+  coach_notes: Control the stretch.

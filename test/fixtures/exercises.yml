@@ -1,0 +1,23 @@
+bench_press:
+  public_id: benchpress001
+  name: Dumbbell Bench Press
+  movement_category: Press
+  primary_muscle_group: Chest
+  equipment_type: Dumbbell
+  notes: Neutral grip and smooth tempo.
+
+lat_pulldown:
+  public_id: latpulldown001
+  name: Lat Pulldown
+  movement_category: Pull
+  primary_muscle_group: Back
+  equipment_type: Cable
+  notes: Pause at the chest.
+
+squat:
+  public_id: squat001
+  name: Goblet Squat
+  movement_category: Squat
+  primary_muscle_group: Legs
+  equipment_type: Kettlebell
+  notes: Stay tall through the midline.

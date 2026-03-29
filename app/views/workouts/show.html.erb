@@ -1,0 +1,84 @@
+<% content_for :title, @workout.title %>
+
+<section class="card panel-card exercise-detail">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Workout notebook</p>
+      <h1><%= @workout.title %></h1>
+      <p class="supporting-text"><%= @workout.workout_on.to_fs(:long) %> · <%= @workout.status.humanize %></p>
+    </div>
+
+    <div class="button-row">
+      <%= link_to "Back to workouts", workouts_path, class: "button button-ghost" %>
+      <%= link_to "Edit", edit_workout_path(@workout), class: "button" %>
+      <%= button_to "Archive", workout_path(@workout), method: :delete, class: "button button-ghost" %>
+    </div>
+  </div>
+
+  <dl class="detail-grid">
+    <div>
+      <dt>Status</dt>
+      <dd><%= @workout.status.humanize %></dd>
+    </div>
+
+    <div>
+      <dt>Total difficulty</dt>
+      <dd><%= number_with_precision(@workout.total_difficulty, precision: 1) %></dd>
+    </div>
+
+    <div>
+      <dt>Workout date</dt>
+      <dd><%= @workout.workout_on.to_fs(:long) %></dd>
+    </div>
+
+    <div>
+      <dt>Active workout</dt>
+      <dd><%= @workout.status == "in_progress" ? "Yes" : "No" %></dd>
+    </div>
+  </dl>
+
+  <div>
+    <p class="panel-label">Notes</p>
+    <p class="supporting-text"><%= @workout.notes.presence || "No notes yet." %></p>
+  </div>
+</section>
+
+<section class="card panel-card">
+  <div class="section-heading">
+    <div>
+      <p class="panel-label">Planned sets</p>
+      <h2><%= pluralize(@workout.workout_sets.count, "planned set") %></h2>
+    </div>
+
+    <div class="button-row">
+      <%= link_to "Add planned set", new_workout_workout_set_path(@workout), class: "button" %>
+    </div>
+  </div>
+
+  <% if @workout.workout_sets.any? %>
+    <div class="exercise-list workout-list">
+      <% @workout.workout_sets.each do |workout_set| %>
+        <article class="workout-row planned-set-row">
+          <div class="exercise-heading">
+            <h3><%= workout_set.position %>. <%= workout_set.exercise.name %></h3>
+            <%= link_to "Edit", edit_workout_workout_set_path(@workout, workout_set), class: "exercise-edit-link" %>
+          </div>
+
+          <p class="exercise-meta">
+            <%= [workout_set.target_reps.present? ? "#{workout_set.target_reps} reps" : nil, workout_set.target_weight.present? ? "#{number_with_precision(workout_set.target_weight, precision: 1)} weight" : nil].compact.join(" / ").presence || "Targets pending" %>
+          </p>
+
+          <% if workout_set.coach_notes.present? %>
+            <p class="supporting-text workout-note-preview"><%= workout_set.coach_notes %></p>
+          <% end %>
+
+          <div class="row-actions row-actions-inline">
+            <%= button_to "Remove", workout_workout_set_path(@workout, workout_set), method: :delete, class: "button button-ghost button-small" %>
+          </div>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="supporting-text">No planned sets yet. Add exercises to give the workout structure before logging starts.</p>
+  <% end %>
+</section>

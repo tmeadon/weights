@@ -1,0 +1,23 @@
+draft_session:
+  user: one
+  title: Upper Body A
+  workout_on: 2026-03-28
+  notes: Smooth tempo and keep rest honest.
+  status: draft
+  total_difficulty: 0
+
+active_session:
+  user: one
+  title: Lower Body Session
+  workout_on: 2026-03-29
+  notes: Main lift focus.
+  status: in_progress
+  total_difficulty: 0
+
+completed_session:
+  user: two
+  title: Pull Day
+  workout_on: 2026-03-27
+  notes: Grip faded late.
+  status: completed
+  total_difficulty: 12.5

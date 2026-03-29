@@ -1,0 +1,11 @@
+<% content_for :title, "Edit planned set" %>
+
+<section class="auth-layout auth-layout-compact">
+  <div class="card auth-card">
+    <p class="eyebrow">Planned sets</p>
+    <h1>Edit planned set</h1>
+    <p class="supporting-text">Adjust the planned target for <%= @workout_set.exercise.name %> inside <%= @workout.title %>.</p>
+
+    <%= render "form", workout: @workout, workout_set: @workout_set, exercises: @exercises %>
+  </div>
+</section>
