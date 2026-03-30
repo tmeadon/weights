@@ -330,6 +330,106 @@ select:focus {
   max-width: 72ch;
 }
 
+.planned-set-table {
+  display: grid;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.planned-set-row {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) minmax(0, 1fr) 24px;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(180, 96, 61, 0.08);
+  font-size: 0.92rem;
+}
+
+.planned-set-header {
+  background: transparent;
+  border: 0;
+  padding: 0 12px;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+}
+
+.planned-set-index {
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.planned-set-muted {
+  color: var(--ink-soft);
+}
+
+.link-button-form {
+  margin: 0;
+}
+
+.link-button {
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink-soft);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.link-button:hover,
+.link-button:focus-visible {
+  color: var(--accent-deep);
+  text-decoration: underline;
+}
+
+.exercise-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  width: 100%;
+}
+
+.exercise-remove-link {
+  font-size: 0.9rem;
+}
+
+.exercise-remove-link {
+  justify-self: end;
+  text-align: right;
+}
+
+.chip-remove-form {
+  margin: 0;
+}
+
+.chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  border: 1px solid rgba(180, 96, 61, 0.25);
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.chip-remove:hover,
+.chip-remove:focus-visible {
+  color: var(--accent-deep);
+  border-color: rgba(180, 96, 61, 0.5);
+  background: #fff9f2;
+}
+
 .hero {
   display: grid;
   grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.9fr);
@@ -512,6 +612,71 @@ select:focus {
   font-size: 0.88rem;
 }
 
+.inline-builder-panel {
+  margin-bottom: 22px;
+}
+
+.builder-panel-compact {
+  gap: 12px;
+  padding: 16px;
+}
+
+.planner-row {
+  display: grid;
+  grid-template-columns: minmax(200px, 1.4fr) 72px 140px 110px auto auto;
+  gap: 10px 12px;
+  align-items: center;
+}
+
+.planner-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--ink);
+  font: inherit;
+}
+
+.planner-input:focus {
+  outline: 2px solid var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.planner-input-sets,
+.planner-input-weight {
+  text-align: center;
+}
+
+.planner-input-reps {
+  text-align: center;
+}
+
+.planner-hint {
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+}
+
+.planner-note {
+  grid-column: 1 / -1;
+  border-top: 1px dashed var(--line);
+  padding-top: 10px;
+}
+
+.planner-note summary {
+  color: var(--ink-soft);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.planner-note[open] summary {
+  margin-bottom: 8px;
+}
+
+.planner-input-note {
+  width: 100%;
+}
+
 .field input {
   width: 100%;
   padding: 14px 16px;
@@ -641,7 +806,8 @@ select:focus {
   }
 
   .builder-heading,
-  .set-builder-table {
+  .set-builder-table,
+  .planner-row {
     grid-template-columns: 1fr;
   }
 
@@ -672,5 +838,53 @@ select:focus {
 
   .button-row {
     grid-auto-flow: row;
+  }
+
+  .builder-panel-compact {
+    padding: 12px;
+  }
+
+  .planner-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .planner-row .button {
+    width: 100%;
+  }
+
+  .planner-input {
+    padding: 10px 12px;
+  }
+
+  .planner-hint {
+    font-size: 0.8rem;
+  }
+
+  .planner-note {
+    padding-top: 8px;
+  }
+
+  .planner-input-reps,
+  .planner-input-sets,
+  .planner-input-weight {
+    text-align: center;
+  }
+
+  .planner-row select,
+  .planner-row .planner-input-note,
+  .planner-row .planner-hint,
+  .planner-row details {
+    grid-column: 1 / -1;
+  }
+
+  .planner-row .button {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .planned-set-row {
+    grid-template-columns: 36px minmax(0, 1fr) minmax(0, 1fr) 24px;
+    font-size: 0.86rem;
   }
 }

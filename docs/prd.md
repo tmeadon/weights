@@ -304,6 +304,18 @@ While a workout is **in_progress**, the user must be able to:
 
 The logging experience must remain extremely fast.
 
+The workout detail interface should therefore be able to evolve from
+planning into logging without forcing the user through separate,
+repetitive edit screens.
+
+Planned-set UI should prefer:
+
+-   compact inline controls
+-   grouped exercise blocks
+-   row-based layouts that can later show both planned and actual values
+
+over large decorative cards or one-form-per-set flows.
+
 ------------------------------------------------------------------------
 
 # 9. Difficulty Calculation
@@ -479,6 +491,10 @@ Includes:
 -   grouped set editing
 -   autosave behaviour
 
+The intended UX direction for this phase is that the workout detail page
+becomes the primary surface for both planning and execution, with minimal
+page navigation and inline updates where possible.
+
 ## Phase 3 --- Intelligence and Analysis
 
 Includes:
@@ -583,4 +599,3 @@ The following are intentionally excluded from the initial rebuild:
 
 -   load externally generated workouts
 -   AI planning integration
-

@@ -23,6 +23,10 @@ class WorkoutsControllerTest < ActionDispatch::IntegrationTest
     assert_select "h1", "Upper Body A"
     assert_select "h2", /planned set/
     assert_select "h3", /Dumbbell Bench Press/
+    assert_select "summary", /Add note/
+    assert_select "input[value='Add']"
+    assert_select ".planned-set-row", /Planned/
+    assert_select "button", "Remove exercise"
   end
 
   test "create workout" do
@@ -32,57 +36,14 @@ class WorkoutsControllerTest < ActionDispatch::IntegrationTest
           title: "Push Session",
           workout_on: "2026-03-30",
           notes: "Start with bench.",
-          status: "draft",
-          planned_entries: {
-            "0" => { exercise_id: exercises(:bench_press).id, set_count: 3, rep_pattern: "8", target_weight: 30, coach_notes: "Smooth eccentric" },
-            "1" => { exercise_id: exercises(:lat_pulldown).id, set_count: 2, rep_pattern: "10", target_weight: 45, coach_notes: "Pause at chest" },
-            "2" => { exercise_id: "", set_count: "", rep_pattern: "", target_weight: "", coach_notes: "" },
-            "3" => { exercise_id: "", set_count: "", rep_pattern: "", target_weight: "", coach_notes: "" }
-          }
+          status: "draft"
         }
       }
     end
 
     workout = Workout.order(:id).last
     assert_redirected_to workout_path(workout)
-    assert_equal 5, workout.workout_sets.count
-  end
-
-  test "update workout can add another planned set row" do
-    assert_difference("WorkoutSet.count", 3) do
-      patch workout_path(@workout), params: {
-        workout: {
-          title: @workout.title,
-          workout_on: @workout.workout_on,
-          notes: @workout.notes,
-          status: @workout.status,
-          planned_entries: {
-            "0" => { exercise_id: exercises(:squat).id, set_count: "", rep_pattern: "9,9,8", target_weight: 24, coach_notes: "Controlled tempo" }
-          }
-        }
-      }
-    end
-
-    assert_redirected_to workout_path(@workout)
-    assert_equal [ 9, 9, 8 ], @workout.workout_sets.reload.last(3).map(&:target_reps)
-  end
-
-  test "does not create workout when a builder row is invalid" do
-    assert_no_difference("Workout.count") do
-      post workouts_path, params: {
-        workout: {
-          title: "Push Session",
-          workout_on: "2026-03-30",
-          status: "draft",
-          planned_entries: {
-            "0" => { exercise_id: exercises(:bench_press).id, set_count: 3, rep_pattern: "", target_weight: 30, coach_notes: "Missing reps" }
-          }
-        }
-      }
-    end
-
-    assert_response :unprocessable_entity
-    assert_select ".flash", /needs reps/i
+    assert_equal 0, workout.workout_sets.count
   end
 
   test "update workout" do

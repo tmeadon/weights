@@ -15,7 +15,11 @@ Rails.application.routes.draw do
     end
   end
   resources :workouts do
-    resources :workout_sets, except: %i[index show]
+    resources :workout_sets, except: %i[index show] do
+      collection do
+        delete :remove_exercise
+      end
+    end
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

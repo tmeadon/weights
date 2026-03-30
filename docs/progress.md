@@ -2,7 +2,7 @@
 
 ## Current Status
 
-Milestones 1 through 3 are complete, and Milestone 4 has started with the first planned-set slice in place.
+Milestones 1 through 4 are functionally in place, and the current refinement work is focused on making planned-set entry and editing feel fast enough for real use before Milestone 5 execution logging begins.
 
 ## Completed So Far
 
@@ -51,7 +51,10 @@ Milestones 1 through 3 are complete, and Milestone 4 has started with the first 
 - Added planned target reps, target weight, ordering, and coach notes
 - Built nested planned-set create, edit, and remove flows from the workout detail page
 - Surfaced workout structure on the workout detail view
-- Added a grouped exercise planner on the workout form so common patterns like `3 x 8 @ weight` or `9,9,8` can be entered quickly
+- Added a grouped exercise planner on the workout page so common patterns like `3 x 8 @ weight`, `3x8`, or `9,9,8` can be entered quickly without leaving the session view
+- Reworked the planned-set UI around Turbo so adding and removing sets updates in place without a full-page refresh
+- Shifted the workout detail presentation from large pills to a compact mini-table that already reserves space for future actuals
+- Continued tightening small-screen spacing, inline controls, and remove actions so the page reads more like a training log than a CRUD screen
 
 ### Configuration and Developer Experience
 
@@ -119,7 +122,9 @@ Milestones 1 through 3 are complete, and Milestone 4 has started with the first 
   - workout detail rendering for the planned structure
   - automatic ordering for newly added sets
   - position reordering after set removal
-  - grouped set planning with set count plus flexible reps patterns
+  - grouped set planning with flexible reps patterns and grouped workout display
+  - inline Hotwire updates for add/remove actions
+  - iterative UI refinement toward the future execution logging flow
 
 ## Recommended Next Step
 
@@ -128,3 +133,9 @@ Continue Milestone 5 by layering in execution logging:
 - add actual reps, actual weight, and RPE fields
 - allow in-progress workouts to record performed results
 - support adding extra sets and quick exercise additions during execution
+
+## UI Direction Notes
+
+- Planned-set entry now favors a compact inline workout-page form instead of separate edit/create screens for every small change
+- Planned-set display now favors rows and columns over decorative pills so the later transition to planned-vs-actual logging is straightforward
+- Future execution work should preserve the current compact notebook feel, especially on mobile widths

@@ -1,0 +1,41 @@
+<% if workout.workout_sets.any? %>
+  <div class="exercise-list workout-list">
+    <% workout.planned_exercise_groups.each do |exercise, grouped_sets| %>
+      <article class="workout-row planned-group-row">
+        <div class="exercise-heading">
+          <h3><%= exercise.name %></h3>
+          <%= button_to "Remove exercise", remove_exercise_workout_workout_sets_path(workout, exercise_id: exercise.id), method: :delete, class: "link-button exercise-remove-link", form_class: "link-button-form" %>
+        </div>
+
+        <div class="planned-set-table">
+          <div class="planned-set-row planned-set-header">
+            <span>Set</span>
+            <span>Planned</span>
+            <span>Actual</span>
+            <span></span>
+          </div>
+
+          <% grouped_sets.each do |workout_set| %>
+            <div class="planned-set-row">
+              <span class="planned-set-index"><%= workout_set.position %></span>
+              <span>
+                <%= workout_set.target_reps || "-" %> reps<% if workout_set.target_weight.present? %> @ <%= number_with_precision(workout_set.target_weight, precision: 1) %> kg<% end %>
+              </span>
+              <span class="planned-set-muted">—</span>
+              <%= button_to "x", workout_workout_set_path(workout, workout_set), method: :delete, class: "chip-remove", form_class: "chip-remove-form", aria: { label: "Remove set #{workout_set.position}" } %>
+            </div>
+          <% end %>
+        </div>
+
+        <% notes = grouped_sets.map(&:coach_notes).compact.uniq %>
+        <% if notes.any? %>
+          <% formatted_notes = notes.flat_map { |note| note.to_s.split(/\r?\n/) } %>
+          <div class="supporting-text workout-note-preview"><%= safe_join(formatted_notes, tag.br) %></div>
+        <% end %>
+
+      </article>
+    <% end %>
+  </div>
+<% else %>
+  <p class="supporting-text">No planned sets yet. Add exercises to give the workout structure before logging starts.</p>
+<% end %>

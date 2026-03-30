@@ -8,12 +8,25 @@ class WorkoutSetsController < ApplicationController
   end
 
   def create
-    @workout_set = @workout.workout_sets.new(workout_set_params)
-
-    if @workout_set.save
-      redirect_to workout_path(@workout), notice: "Planned set added."
+    if add_planned_sets
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.replace("planned_set_planner", partial: "workouts/planned_set_planner", locals: { workout: @workout, exercises: @exercises, planned_entry: default_planned_entry }),
+            turbo_stream.update("planned_sets_list", partial: "workouts/planned_sets_list", locals: { workout: @workout }),
+            turbo_stream.update("planned_sets_count", partial: "workouts/planned_sets_count", locals: { workout: @workout })
+          ]
+        end
+        format.html { redirect_to workout_path(@workout), notice: "Planned sets added." }
+      end
     else
-      render :new, status: :unprocessable_entity
+      @planned_entry = planned_entry_params.to_h
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace("planned_set_planner", partial: "workouts/planned_set_planner", locals: { workout: @workout, exercises: @exercises, planned_entry: @planned_entry }), status: :unprocessable_entity
+        end
+        format.html { render "workouts/show", status: :unprocessable_entity }
+      end
     end
   end
 
@@ -31,7 +44,31 @@ class WorkoutSetsController < ApplicationController
   def destroy
     @workout_set.destroy
     reorder_positions
-    redirect_to workout_path(@workout), notice: "Planned set removed.", status: :see_other
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: [
+          turbo_stream.update("planned_sets_list", partial: "workouts/planned_sets_list", locals: { workout: @workout }),
+          turbo_stream.update("planned_sets_count", partial: "workouts/planned_sets_count", locals: { workout: @workout })
+        ]
+      end
+      format.html { redirect_to workout_path(@workout), notice: "Planned set removed.", status: :see_other }
+    end
+  end
+
+  def remove_exercise
+    exercise_id = params[:exercise_id]
+    @workout.workout_sets.where(exercise_id:).destroy_all
+    reorder_positions
+
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: [
+          turbo_stream.update("planned_sets_list", partial: "workouts/planned_sets_list", locals: { workout: @workout }),
+          turbo_stream.update("planned_sets_count", partial: "workouts/planned_sets_count", locals: { workout: @workout })
+        ]
+      end
+      format.html { redirect_to workout_path(@workout), notice: "Exercise removed from workout.", status: :see_other }
+    end
   end
 
   private
@@ -49,6 +86,19 @@ class WorkoutSetsController < ApplicationController
 
     def workout_set_params
       params.expect(workout_set: [ :exercise_id, :position, :target_weight, :target_reps, :coach_notes ])
+    end
+
+    def planned_entry_params
+      params.require(:planned_entry).permit(:exercise_id, :set_count, :rep_pattern, :target_weight, :coach_notes)
+    end
+
+    def add_planned_sets
+      @planned_entry = planned_entry_params.to_h
+      @workout.append_planned_entries([ @planned_entry.symbolize_keys ])
+    end
+
+    def default_planned_entry
+      { "exercise_id" => "", "set_count" => "3", "rep_pattern" => "8", "target_weight" => "", "coach_notes" => "" }
     end
 
     def reorder_positions

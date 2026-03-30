@@ -35,6 +35,29 @@ class Workout < ApplicationRecord
     update!(deleted_at: Time.current)
   end
 
+  def planned_exercise_groups
+    workout_sets.group_by(&:exercise)
+  end
+
+  def summarize_planned_group(workout_sets)
+    reps = workout_sets.map(&:target_reps).compact
+    weight = workout_sets.map(&:target_weight).compact.uniq
+
+    rep_summary = if reps.empty?
+      "Targets pending"
+    elsif reps.uniq.size == 1
+      "#{reps.size} x #{reps.first}"
+    else
+      reps.join(",")
+    end
+
+    if weight.one?
+      "#{rep_summary} @ #{weight.first.to_f % 1 == 0 ? weight.first.to_i : weight.first.to_f} kg"
+    else
+      rep_summary
+    end
+  end
+
   def append_planned_entries(entries)
     rows = Array(entries).select do |entry|
       entry.values.any?(&:present?)

@@ -8,19 +8,13 @@ class WorkoutSetsControllerTest < ActionDispatch::IntegrationTest
     sign_in_as(@user)
   end
 
-  test "new" do
-    get new_workout_workout_set_path(@workout)
-
-    assert_response :success
-    assert_select "h1", "Add a planned set"
-  end
-
-  test "create workout set" do
-    assert_difference("WorkoutSet.count", 1) do
+  test "create workout sets from a single exercise block" do
+    assert_difference("WorkoutSet.count", 3) do
       post workout_workout_sets_path(@workout), params: {
-        workout_set: {
+        planned_entry: {
           exercise_id: exercises(:squat).id,
-          target_reps: 12,
+          set_count: 3,
+          rep_pattern: "8",
           target_weight: 24,
           coach_notes: "Drive knees forward."
         }
@@ -28,7 +22,51 @@ class WorkoutSetsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_redirected_to workout_path(@workout)
-    assert_equal 3, @workout.workout_sets.reload.last.position
+    assert_equal [ 8, 8, 8 ], @workout.workout_sets.reload.last(3).map(&:target_reps)
+  end
+
+  test "create workout sets with progressive reps" do
+    assert_difference("WorkoutSet.count", 3) do
+      post workout_workout_sets_path(@workout), params: {
+        planned_entry: {
+          exercise_id: exercises(:squat).id,
+          set_count: "",
+          rep_pattern: "9,9,8",
+          target_weight: 24,
+          coach_notes: "Controlled tempo"
+        }
+      }
+    end
+
+    assert_redirected_to workout_path(@workout)
+    assert_equal [ 9, 9, 8 ], @workout.workout_sets.reload.last(3).map(&:target_reps)
+  end
+
+  test "remove exercise removes all planned sets for that exercise" do
+    assert_difference("WorkoutSet.count", -1) do
+      delete remove_exercise_workout_workout_sets_path(@workout, exercise_id: exercises(:bench_press).id)
+    end
+
+    assert_redirected_to workout_path(@workout)
+    assert_not @workout.workout_sets.reload.exists?(exercise_id: exercises(:bench_press).id)
+  end
+
+  test "invalid planned entry re-renders workout show" do
+    assert_no_difference("WorkoutSet.count") do
+      post workout_workout_sets_path(@workout), params: {
+        planned_entry: {
+          exercise_id: exercises(:squat).id,
+          set_count: 3,
+          rep_pattern: "",
+          target_weight: 24,
+          coach_notes: "Missing reps"
+        }
+      }
+    end
+
+    assert_response :unprocessable_entity
+    assert_select ".flash", /needs reps/i
+    assert_select ".panel-label", "Add sets"
   end
 
   test "edit" do
@@ -63,7 +101,13 @@ class WorkoutSetsControllerTest < ActionDispatch::IntegrationTest
   test "requires authentication" do
     sign_out
 
-    get new_workout_workout_set_path(@workout)
+    post workout_workout_sets_path(@workout), params: {
+      planned_entry: {
+        exercise_id: exercises(:squat).id,
+        set_count: 3,
+        rep_pattern: "8"
+      }
+    }
 
     assert_redirected_to new_session_path
   end

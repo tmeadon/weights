@@ -4,8 +4,8 @@
   <div class="card auth-card">
     <p class="eyebrow">Workout notebook</p>
     <h1>Edit <%= @workout.title %></h1>
-    <p class="supporting-text">Update workout details and revise multiple planned sets from one compact editor.</p>
+    <p class="supporting-text">Update workout details here. Exercise planning stays on the workout page so the session structure is visible while you build it.</p>
 
-    <%= render "form", workout: @workout, exercises: @exercises, planned_entries: @planned_entries %>
+    <%= render "form", workout: @workout %>
   </div>
 </section>

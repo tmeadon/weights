@@ -62,6 +62,16 @@ class WorkoutTest < ActiveSupport::TestCase
     assert_equal [ 9, 9, 8 ], workout.workout_sets.pluck(:target_reps)
   end
 
+  test "accepts compact 3x8 style patterns" do
+    workout = users(:one).workouts.create!(title: "Push Day", workout_on: Date.new(2026, 3, 31), status: "draft")
+
+    assert workout.append_planned_entries([
+      { exercise_id: exercises(:bench_press).id, rep_pattern: "3x8", target_weight: "30" }
+    ])
+
+    assert_equal [ 8, 8, 8 ], workout.workout_sets.pluck(:target_reps)
+  end
+
   test "adds an error when a planned row misses reps" do
     workout = users(:one).workouts.create!(title: "Push Day", workout_on: Date.new(2026, 3, 31), status: "draft")
 
