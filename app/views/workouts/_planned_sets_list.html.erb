@@ -18,10 +18,39 @@
           <% grouped_sets.each do |workout_set| %>
             <div class="planned-set-row">
               <span class="planned-set-index"><%= workout_set.position %></span>
-              <span>
-                <%= workout_set.target_reps || "-" %> reps<% if workout_set.target_weight.present? %> @ <%= number_with_precision(workout_set.target_weight, precision: 1) %> kg<% end %>
-              </span>
-              <span class="planned-set-muted">—</span>
+              <div>
+                <% if workout_set.target_reps.present? || workout_set.target_weight.present? %>
+                  <%= workout_set.target_reps || "-" %> reps<% if workout_set.target_weight.present? %> @ <%= number_with_precision(workout_set.target_weight, precision: 1) %> kg<% end %>
+                <% elsif workout_set.actual_logged? %>
+                  <span class="planned-set-muted">Added during workout</span>
+                <% else %>
+                  <span class="planned-set-muted">Targets pending</span>
+                <% end %>
+              </div>
+              <div>
+                <% if workout.status == "in_progress" %>
+                  <%= form_with url: workout_workout_set_path(workout, workout_set), method: :patch, scope: :execution, class: "actual-set-form", local: false, data: { controller: "autosave", autosave_delay_value: 250 } do |form| %>
+                    <% weight_placeholder = "" %>
+                    <% reps_placeholder = "" %>
+                    <div class="actual-field">
+                      <%= form.number_field :actual_weight, value: workout_set.actual_weight, min: 0, step: 0.5, placeholder: weight_placeholder, class: "planner-input actual-set-input", data: { action: "input->autosave#queue blur->autosave#submit" } %>
+                      <span class="actual-field-unit">kg</span>
+                    </div>
+                    <div class="actual-field">
+                      <%= form.number_field :actual_reps, value: workout_set.actual_reps, min: 1, placeholder: reps_placeholder, class: "planner-input actual-set-input", data: { action: "input->autosave#queue blur->autosave#submit" } %>
+                      <span class="actual-field-unit">reps</span>
+                    </div>
+                  <% end %>
+
+                  <% if workout_set.errors.any? %>
+                    <div class="actual-set-errors"><%= workout_set.errors.full_messages.to_sentence %></div>
+                  <% end %>
+                <% elsif workout_set.actual_logged? %>
+                  <span><%= workout_set.actual_reps || "-" %> reps<% if workout_set.actual_weight.present? %> @ <%= number_with_precision(workout_set.actual_weight, precision: 1) %> kg<% end %></span>
+                <% else %>
+                  <span class="planned-set-muted">—</span>
+                <% end %>
+              </div>
               <%= button_to "x", workout_workout_set_path(workout, workout_set), method: :delete, class: "chip-remove", form_class: "chip-remove-form", aria: { label: "Remove set #{workout_set.position}" } %>
             </div>
           <% end %>
@@ -37,5 +66,5 @@
     <% end %>
   </div>
 <% else %>
-  <p class="supporting-text">No planned sets yet. Add exercises to give the workout structure before logging starts.</p>
+  <p class="supporting-text">No sets yet. Add exercises to give the workout structure before logging starts.</p>
 <% end %>

@@ -8,25 +8,10 @@ class WorkoutSetsController < ApplicationController
   end
 
   def create
-    if add_planned_sets
-      respond_to do |format|
-        format.turbo_stream do
-          render turbo_stream: [
-            turbo_stream.replace("planned_set_planner", partial: "workouts/planned_set_planner", locals: { workout: @workout, exercises: @exercises, planned_entry: default_planned_entry }),
-            turbo_stream.update("planned_sets_list", partial: "workouts/planned_sets_list", locals: { workout: @workout }),
-            turbo_stream.update("planned_sets_count", partial: "workouts/planned_sets_count", locals: { workout: @workout })
-          ]
-        end
-        format.html { redirect_to workout_path(@workout), notice: "Planned sets added." }
-      end
+    if execution_request?
+      create_execution_set
     else
-      @planned_entry = planned_entry_params.to_h
-      respond_to do |format|
-        format.turbo_stream do
-          render turbo_stream: turbo_stream.replace("planned_set_planner", partial: "workouts/planned_set_planner", locals: { workout: @workout, exercises: @exercises, planned_entry: @planned_entry }), status: :unprocessable_entity
-        end
-        format.html { render "workouts/show", status: :unprocessable_entity }
-      end
+      create_planned_sets
     end
   end
 
@@ -34,10 +19,14 @@ class WorkoutSetsController < ApplicationController
   end
 
   def update
-    if @workout_set.update(workout_set_params)
-      redirect_to workout_path(@workout), notice: "Planned set updated."
+    if execution_request?
+      update_execution_set
     else
-      render :edit, status: :unprocessable_entity
+      if @workout_set.update(workout_set_params)
+        redirect_to workout_path(@workout), notice: "Planned set updated."
+      else
+        render :edit, status: :unprocessable_entity
+      end
     end
   end
 
@@ -88,6 +77,10 @@ class WorkoutSetsController < ApplicationController
       params.expect(workout_set: [ :exercise_id, :position, :target_weight, :target_reps, :coach_notes ])
     end
 
+    def execution_params
+      params.expect(execution: [ :exercise_id, :actual_weight, :actual_reps ])
+    end
+
     def planned_entry_params
       params.require(:planned_entry).permit(:exercise_id, :set_count, :rep_pattern, :target_weight, :coach_notes)
     end
@@ -97,8 +90,95 @@ class WorkoutSetsController < ApplicationController
       @workout.append_planned_entries([ @planned_entry.symbolize_keys ])
     end
 
+    def add_execution_set
+      @execution_entry = execution_params.to_h
+      @workout.append_execution_entry(@execution_entry.symbolize_keys)
+    end
+
+    def create_planned_sets
+      if add_planned_sets
+        respond_to do |format|
+          format.turbo_stream do
+            render turbo_stream: [
+              turbo_stream.replace("planned_set_planner", partial: "workouts/planned_set_planner", locals: { workout: @workout, exercises: @exercises, planned_entry: default_planned_entry }),
+              turbo_stream.update("planned_sets_list", partial: "workouts/planned_sets_list", locals: { workout: @workout }),
+              turbo_stream.update("planned_sets_count", partial: "workouts/planned_sets_count", locals: { workout: @workout })
+            ]
+          end
+          format.html { redirect_to workout_path(@workout), notice: "Planned sets added." }
+        end
+      else
+        @execution_entry = default_execution_entry
+        respond_to do |format|
+          format.turbo_stream do
+            render turbo_stream: turbo_stream.replace("planned_set_planner", partial: "workouts/planned_set_planner", locals: { workout: @workout, exercises: @exercises, planned_entry: @planned_entry }), status: :unprocessable_entity
+          end
+          format.html { render "workouts/show", status: :unprocessable_entity }
+        end
+      end
+    end
+
+    def create_execution_set
+      if add_execution_set
+        respond_to do |format|
+          format.turbo_stream do
+            render turbo_stream: [
+              turbo_stream.replace("execution_set_logger", partial: "workouts/execution_set_logger", locals: { workout: @workout, exercises: @exercises, execution_entry: default_execution_entry }),
+              turbo_stream.update("planned_sets_list", partial: "workouts/planned_sets_list", locals: { workout: @workout }),
+              turbo_stream.update("planned_sets_count", partial: "workouts/planned_sets_count", locals: { workout: @workout })
+            ]
+          end
+          format.html { redirect_to workout_path(@workout), notice: "Set logged." }
+        end
+      else
+        @planned_entry = default_planned_entry
+        respond_to do |format|
+          format.turbo_stream do
+            render turbo_stream: turbo_stream.replace("execution_set_logger", partial: "workouts/execution_set_logger", locals: { workout: @workout, exercises: @exercises, execution_entry: @execution_entry }), status: :unprocessable_entity
+          end
+          format.html { render "workouts/show", status: :unprocessable_entity }
+        end
+      end
+    end
+
+    def update_execution_set
+      unless @workout.status == "in_progress"
+        redirect_to workout_path(@workout), alert: "Only in-progress workouts can log sets."
+        return
+      end
+
+      if @workout_set.update(execution_params.except(:exercise_id))
+        @workout.workout_sets.reload
+        respond_to do |format|
+          format.turbo_stream do
+            head :no_content
+          end
+          format.html { redirect_to workout_path(@workout), notice: "Set updated." }
+        end
+      else
+        respond_to do |format|
+          format.turbo_stream do
+            render turbo_stream: turbo_stream.update("planned_sets_list", partial: "workouts/planned_sets_list", locals: { workout: @workout }), status: :unprocessable_entity
+          end
+          format.html do
+            @planned_entry = default_planned_entry
+            @execution_entry = default_execution_entry
+            render "workouts/show", status: :unprocessable_entity
+          end
+        end
+      end
+    end
+
     def default_planned_entry
       { "exercise_id" => "", "set_count" => "3", "rep_pattern" => "8", "target_weight" => "", "coach_notes" => "" }
+    end
+
+    def default_execution_entry
+      { "exercise_id" => "", "actual_weight" => "", "actual_reps" => "" }
+    end
+
+    def execution_request?
+      params[:execution].present?
     end
 
     def reorder_positions

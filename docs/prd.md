@@ -285,11 +285,8 @@ Actual execution fields include:
 
 -   actual weight
 -   actual reps
--   RPE (rate of perceived exertion)
 
-If RPE is omitted, the system defaults to:
-
-7.0
+Effort can be inferred by comparing planned targets to actual results.
 
 ------------------------------------------------------------------------
 
@@ -334,7 +331,8 @@ Difficulty calculations use:
 
 -   weight
 -   reps
--   RPE
+
+Effort can optionally be inferred from planned-vs-actual deltas.
 
 If actual results are missing, planned values may be used.
 
@@ -513,7 +511,8 @@ A user can:
 -   create a workout with title, date, and notes
 -   add planned sets for exercises
 -   start a workout and mark it **in progress**
--   log weight, reps, and RPE during the session
+-   log weight and reps during the session
+-   log weight and reps during the session
 -   add extra sets and new exercises mid-workout
 -   finish a workout and store it as history
 
@@ -574,7 +573,6 @@ The following are intentionally excluded from the initial rebuild:
 
 -   actual reps
 -   actual weight
--   RPE logging
 -   add sets during workout
 -   add new exercises during workout
 

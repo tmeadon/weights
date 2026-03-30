@@ -46,13 +46,19 @@
 <section class="card panel-card">
   <div class="section-heading">
     <div>
-      <p class="panel-label">Planned sets</p>
-      <h2 id="planned_sets_count"><%= pluralize(@workout.workout_sets.count, "planned set") %></h2>
+      <p class="panel-label">Workout sets</p>
+      <h2 id="planned_sets_count"><%= render "workouts/planned_sets_count", workout: @workout %></h2>
     </div>
   </div>
 
   <%= turbo_frame_tag "planned_set_planner" do %>
     <%= render "workouts/planned_set_planner", workout: @workout, exercises: @exercises, planned_entry: @planned_entry %>
+  <% end %>
+
+  <% if @workout.status == "in_progress" %>
+    <%= turbo_frame_tag "execution_set_logger" do %>
+      <%= render "workouts/execution_set_logger", workout: @workout, exercises: @exercises, execution_entry: @execution_entry %>
+    <% end %>
   <% end %>
 
   <%= turbo_frame_tag "planned_sets_list" do %>

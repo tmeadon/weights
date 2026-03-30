@@ -81,4 +81,30 @@ class WorkoutTest < ActiveSupport::TestCase
 
     assert_includes workout.errors[:base], "Planned row 1 needs reps."
   end
+
+  test "appends logged execution sets to an in-progress workout" do
+    workout = workouts(:active_session)
+
+    assert workout.append_execution_entry(
+      exercise_id: exercises(:bench_press).id,
+      actual_reps: "9",
+      actual_weight: "30"
+    )
+
+    logged_set = workout.workout_sets.order(:position).last
+    assert_equal exercises(:bench_press), logged_set.exercise
+    assert_equal 9, logged_set.actual_reps
+    assert_equal 30.0, logged_set.actual_weight.to_f
+  end
+
+  test "rejects logged execution sets for draft workouts" do
+    workout = workouts(:draft_session)
+
+    assert_not workout.append_execution_entry(
+      exercise_id: exercises(:bench_press).id,
+      actual_reps: "9"
+    )
+
+    assert_includes workout.errors[:base], "Only in-progress workouts can log sets."
+  end
 end

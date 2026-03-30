@@ -367,6 +367,48 @@ select:focus {
   color: var(--ink-soft);
 }
 
+.actual-set-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  align-items: center;
+}
+
+.actual-field {
+  position: relative;
+}
+
+.actual-field-unit {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  color: var(--ink-soft);
+  pointer-events: none;
+  opacity: 0.7;
+  transition: opacity 120ms ease-out;
+}
+
+.actual-set-input:focus + .actual-field-unit,
+.actual-set-input:not(:placeholder-shown) + .actual-field-unit {
+  opacity: 0;
+}
+
+.actual-set-input {
+  min-width: 0;
+  padding: 8px 10px;
+  padding-right: 32px;
+  text-align: center;
+  font-size: 0.85rem;
+}
+
+.actual-set-errors {
+  margin-top: 6px;
+  color: #9f3a2f;
+  font-size: 0.82rem;
+}
+
 .link-button-form {
   margin: 0;
 }
@@ -657,6 +699,14 @@ select:focus {
   font-size: 0.88rem;
 }
 
+.execution-builder-panel {
+  margin-top: 12px;
+}
+
+.execution-row {
+  grid-template-columns: minmax(200px, 1.4fr) 110px 110px auto;
+}
+
 .planner-note {
   grid-column: 1 / -1;
   border-top: 1px dashed var(--line);
@@ -886,5 +936,9 @@ select:focus {
   .planned-set-row {
     grid-template-columns: 36px minmax(0, 1fr) minmax(0, 1fr) 24px;
     font-size: 0.86rem;
+  }
+
+  .actual-set-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

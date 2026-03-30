@@ -9,6 +9,7 @@ class WorkoutsController < ApplicationController
 
   def show
     @planned_entry = default_planned_entry
+    @execution_entry = default_execution_entry
   end
 
   def new
@@ -56,5 +57,9 @@ class WorkoutsController < ApplicationController
 
     def default_planned_entry
       { "exercise_id" => "", "set_count" => "3", "rep_pattern" => "8", "target_weight" => "", "coach_notes" => "" }
+    end
+
+    def default_execution_entry
+      { "exercise_id" => "", "actual_weight" => "", "actual_reps" => "" }
     end
 end

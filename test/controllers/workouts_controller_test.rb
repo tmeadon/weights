@@ -21,12 +21,21 @@ class WorkoutsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h1", "Upper Body A"
-    assert_select "h2", /planned set/
+    assert_select "h2", /set/
     assert_select "h3", /Dumbbell Bench Press/
     assert_select "summary", /Add note/
     assert_select "input[value='Add']"
     assert_select ".planned-set-row", /Planned/
     assert_select "button", "Remove exercise"
+  end
+
+  test "show active workout includes execution logging controls" do
+    get workout_path(workouts(:active_session))
+
+    assert_response :success
+    assert_select ".panel-label", "Log extra set"
+    assert_select "input[value='Log set']"
+    assert_select "input[name='execution[actual_reps]']"
   end
 
   test "create workout" do

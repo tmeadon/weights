@@ -13,3 +13,11 @@ draft_row:
   target_weight: 45
   target_reps: 10
   coach_notes: Control the stretch.
+
+active_squat:
+  workout: active_session
+  exercise: squat
+  position: 1
+  target_weight: 32
+  target_reps: 8
+  coach_notes: Stay tall.

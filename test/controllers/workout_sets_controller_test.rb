@@ -4,7 +4,9 @@ class WorkoutSetsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @user = users(:one)
     @workout = workouts(:draft_session)
+    @active_workout = workouts(:active_session)
     @workout_set = workout_sets(:draft_bench)
+    @active_workout_set = workout_sets(:active_squat)
     sign_in_as(@user)
   end
 
@@ -96,6 +98,50 @@ class WorkoutSetsControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to workout_path(@workout)
     assert_equal [ 1 ], @workout.workout_sets.reload.pluck(:position)
+  end
+
+  test "create logged set for an in-progress workout" do
+    assert_difference("WorkoutSet.count", 1) do
+      post workout_workout_sets_path(@active_workout), params: {
+        execution: {
+          exercise_id: exercises(:bench_press).id,
+          actual_reps: 9,
+          actual_weight: 30
+        }
+      }
+    end
+
+    assert_redirected_to workout_path(@active_workout)
+    logged_set = @active_workout.workout_sets.reload.order(:position).last
+    assert_equal 9, logged_set.actual_reps
+  end
+
+  test "does not create logged set for a draft workout" do
+    assert_no_difference("WorkoutSet.count") do
+      post workout_workout_sets_path(@workout), params: {
+        execution: {
+          exercise_id: exercises(:bench_press).id,
+          actual_reps: 9,
+          actual_weight: 30
+        }
+      }
+    end
+
+    assert_response :unprocessable_entity
+    assert_select ".flash", /in-progress workouts can log sets/i
+  end
+
+  test "update logged results for an in-progress set" do
+    patch workout_workout_set_path(@active_workout, @active_workout_set), params: {
+      execution: {
+        actual_reps: 10,
+        actual_weight: 34,
+      }
+    }
+
+    assert_redirected_to workout_path(@active_workout)
+    assert_equal 10, @active_workout_set.reload.actual_reps
+    assert_equal 34.0, @active_workout_set.actual_weight.to_f
   end
 
   test "requires authentication" do

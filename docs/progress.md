@@ -2,7 +2,7 @@
 
 ## Current Status
 
-Milestones 1 through 4 are functionally in place, and the current refinement work is focused on making planned-set entry and editing feel fast enough for real use before Milestone 5 execution logging begins.
+Milestones 1 through 5 are now functionally in place, with the current implementation moving from planned-set authoring into live execution logging on the workout detail page.
 
 ## Completed So Far
 
@@ -55,6 +55,14 @@ Milestones 1 through 4 are functionally in place, and the current refinement wor
 - Reworked the planned-set UI around Turbo so adding and removing sets updates in place without a full-page refresh
 - Shifted the workout detail presentation from large pills to a compact mini-table that already reserves space for future actuals
 - Continued tightening small-screen spacing, inline controls, and remove actions so the page reads more like a training log than a CRUD screen
+
+### Execution Logging
+
+- Added `actual_reps` and `actual_weight` fields to `WorkoutSet`
+- Added inline actual-result logging controls directly inside the workout set table for in-progress workouts
+- Added a quick "Log extra set" flow so new sets and new exercises can be recorded without leaving the workout page
+- Added autosave on change for actuals to keep logging lightweight
+- Preserved the existing planned-vs-actual split so draft planning data stays intact while performed results are captured separately
 
 ### Configuration and Developer Experience
 
@@ -128,14 +136,14 @@ Milestones 1 through 4 are functionally in place, and the current refinement wor
 
 ## Recommended Next Step
 
-Continue Milestone 5 by layering in execution logging:
+Move into Milestone 6 by adding the first difficulty calculations:
 
-- add actual reps, actual weight, and RPE fields
-- allow in-progress workouts to record performed results
-- support adding extra sets and quick exercise additions during execution
+- calculate per-set difficulty from weight and reps
+- roll set difficulty up to `workouts.total_difficulty`
+- refresh totals automatically when logged values or set counts change
 
 ## UI Direction Notes
 
 - Planned-set entry now favors a compact inline workout-page form instead of separate edit/create screens for every small change
 - Planned-set display now favors rows and columns over decorative pills so the later transition to planned-vs-actual logging is straightforward
-- Future execution work should preserve the current compact notebook feel, especially on mobile widths
+- Execution logging now uses the same compact row layout, and future refinements should keep prioritizing one-page workflow and mobile readability

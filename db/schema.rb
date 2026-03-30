@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_29_213000) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_30_101500) do
   create_table "exercises", force: :cascade do |t|
     t.datetime "archived_at"
     t.datetime "created_at", null: false
@@ -47,6 +47,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_213000) do
   end
 
   create_table "workout_sets", force: :cascade do |t|
+    t.integer "actual_reps"
+    t.decimal "actual_weight", precision: 8, scale: 2
     t.text "coach_notes"
     t.datetime "created_at", null: false
     t.integer "exercise_id", null: false

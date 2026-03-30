@@ -8,10 +8,16 @@ class WorkoutSet < ApplicationRecord
   validates :position, uniqueness: { scope: :workout_id }
   validates :target_reps, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
   validates :target_weight, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+  validates :actual_reps, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
+  validates :actual_weight, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
 
   scope :ordered, -> { includes(:exercise).order(:position, :created_at) }
 
   before_validation :assign_position, on: :create
+
+  def actual_logged?
+    actual_reps.present? || actual_weight.present?
+  end
 
   private
     def assign_position
@@ -19,4 +25,5 @@ class WorkoutSet < ApplicationRecord
 
       self.position = workout.workout_sets.maximum(:position).to_i + 1
     end
+
 end

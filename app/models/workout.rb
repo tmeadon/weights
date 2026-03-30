@@ -58,6 +58,10 @@ class Workout < ApplicationRecord
     end
   end
 
+  def execution_logging?
+    status.in?(%w[in_progress completed])
+  end
+
   def append_planned_entries(entries)
     rows = Array(entries).select do |entry|
       entry.values.any?(&:present?)
@@ -104,6 +108,41 @@ class Workout < ApplicationRecord
 
     pending_sets.each(&:save!)
     true
+  end
+
+  def append_execution_entry(entry)
+    unless status == "in_progress"
+      errors.add(:base, "Only in-progress workouts can log sets.")
+      return false
+    end
+
+    exercise = Exercise.active.find_by(id: entry[:exercise_id])
+    unless exercise
+      errors.add(:base, "Logged set needs an exercise.")
+      return false
+    end
+
+    if entry[:actual_reps].blank?
+      errors.add(:base, "Logged set needs reps.")
+      return false
+    end
+
+    workout_set = workout_sets.build(
+      exercise:,
+      actual_reps: entry[:actual_reps],
+      actual_weight: entry[:actual_weight],
+      position: workout_sets.maximum(:position).to_i + 1
+    )
+
+    if workout_set.valid?
+      workout_set.save!
+      true
+    else
+      workout_set.errors.full_messages.each do |message|
+        errors.add(:base, message)
+      end
+      false
+    end
   end
 
   private
