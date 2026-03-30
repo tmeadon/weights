@@ -14,9 +14,18 @@ class WorkoutSet < ApplicationRecord
   scope :ordered, -> { includes(:exercise).order(:position, :created_at) }
 
   before_validation :assign_position, on: :create
+  after_commit :refresh_workout_difficulty, on: %i[create update destroy]
 
   def actual_logged?
     actual_reps.present? || actual_weight.present?
+  end
+
+  def difficulty
+    reps = actual_reps || target_reps
+    weight = actual_weight || target_weight
+    return BigDecimal("0") if reps.blank? || weight.blank?
+
+    BigDecimal(weight.to_s) * reps
   end
 
   private
@@ -24,6 +33,10 @@ class WorkoutSet < ApplicationRecord
       return if position.present? || workout.blank?
 
       self.position = workout.workout_sets.maximum(:position).to_i + 1
+    end
+
+    def refresh_workout_difficulty
+      workout&.recalculate_total_difficulty!
     end
 
 end

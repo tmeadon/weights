@@ -107,4 +107,14 @@ class WorkoutTest < ActiveSupport::TestCase
 
     assert_includes workout.errors[:base], "Only in-progress workouts can log sets."
   end
+
+  test "updates workout difficulty after set changes" do
+    workout = workouts(:draft_session)
+    workout_set = workout_sets(:draft_bench)
+
+    workout_set.update!(actual_reps: 10, actual_weight: 32)
+
+    workout.reload
+    assert_equal 770.0, workout.total_difficulty.to_f
+  end
 end

@@ -40,4 +40,26 @@ class WorkoutSetTest < ActiveSupport::TestCase
 
     assert workout_set.actual_logged?
   end
+
+  test "difficulty uses actual values when present" do
+    workout_set = workouts(:draft_session).workout_sets.create!(
+      exercise: exercises(:bench_press),
+      target_reps: 8,
+      target_weight: 40,
+      actual_reps: 6,
+      actual_weight: 42
+    )
+
+    assert_equal BigDecimal("252"), workout_set.difficulty
+  end
+
+  test "difficulty falls back to planned targets" do
+    workout_set = workouts(:draft_session).workout_sets.create!(
+      exercise: exercises(:bench_press),
+      target_reps: 8,
+      target_weight: 40
+    )
+
+    assert_equal BigDecimal("320"), workout_set.difficulty
+  end
 end

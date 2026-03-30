@@ -2,7 +2,7 @@
 
 ## Current Status
 
-Milestones 1 through 5 are now functionally in place, with the current implementation moving from planned-set authoring into live execution logging on the workout detail page.
+Milestones 1 through 5 are now functionally in place, and Milestone 6 has started with initial difficulty calculations.
 
 ## Completed So Far
 
@@ -136,11 +136,11 @@ Milestones 1 through 5 are now functionally in place, with the current implement
 
 ## Recommended Next Step
 
-Move into Milestone 6 by adding the first difficulty calculations:
+Continue Milestone 6 by surfacing difficulty feedback:
 
-- calculate per-set difficulty from weight and reps
-- roll set difficulty up to `workouts.total_difficulty`
-- refresh totals automatically when logged values or set counts change
+- display per-set difficulty on the workout view
+- show the workout total updating in real time as sets are logged
+- add test coverage for difficulty edge cases (missing weight or reps)
 
 ## UI Direction Notes
 

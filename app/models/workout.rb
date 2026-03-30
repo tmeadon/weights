@@ -145,6 +145,11 @@ class Workout < ApplicationRecord
     end
   end
 
+  def recalculate_total_difficulty!
+    total = workout_sets.reduce(BigDecimal("0")) { |sum, workout_set| sum + workout_set.difficulty }
+    update_column(:total_difficulty, total)
+  end
+
   private
     def expand_reps(rep_pattern, set_count, line_number)
       pattern = rep_pattern.to_s.strip
