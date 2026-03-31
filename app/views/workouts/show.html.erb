@@ -3,15 +3,30 @@
 <section class="card panel-card exercise-detail">
   <div class="section-heading">
     <div>
-      <p class="eyebrow">Workout notebook</p>
+      <%= link_to workouts_path, class: "breadcrumb" do %>
+        <span class="breadcrumb-label">Workouts</span>
+      <% end %>
       <h1><%= @workout.title %></h1>
       <p class="supporting-text"><%= @workout.workout_on.to_fs(:long) %> · <%= @workout.status.humanize %></p>
     </div>
 
-    <div class="button-row">
-      <%= link_to "Back to workouts", workouts_path, class: "button button-ghost" %>
-      <%= link_to "Edit", edit_workout_path(@workout), class: "button" %>
-      <%= button_to "Archive", workout_path(@workout), method: :delete, class: "button button-ghost" %>
+    <div class="workout-actions">
+      <div class="workout-actions-primary">
+        <% if @workout.status == "draft" %>
+          <%= button_to "Start workout", workout_path(@workout), method: :patch, params: { workout: { status: "in_progress" } }, class: "button" %>
+        <% elsif @workout.status == "in_progress" %>
+          <%= button_to "Complete workout", workout_path(@workout), method: :patch, params: { workout: { status: "completed" } }, class: "button" %>
+        <% else %>
+          <%= button_to "Reopen workout", workout_path(@workout), method: :patch, params: { workout: { status: "draft" } }, class: "button" %>
+        <% end %>
+      </div>
+
+      <div class="workout-actions-secondary">
+        <%= link_to "Edit", edit_workout_path(@workout), class: "button button-ghost" %>
+        <% if @workout.status.in?(["draft", "in_progress"]) %>
+          <%= button_to "Cancel", workout_path(@workout), method: :patch, params: { workout: { status: "cancelled" } }, class: "button button-ghost", form: { data: { turbo_confirm: "Cancel this workout? You can reopen it later from the workout page." } } %>
+        <% end %>
+      </div>
     </div>
   </div>
 

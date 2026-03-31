@@ -27,6 +27,24 @@ class WorkoutsControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[value='Add']"
     assert_select ".planned-set-row", /Planned/
     assert_select "button", "Remove exercise"
+    assert_select "button", "Start workout"
+    assert_select "button", "Cancel workout"
+    assert_select "button", text: "Archive", count: 0
+  end
+
+  test "start workout from show" do
+    workouts(:active_session).update!(status: "completed")
+    patch workout_path(@workout), params: { workout: { status: "in_progress" } }
+
+    assert_redirected_to workout_path(@workout)
+    assert_equal "in_progress", @workout.reload.status
+  end
+
+  test "cancel workout from show" do
+    patch workout_path(@workout), params: { workout: { status: "cancelled" } }
+
+    assert_redirected_to workout_path(@workout)
+    assert_equal "cancelled", @workout.reload.status
   end
 
   test "show active workout includes execution logging controls" do
@@ -66,6 +84,13 @@ class WorkoutsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to workout_path(@workout)
     assert_equal "Updated notebook entry.", @workout.reload.notes
     assert_equal "Upper Body A Revised", @workout.title
+  end
+
+  test "edit shows archive action" do
+    get edit_workout_path(@workout)
+
+    assert_response :success
+    assert_select "form button", "Archive workout"
   end
 
   test "destroy archives workout" do

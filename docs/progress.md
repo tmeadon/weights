@@ -42,6 +42,8 @@ Milestones 1 through 5 are now functionally in place, and Milestone 6 has starte
 - Added user-owned `Workout` model with title, date, notes, status, total difficulty, and soft-delete fields
 - Built workout CRUD flows with list, detail, create, edit, and archive behavior
 - Added draft / in-progress / completed lifecycle validation rules
+- Added cancelled workouts for plans that never ran
+- Added cancelled workouts for plans that never ran, with optional reopen to draft
 - Enforced a single in-progress workout per user
 - Added active workout surfacing on the workout index
 
@@ -70,6 +72,7 @@ Milestones 1 through 5 are now functionally in place, and Milestone 6 has starte
 - Added per-set difficulty derived from weight and reps with actuals taking priority
 - Added planned vs actual difficulty totals on the workout page
 - Added tests for difficulty fallback behavior when data is missing
+- Planned difficulty now snapshots when a workout moves from draft to in-progress
 
 ### Configuration and Developer Experience
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_30_101500) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_30_113000) do
   create_table "exercises", force: :cascade do |t|
     t.datetime "archived_at"
     t.datetime "created_at", null: false
@@ -67,6 +67,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_30_101500) do
     t.datetime "created_at", null: false
     t.datetime "deleted_at"
     t.text "notes"
+    t.decimal "planned_total_difficulty", precision: 10, scale: 2, default: "0.0", null: false
     t.string "status", default: "draft", null: false
     t.string "title", null: false
     t.decimal "total_difficulty", precision: 10, scale: 2, default: "0.0", null: false

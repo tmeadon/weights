@@ -1,5 +1,5 @@
 class Workout < ApplicationRecord
-  STATUSES = %w[draft in_progress completed].freeze
+  STATUSES = %w[draft in_progress completed cancelled].freeze
 
   belongs_to :user
   has_many :workout_sets, -> { ordered }, dependent: :destroy
@@ -12,8 +12,11 @@ class Workout < ApplicationRecord
   validates :workout_on, presence: true
   validates :status, inclusion: { in: STATUSES }
   validates :total_difficulty, numericality: { greater_than_or_equal_to: 0 }
+  validates :planned_total_difficulty, numericality: { greater_than_or_equal_to: 0 }
   validate :status_transition_is_allowed, if: :will_save_change_to_status?
   validate :single_active_workout_per_user, if: :status_in_progress?
+
+  before_update :snapshot_planned_difficulty, if: :starting_workout?
 
   scope :active, -> { where(deleted_at: nil) }
   scope :deleted, -> { where.not(deleted_at: nil) }
@@ -151,6 +154,8 @@ class Workout < ApplicationRecord
   end
 
   def planned_total_difficulty
+    return super unless status == "draft"
+
     workout_sets.reduce(BigDecimal("0")) { |sum, workout_set| sum + workout_set.planned_difficulty }
   end
 
@@ -206,9 +211,10 @@ class Workout < ApplicationRecord
       return if status_was == status
 
       allowed = {
-        "draft" => %w[draft in_progress],
-        "in_progress" => %w[in_progress completed],
-        "completed" => %w[completed]
+        "draft" => %w[draft in_progress cancelled],
+        "in_progress" => %w[in_progress completed cancelled],
+        "completed" => %w[completed draft],
+        "cancelled" => %w[cancelled draft]
       }
 
       return if allowed.fetch(status_was, [ status_was ]).include?(status)
@@ -222,5 +228,16 @@ class Workout < ApplicationRecord
       return unless scope.exists?
 
       errors.add(:status, "allows only one in-progress workout at a time")
+    end
+
+    def starting_workout?
+      status_change_to_be_saved.in?([
+        ["draft", "in_progress"],
+        ["draft", "cancelled"]
+      ])
+    end
+
+    def snapshot_planned_difficulty
+      self.planned_total_difficulty = workout_sets.reduce(BigDecimal("0")) { |sum, workout_set| sum + workout_set.planned_difficulty }
     end
 end

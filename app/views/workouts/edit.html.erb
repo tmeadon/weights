@@ -7,5 +7,9 @@
     <p class="supporting-text">Update workout details here. Exercise planning stays on the workout page so the session structure is visible while you build it.</p>
 
     <%= render "form", workout: @workout %>
+
+    <div class="button-row">
+      <%= button_to "Archive workout", workout_path(@workout), method: :delete, class: "button button-ghost", form: { data: { turbo_confirm: "Archive this workout?" } } %>
+    </div>
   </div>
 </section>

@@ -203,7 +203,8 @@ Workouts follow a defined lifecycle.
 
 draft\
 in_progress\
-completed
+completed\
+cancelled
 
 ------------------------------------------------------------------------
 
@@ -211,9 +212,13 @@ completed
 
 -   New workouts default to **draft**
 -   Draft workouts may transition to **in_progress**
+-   Draft workouts may transition to **cancelled**
 -   In-progress workouts may transition to **completed**
+-   In-progress workouts may transition to **cancelled**
 -   Draft workouts may **not skip directly** to completed
 -   Completed workouts may **not transition backward**
+-   Completed workouts may transition back to **draft**
+-   Cancelled workouts may transition back to **draft**
 
 ------------------------------------------------------------------------
 

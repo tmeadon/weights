@@ -31,6 +31,25 @@ class WorkoutTest < ActiveSupport::TestCase
     assert_includes workout.errors[:status], "cannot transition from draft to completed"
   end
 
+  test "allows cancelling from draft" do
+    workout = workouts(:draft_session)
+
+    assert workout.update(status: "cancelled")
+  end
+
+  test "allows cancelling from in progress" do
+    workout = workouts(:active_session)
+
+    assert workout.update(status: "cancelled")
+  end
+
+  test "prevents moving cancelled workouts" do
+    workout = workouts(:draft_session)
+    workout.update!(status: "cancelled")
+
+    assert workout.update(status: "draft")
+  end
+
   test "discard hides workout from active scope" do
     workout = workouts(:draft_session)
 
@@ -118,5 +137,17 @@ class WorkoutTest < ActiveSupport::TestCase
     assert_in_delta 762.3, workout.total_difficulty.to_f, 0.01
     assert_in_delta 702.3, workout.planned_total_difficulty.to_f, 0.01
     assert_in_delta 316.8, workout.actual_total_difficulty.to_f, 0.01
+  end
+
+  test "freezes planned difficulty once workout starts" do
+    workouts(:active_session).update!(status: "completed")
+    workout = workouts(:draft_session)
+    workout.update!(status: "in_progress")
+
+    snapshot = workout.planned_total_difficulty
+    workout.workout_sets.first.destroy!
+
+    workout.reload
+    assert_equal snapshot, workout.planned_total_difficulty
   end
 end

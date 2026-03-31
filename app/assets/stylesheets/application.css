@@ -149,6 +149,28 @@ select:focus {
   align-items: start;
 }
 
+.breadcrumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  text-decoration: none;
+}
+
+.breadcrumb::before {
+  content: "←";
+  font-size: 0.9rem;
+}
+
+.breadcrumb:hover,
+.breadcrumb:focus-visible {
+  color: var(--accent-deep);
+}
+
 .page-header,
 .panel-card,
 .exercise-detail {
@@ -195,9 +217,42 @@ select:focus {
   margin: 0;
 }
 
+.detail-grid-group {
+  display: contents;
+}
+
 .button-row {
   grid-auto-flow: column;
   justify-content: start;
+}
+
+.workout-actions {
+  display: grid;
+  gap: 14px;
+  justify-items: start;
+}
+
+.workout-actions-primary,
+.workout-actions-secondary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-start;
+}
+
+.workout-actions-primary .button {
+  min-width: min(240px, 100%);
+}
+
+.workout-actions-secondary .button {
+  white-space: nowrap;
+}
+
+.workout-actions-secondary .button,
+.workout-actions-secondary .button-ghost {
+  padding: 10px 14px;
+  min-height: 40px;
+  font-size: 0.95rem;
 }
 
 .exercise-list {
@@ -896,6 +951,19 @@ select:focus {
 
   .button-row {
     grid-auto-flow: row;
+  }
+
+  .workout-actions {
+    gap: 12px;
+  }
+
+  .workout-actions-primary .button {
+    width: 100%;
+  }
+
+  .workout-actions-primary,
+  .workout-actions-secondary {
+    justify-content: flex-start;
   }
 
   .builder-panel-compact {
