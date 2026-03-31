@@ -232,8 +232,8 @@ class Workout < ApplicationRecord
 
     def starting_workout?
       status_change_to_be_saved.in?([
-        ["draft", "in_progress"],
-        ["draft", "cancelled"]
+        [ "draft", "in_progress" ],
+        [ "draft", "cancelled" ]
       ])
     end
 
