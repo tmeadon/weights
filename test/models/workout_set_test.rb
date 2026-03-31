@@ -50,7 +50,9 @@ class WorkoutSetTest < ActiveSupport::TestCase
       actual_weight: 42
     )
 
-    assert_equal BigDecimal("252"), workout_set.difficulty
+    assert_in_delta 289.8, workout_set.difficulty.to_f, 0.01
+    assert_in_delta 342.4, workout_set.planned_difficulty.to_f, 0.01
+    assert_in_delta 289.8, workout_set.actual_difficulty.to_f, 0.01
   end
 
   test "difficulty falls back to planned targets" do
@@ -60,7 +62,7 @@ class WorkoutSetTest < ActiveSupport::TestCase
       target_weight: 40
     )
 
-    assert_equal BigDecimal("320"), workout_set.difficulty
+    assert_in_delta 342.4, workout_set.difficulty.to_f, 0.01
   end
 
   test "difficulty is zero without weight" do

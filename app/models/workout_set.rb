@@ -21,11 +21,15 @@ class WorkoutSet < ApplicationRecord
   end
 
   def difficulty
-    reps = actual_reps || target_reps
-    weight = actual_weight || target_weight
-    return BigDecimal("0") if reps.blank? || weight.blank?
+    actual_logged? ? actual_difficulty : planned_difficulty
+  end
 
-    BigDecimal(weight.to_s) * reps
+  def planned_difficulty
+    compute_difficulty(target_reps, target_weight)
+  end
+
+  def actual_difficulty
+    compute_difficulty(actual_reps, actual_weight)
   end
 
   private
@@ -37,5 +41,18 @@ class WorkoutSet < ApplicationRecord
 
     def refresh_workout_difficulty
       workout&.recalculate_total_difficulty!
+    end
+
+    def intensity_factor(reps)
+      factor = 1.35 - (0.04 * (reps.to_i - 1))
+      factor = [ factor, 0.6 ].max
+      factor = [ factor, 1.35 ].min
+      BigDecimal(factor.to_s)
+    end
+
+    def compute_difficulty(reps, weight)
+      return BigDecimal("0") if reps.blank? || weight.blank?
+
+      BigDecimal(weight.to_s) * reps * intensity_factor(reps)
     end
 end

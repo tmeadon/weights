@@ -1,0 +1,10 @@
+<div id="workout_difficulty_totals" class="detail-grid-group">
+  <div>
+    <dt>Actual difficulty</dt>
+    <dd><%= number_with_precision(workout.actual_total_difficulty, precision: 1, strip_insignificant_zeros: true) %></dd>
+  </div>
+  <div>
+    <dt>Planned difficulty</dt>
+    <dd><%= number_with_precision(workout.planned_total_difficulty, precision: 1, strip_insignificant_zeros: true) %></dd>
+  </div>
+</div>

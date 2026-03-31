@@ -39,7 +39,7 @@ class WorkoutSetsController < ApplicationController
         render turbo_stream: [
           turbo_stream.update("planned_sets_list", partial: "workouts/planned_sets_list", locals: { workout: @workout }),
           turbo_stream.update("planned_sets_count", partial: "workouts/planned_sets_count", locals: { workout: @workout }),
-          turbo_stream.update("workout_total_difficulty", partial: "workouts/total_difficulty", locals: { workout: @workout })
+          turbo_stream.replace("workout_difficulty_totals", partial: "workouts/difficulty_totals", locals: { workout: @workout })
         ]
       end
       format.html { redirect_to workout_path(@workout), notice: "Planned set removed.", status: :see_other }
@@ -57,7 +57,7 @@ class WorkoutSetsController < ApplicationController
         render turbo_stream: [
           turbo_stream.update("planned_sets_list", partial: "workouts/planned_sets_list", locals: { workout: @workout }),
           turbo_stream.update("planned_sets_count", partial: "workouts/planned_sets_count", locals: { workout: @workout }),
-          turbo_stream.update("workout_total_difficulty", partial: "workouts/total_difficulty", locals: { workout: @workout })
+          turbo_stream.replace("workout_difficulty_totals", partial: "workouts/difficulty_totals", locals: { workout: @workout })
         ]
       end
       format.html { redirect_to workout_path(@workout), notice: "Exercise removed from workout.", status: :see_other }
@@ -108,7 +108,7 @@ class WorkoutSetsController < ApplicationController
               turbo_stream.replace("planned_set_planner", partial: "workouts/planned_set_planner", locals: { workout: @workout, exercises: @exercises, planned_entry: default_planned_entry }),
               turbo_stream.update("planned_sets_list", partial: "workouts/planned_sets_list", locals: { workout: @workout }),
               turbo_stream.update("planned_sets_count", partial: "workouts/planned_sets_count", locals: { workout: @workout }),
-              turbo_stream.update("workout_total_difficulty", partial: "workouts/total_difficulty", locals: { workout: @workout })
+              turbo_stream.replace("workout_difficulty_totals", partial: "workouts/difficulty_totals", locals: { workout: @workout })
             ]
           end
           format.html { redirect_to workout_path(@workout), notice: "Planned sets added." }
@@ -133,7 +133,7 @@ class WorkoutSetsController < ApplicationController
               turbo_stream.replace("execution_set_logger", partial: "workouts/execution_set_logger", locals: { workout: @workout, exercises: @exercises, execution_entry: default_execution_entry }),
               turbo_stream.update("planned_sets_list", partial: "workouts/planned_sets_list", locals: { workout: @workout }),
               turbo_stream.update("planned_sets_count", partial: "workouts/planned_sets_count", locals: { workout: @workout }),
-              turbo_stream.update("workout_total_difficulty", partial: "workouts/total_difficulty", locals: { workout: @workout })
+              turbo_stream.replace("workout_difficulty_totals", partial: "workouts/difficulty_totals", locals: { workout: @workout })
             ]
           end
           format.html { redirect_to workout_path(@workout), notice: "Set logged." }

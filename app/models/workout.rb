@@ -150,6 +150,14 @@ class Workout < ApplicationRecord
     update_column(:total_difficulty, total)
   end
 
+  def planned_total_difficulty
+    workout_sets.reduce(BigDecimal("0")) { |sum, workout_set| sum + workout_set.planned_difficulty }
+  end
+
+  def actual_total_difficulty
+    workout_sets.reduce(BigDecimal("0")) { |sum, workout_set| sum + workout_set.actual_difficulty }
+  end
+
   private
     def expand_reps(rep_pattern, set_count, line_number)
       pattern = rep_pattern.to_s.strip

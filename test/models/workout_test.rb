@@ -115,6 +115,8 @@ class WorkoutTest < ActiveSupport::TestCase
     workout_set.update!(actual_reps: 10, actual_weight: 32)
 
     workout.reload
-    assert_equal 770.0, workout.total_difficulty.to_f
+    assert_in_delta 762.3, workout.total_difficulty.to_f, 0.01
+    assert_in_delta 702.3, workout.planned_total_difficulty.to_f, 0.01
+    assert_in_delta 316.8, workout.actual_total_difficulty.to_f, 0.01
   end
 end

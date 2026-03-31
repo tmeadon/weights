@@ -21,10 +21,7 @@
       <dd><%= @workout.status.humanize %></dd>
     </div>
 
-    <div>
-      <dt>Total difficulty</dt>
-      <dd id="workout_total_difficulty"><%= render "workouts/total_difficulty", workout: @workout %></dd>
-    </div>
+    <%= render "workouts/difficulty_totals", workout: @workout %>
 
     <div>
       <dt>Workout date</dt>

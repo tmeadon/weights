@@ -68,7 +68,7 @@ Milestones 1 through 5 are now functionally in place, and Milestone 6 has starte
 ### Difficulty Engine (In Progress)
 
 - Added per-set difficulty derived from weight and reps with actuals taking priority
-- Added workout total difficulty output on the workout page
+- Added planned vs actual difficulty totals on the workout page
 - Added tests for difficulty fallback behavior when data is missing
 
 ### Configuration and Developer Experience
