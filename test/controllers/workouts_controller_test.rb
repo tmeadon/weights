@@ -12,8 +12,10 @@ class WorkoutsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h1", "Workouts"
-    assert_select "a", "Upper Body A"
-    assert_select "a", "Lower Body Session"
+    assert_select "h3 a", /Upper Body A/
+    assert_select "h2 a", /Lower Body Session/
+    assert_select "a", "Me"
+    assert_select ".workout-row-date", /days ago|Today|Tomorrow|Yesterday|March/
   end
 
   test "show" do
@@ -28,7 +30,7 @@ class WorkoutsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".planned-set-row", /Planned/
     assert_select "button", "Remove exercise"
     assert_select "button", "Start workout"
-    assert_select "button", "Cancel workout"
+    assert_select "button", "Cancel"
     assert_select "button", text: "Archive", count: 0
   end
 

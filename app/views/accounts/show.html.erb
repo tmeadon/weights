@@ -1,0 +1,20 @@
+<% content_for :title, "Account" %>
+
+<section class="auth-layout auth-layout-compact">
+  <div class="card auth-card">
+    <p class="eyebrow">Account</p>
+    <h1>Me</h1>
+    <p class="supporting-text">Signed in as <%= current_user.email_address %>.</p>
+
+    <dl class="detail-grid account-detail-grid">
+      <div>
+        <dt>Email</dt>
+        <dd><%= current_user.email_address %></dd>
+      </div>
+    </dl>
+
+    <div class="button-row">
+      <%= button_to "Sign out", session_path, method: :delete, class: "button button-ghost" %>
+    </div>
+  </div>
+</section>

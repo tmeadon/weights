@@ -26,19 +26,25 @@
   <body class="app-body">
     <div class="app-shell">
       <header class="topbar">
-        <%= link_to "Weights", root_path, class: "brand" %>
+        <div class="topbar-primary">
+          <%= link_to "Weights", root_path, class: "brand" %>
 
-        <nav class="topbar-actions">
           <% if authenticated? %>
-            <%= link_to "Workouts", workouts_path, class: "button button-ghost" %>
-            <%= link_to "Exercises", exercises_path, class: "button button-ghost" %>
-            <span class="topbar-meta"><%= current_user.email_address %></span>
-            <%= button_to "Sign out", session_path, method: :delete, class: "button button-ghost" %>
-          <% else %>
-            <%= link_to "Sign in", new_session_path, class: "button button-ghost" %>
-            <%= link_to "Create account", new_registration_path, class: "button" %>
+            <nav class="topbar-nav" aria-label="Primary">
+              <%= link_to "Workouts", workouts_path, class: ["topbar-pill", (current_page?(workouts_path) ? "topbar-pill-active" : nil)] %>
+              <%= link_to "Exercises", exercises_path, class: ["topbar-pill", (current_page?(exercises_path) ? "topbar-pill-active" : nil)] %>
+              <span class="topbar-nav-spacer"></span>
+              <%= link_to "Me", account_path, class: ["topbar-link", (current_page?(account_path) ? "topbar-link-active" : nil)] %>
+            </nav>
           <% end %>
-        </nav>
+        </div>
+
+        <div class="topbar-secondary">
+          <% unless authenticated? %>
+            <%= link_to "Sign in", new_session_path, class: "topbar-link" %>
+            <%= link_to "Create account", new_registration_path, class: "topbar-pill topbar-pill-active" %>
+          <% end %>
+        </div>
       </header>
 
       <main class="page-shell">

@@ -3,6 +3,7 @@ Rails.application.routes.draw do
 
   get "sign-up", to: "registrations#new", as: :new_registration
   resources :registrations, only: :create
+  resource :account, only: :show
   resource :session
   resources :passwords, param: :token
   resources :exercises do

@@ -81,40 +81,110 @@ select:focus {
 }
 
 .topbar {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px 16px;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 24px;
-  padding: 18px 22px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: rgba(255, 251, 244, 0.76);
-  backdrop-filter: blur(18px);
-  box-shadow: var(--shadow);
+  margin-bottom: 18px;
+  padding: 6px 4px 8px;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
 }
 
 .brand {
   font-family: var(--font-serif);
-  font-size: 1.35rem;
+  font-size: 1.15rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
   text-decoration: none;
 }
 
-.topbar-actions {
+.topbar-primary {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  min-width: 0;
+  width: 100%;
 }
 
-.topbar-actions form {
+.topbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 1px;
+}
+
+.topbar-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.topbar-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 251, 244, 0.88);
+  color: var(--ink-soft);
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.topbar-pill-active {
+  border-color: rgba(191, 101, 62, 0.75);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px rgba(191, 101, 62, 0.16);
+}
+
+.topbar-nav-spacer {
+  flex: 1 0 16px;
+}
+
+.topbar-secondary {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  justify-self: end;
+}
+
+.topbar-secondary form {
   margin: 0;
 }
 
 .topbar-meta {
   color: var(--ink-soft);
+  font-size: 0.85rem;
+}
+
+.topbar-link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink-soft);
+  font: inherit;
+  font-weight: 600;
   font-size: 0.95rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.topbar-link:hover,
+.topbar-link:focus-visible {
+  color: var(--accent-deep);
+}
+
+.topbar-link-active {
+  color: var(--ink);
+}
+
+.account-detail-grid {
+  margin-top: 18px;
 }
 
 .page-shell {
@@ -277,6 +347,14 @@ select:focus {
   gap: 6px;
   padding: 18px 0;
   border-top: 1px solid var(--line);
+}
+
+.workout-row-date {
+  margin-left: 8px;
+  color: var(--ink-soft);
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  font-weight: 600;
 }
 
 .workout-row:first-child {
@@ -641,6 +719,7 @@ select:focus {
 .field {
   display: grid;
   gap: 8px;
+  min-width: 0;
 }
 
 .field label {
@@ -791,12 +870,24 @@ select:focus {
 
 .field input {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   padding: 14px 16px;
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-sm);
   background: rgba(255, 255, 255, 0.82);
   color: var(--ink);
   font-size: 16px;
+}
+
+.field input[type="date"] {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-inline-size: 0;
+  -webkit-appearance: none;
+  appearance: none;
+  text-align: left;
 }
 
 .field input:focus {
@@ -909,13 +1000,23 @@ select:focus {
   }
 
   .topbar {
-    border-radius: 28px;
+    grid-template-columns: 1fr;
+    padding-top: 4px;
   }
 
-  .topbar,
-  .topbar-actions {
+  .topbar-primary,
+  .topbar-secondary {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .brand {
+    display: none;
+  }
+
+  .topbar-secondary {
+    justify-self: start;
+    gap: 8px;
   }
 
   .builder-heading,

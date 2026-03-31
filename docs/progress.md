@@ -18,6 +18,7 @@ Milestones 1 through 5 are now functionally in place, and Milestone 6 has starte
 - Rails authentication generator added session and password reset flows
 - Sign-up flow added with `RegistrationsController`
 - Sign-in and sign-out wired through session handling
+- Added a simple account page with email display and sign-out action
 - Password reset views restyled to match the app shell
 - Root layout updated to show auth actions based on session state
 
@@ -28,6 +29,7 @@ Milestones 1 through 5 are now functionally in place, and Milestone 6 has starte
 - Shared design tokens added for color, spacing, typography, borders, and elevation
 - Reusable button, card, form, status, and responsive layout styles added
 - Authentication pages updated to use the shared visual system
+- Navigation was later simplified into a flatter pill-based bar with a compact `Me` entry point
 
 ### Exercise Library
 
@@ -46,6 +48,7 @@ Milestones 1 through 5 are now functionally in place, and Milestone 6 has starte
 - Added cancelled workouts for plans that never ran, with optional reopen to draft
 - Enforced a single in-progress workout per user
 - Added active workout surfacing on the workout index
+- Added inline status transition actions on the workout page so common lifecycle changes do not require opening edit
 
 ### Planned Sets
 
@@ -82,6 +85,7 @@ Milestones 1 through 5 are now functionally in place, and Milestone 6 has starte
 - Verified linting with `bin/rubocop`
 - Added a lightweight system test harness for CI
 - Added `bin/importmap` to support JS audit checks in CI
+- Added mobile CSS fixes for native date inputs and iOS input zoom behavior
 
 ## Key Files Added or Updated
 
@@ -150,7 +154,7 @@ Milestones 1 through 5 are now functionally in place, and Milestone 6 has starte
 
 Continue Milestone 6 by refining the scoring model:
 
-- confirm the desired difficulty formula (volume, tonnage, or scaled score)
+- monitor the new intensity-weighted difficulty formula in real use and tune it if needed
 - add any required rounding or units for display
 - decide how completed workouts should lock or recalculate difficulty
 
@@ -160,3 +164,4 @@ Continue Milestone 6 by refining the scoring model:
 - Planned-set display now favors rows and columns over decorative pills so the later transition to planned-vs-actual logging is straightforward
 - Execution logging now uses the same compact row layout, and future refinements should keep prioritizing one-page workflow and mobile readability
 - Input font sizes were raised to prevent iOS zoom on focus
+- Workout lists now use inline relative dates for near-term sessions to improve scanability
