@@ -23,7 +23,7 @@
 
     <div>
       <dt>Total difficulty</dt>
-      <dd><%= number_with_precision(@workout.total_difficulty, precision: 1) %></dd>
+      <dd id="workout_total_difficulty"><%= render "workouts/total_difficulty", workout: @workout %></dd>
     </div>
 
     <div>

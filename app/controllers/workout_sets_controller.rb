@@ -33,11 +33,13 @@ class WorkoutSetsController < ApplicationController
   def destroy
     @workout_set.destroy
     reorder_positions
+    @workout.reload
     respond_to do |format|
       format.turbo_stream do
         render turbo_stream: [
           turbo_stream.update("planned_sets_list", partial: "workouts/planned_sets_list", locals: { workout: @workout }),
-          turbo_stream.update("planned_sets_count", partial: "workouts/planned_sets_count", locals: { workout: @workout })
+          turbo_stream.update("planned_sets_count", partial: "workouts/planned_sets_count", locals: { workout: @workout }),
+          turbo_stream.update("workout_total_difficulty", partial: "workouts/total_difficulty", locals: { workout: @workout })
         ]
       end
       format.html { redirect_to workout_path(@workout), notice: "Planned set removed.", status: :see_other }
@@ -48,12 +50,14 @@ class WorkoutSetsController < ApplicationController
     exercise_id = params[:exercise_id]
     @workout.workout_sets.where(exercise_id:).destroy_all
     reorder_positions
+    @workout.reload
 
     respond_to do |format|
       format.turbo_stream do
         render turbo_stream: [
           turbo_stream.update("planned_sets_list", partial: "workouts/planned_sets_list", locals: { workout: @workout }),
-          turbo_stream.update("planned_sets_count", partial: "workouts/planned_sets_count", locals: { workout: @workout })
+          turbo_stream.update("planned_sets_count", partial: "workouts/planned_sets_count", locals: { workout: @workout }),
+          turbo_stream.update("workout_total_difficulty", partial: "workouts/total_difficulty", locals: { workout: @workout })
         ]
       end
       format.html { redirect_to workout_path(@workout), notice: "Exercise removed from workout.", status: :see_other }
@@ -97,12 +101,14 @@ class WorkoutSetsController < ApplicationController
 
     def create_planned_sets
       if add_planned_sets
+        @workout.reload
         respond_to do |format|
           format.turbo_stream do
             render turbo_stream: [
               turbo_stream.replace("planned_set_planner", partial: "workouts/planned_set_planner", locals: { workout: @workout, exercises: @exercises, planned_entry: default_planned_entry }),
               turbo_stream.update("planned_sets_list", partial: "workouts/planned_sets_list", locals: { workout: @workout }),
-              turbo_stream.update("planned_sets_count", partial: "workouts/planned_sets_count", locals: { workout: @workout })
+              turbo_stream.update("planned_sets_count", partial: "workouts/planned_sets_count", locals: { workout: @workout }),
+              turbo_stream.update("workout_total_difficulty", partial: "workouts/total_difficulty", locals: { workout: @workout })
             ]
           end
           format.html { redirect_to workout_path(@workout), notice: "Planned sets added." }
@@ -120,12 +126,14 @@ class WorkoutSetsController < ApplicationController
 
     def create_execution_set
       if add_execution_set
+        @workout.reload
         respond_to do |format|
           format.turbo_stream do
             render turbo_stream: [
               turbo_stream.replace("execution_set_logger", partial: "workouts/execution_set_logger", locals: { workout: @workout, exercises: @exercises, execution_entry: default_execution_entry }),
               turbo_stream.update("planned_sets_list", partial: "workouts/planned_sets_list", locals: { workout: @workout }),
-              turbo_stream.update("planned_sets_count", partial: "workouts/planned_sets_count", locals: { workout: @workout })
+              turbo_stream.update("planned_sets_count", partial: "workouts/planned_sets_count", locals: { workout: @workout }),
+              turbo_stream.update("workout_total_difficulty", partial: "workouts/total_difficulty", locals: { workout: @workout })
             ]
           end
           format.html { redirect_to workout_path(@workout), notice: "Set logged." }
@@ -148,7 +156,7 @@ class WorkoutSetsController < ApplicationController
       end
 
       if @workout_set.update(execution_params.except(:exercise_id))
-        @workout.workout_sets.reload
+        @workout.reload
         respond_to do |format|
           format.turbo_stream do
             head :no_content

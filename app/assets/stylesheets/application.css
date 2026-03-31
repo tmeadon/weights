@@ -338,7 +338,7 @@ select:focus {
 
 .planned-set-row {
   display: grid;
-  grid-template-columns: 48px minmax(0, 1fr) minmax(0, 1fr) 24px;
+  grid-template-columns: 44px minmax(0, 1.1fr) minmax(0, 1.2fr) 24px;
   gap: 12px;
   align-items: center;
   padding: 8px 12px;
@@ -367,11 +367,16 @@ select:focus {
   color: var(--ink-soft);
 }
 
+.planned-set-compact {
+  display: none;
+}
+
 .actual-set-form {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   align-items: center;
+  justify-content: stretch;
 }
 
 .actual-field {
@@ -399,8 +404,9 @@ select:focus {
   min-width: 0;
   padding: 8px 10px;
   padding-right: 32px;
-  text-align: center;
-  font-size: 0.85rem;
+  text-align: left;
+  font-size: 16px;
+  width: 100%;
 }
 
 .actual-set-errors {
@@ -678,6 +684,7 @@ select:focus {
   background: rgba(255, 255, 255, 0.82);
   color: var(--ink);
   font: inherit;
+  font-size: 16px;
 }
 
 .planner-input:focus {
@@ -734,6 +741,7 @@ select:focus {
   border-radius: var(--radius-sm);
   background: rgba(255, 255, 255, 0.82);
   color: var(--ink);
+  font-size: 16px;
 }
 
 .field input:focus {
@@ -905,6 +913,7 @@ select:focus {
 
   .planner-input {
     padding: 10px 12px;
+    font-size: 16px;
   }
 
   .planner-hint {
@@ -934,8 +943,16 @@ select:focus {
   }
 
   .planned-set-row {
-    grid-template-columns: 36px minmax(0, 1fr) minmax(0, 1fr) 24px;
+    grid-template-columns: 32px minmax(0, 0.95fr) minmax(0, 1.2fr) 24px;
     font-size: 0.86rem;
+  }
+
+  .planned-set-full {
+    display: none;
+  }
+
+  .planned-set-compact {
+    display: inline;
   }
 
   .actual-set-form {

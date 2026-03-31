@@ -20,9 +20,10 @@
               <span class="planned-set-index"><%= workout_set.position %></span>
               <div>
                 <% if workout_set.target_reps.present? || workout_set.target_weight.present? %>
-                  <%= workout_set.target_reps || "-" %> reps<% if workout_set.target_weight.present? %> @ <%= number_with_precision(workout_set.target_weight, precision: 1) %> kg<% end %>
+                  <span class="planned-set-compact"><%= workout_set.target_reps || "-" %> x <%= workout_set.target_weight.present? ? number_with_precision(workout_set.target_weight, precision: 1) : "-" %>kg</span>
+                  <span class="planned-set-full"><%= workout_set.target_reps || "-" %> reps<% if workout_set.target_weight.present? %> @ <%= number_with_precision(workout_set.target_weight, precision: 1) %> kg<% end %></span>
                 <% elsif workout_set.actual_logged? %>
-                  <span class="planned-set-muted">Added during workout</span>
+                  <span class="planned-set-muted">Added live</span>
                 <% else %>
                   <span class="planned-set-muted">Targets pending</span>
                 <% end %>

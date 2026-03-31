@@ -38,5 +38,4 @@ class WorkoutSet < ApplicationRecord
     def refresh_workout_difficulty
       workout&.recalculate_total_difficulty!
     end
-
 end

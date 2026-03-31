@@ -135,7 +135,7 @@ class WorkoutSetsControllerTest < ActionDispatch::IntegrationTest
     patch workout_workout_set_path(@active_workout, @active_workout_set), params: {
       execution: {
         actual_reps: 10,
-        actual_weight: 34,
+        actual_weight: 34
       }
     }
 

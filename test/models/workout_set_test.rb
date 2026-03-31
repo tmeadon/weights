@@ -62,4 +62,22 @@ class WorkoutSetTest < ActiveSupport::TestCase
 
     assert_equal BigDecimal("320"), workout_set.difficulty
   end
+
+  test "difficulty is zero without weight" do
+    workout_set = workouts(:draft_session).workout_sets.create!(
+      exercise: exercises(:bench_press),
+      target_reps: 8
+    )
+
+    assert_equal BigDecimal("0"), workout_set.difficulty
+  end
+
+  test "difficulty is zero without reps" do
+    workout_set = workouts(:draft_session).workout_sets.create!(
+      exercise: exercises(:bench_press),
+      target_weight: 40
+    )
+
+    assert_equal BigDecimal("0"), workout_set.difficulty
+  end
 end

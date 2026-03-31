@@ -62,7 +62,14 @@ Milestones 1 through 5 are now functionally in place, and Milestone 6 has starte
 - Added inline actual-result logging controls directly inside the workout set table for in-progress workouts
 - Added a quick "Log extra set" flow so new sets and new exercises can be recorded without leaving the workout page
 - Added autosave on change for actuals to keep logging lightweight
+- Tightened mobile row spacing and compacted planned text for readability
 - Preserved the existing planned-vs-actual split so draft planning data stays intact while performed results are captured separately
+
+### Difficulty Engine (In Progress)
+
+- Added per-set difficulty derived from weight and reps with actuals taking priority
+- Added workout total difficulty output on the workout page
+- Added tests for difficulty fallback behavior when data is missing
 
 ### Configuration and Developer Experience
 
@@ -70,6 +77,8 @@ Milestones 1 through 5 are now functionally in place, and Milestone 6 has starte
 - Dev server default port changed to `3001` in `config/puma.rb`
 - Verified database setup and tests with `bin/rails db:prepare test`
 - Verified linting with `bin/rubocop`
+- Added a lightweight system test harness for CI
+- Added `bin/importmap` to support JS audit checks in CI
 
 ## Key Files Added or Updated
 
@@ -136,14 +145,15 @@ Milestones 1 through 5 are now functionally in place, and Milestone 6 has starte
 
 ## Recommended Next Step
 
-Continue Milestone 6 by surfacing difficulty feedback:
+Continue Milestone 6 by refining the scoring model:
 
-- display per-set difficulty on the workout view
-- show the workout total updating in real time as sets are logged
-- add test coverage for difficulty edge cases (missing weight or reps)
+- confirm the desired difficulty formula (volume, tonnage, or scaled score)
+- add any required rounding or units for display
+- decide how completed workouts should lock or recalculate difficulty
 
 ## UI Direction Notes
 
 - Planned-set entry now favors a compact inline workout-page form instead of separate edit/create screens for every small change
 - Planned-set display now favors rows and columns over decorative pills so the later transition to planned-vs-actual logging is straightforward
 - Execution logging now uses the same compact row layout, and future refinements should keep prioritizing one-page workflow and mobile readability
+- Input font sizes were raised to prevent iOS zoom on focus
