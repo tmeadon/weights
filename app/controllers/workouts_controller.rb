@@ -1,5 +1,5 @@
 class WorkoutsController < ApplicationController
-  before_action :set_workout, only: %i[show edit update destroy]
+  before_action :set_workout, only: %i[show edit update destroy exercise_history]
   before_action :load_exercises, only: :show
 
   def index
@@ -27,6 +27,17 @@ class WorkoutsController < ApplicationController
   end
 
   def edit
+  end
+
+  def exercise_history
+    @exercise = Exercise.active.find_by(id: params[:exercise_id])
+    @history_groups = @workout.recent_history_for_exercise(params[:exercise_id])
+
+    render partial: "workouts/exercise_history", locals: {
+      workout: @workout,
+      exercise: @exercise,
+      history_groups: @history_groups
+    }
   end
 
   def update

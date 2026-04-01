@@ -163,7 +163,46 @@ class Workout < ApplicationRecord
     workout_sets.reduce(BigDecimal("0")) { |sum, workout_set| sum + workout_set.actual_difficulty }
   end
 
+  def recent_history_for_exercise(exercise_id, limit: 3)
+    return [] if exercise_id.blank?
+
+    recent_sets = WorkoutSet.joins(:workout)
+      .includes(:workout)
+      .where(exercise_id:)
+      .where(workouts: { user_id:, deleted_at: nil })
+      .where.not(workout_id: id)
+      .where("workout_sets.actual_reps IS NOT NULL OR workout_sets.actual_weight IS NOT NULL")
+      .order("workouts.workout_on DESC, workout_sets.position ASC, workout_sets.created_at ASC")
+      .to_a
+
+    recent_sets
+      .group_by(&:workout)
+      .first(limit)
+      .map { |workout, sets| { workout:, sets: } }
+  end
+
+  def summarize_recent_logged_sets(workout_sets)
+    sets = Array(workout_sets)
+    return "" if sets.empty?
+
+    reps = sets.map(&:actual_reps).compact
+    weights = sets.map(&:actual_weight).compact
+
+    if reps.size == sets.size && weights.size == sets.size && reps.uniq.one? && weights.uniq.one?
+      "#{sets.size} x #{reps.first} x #{format_weight(weights.first)}kg"
+    else
+      sets.map do |workout_set|
+        "#{workout_set.actual_reps || "-"} x #{workout_set.actual_weight.present? ? format_weight(workout_set.actual_weight) : "-"}kg"
+      end.join(", ")
+    end
+  end
+
   private
+    def format_weight(weight)
+      number = weight.to_d
+      number.frac.zero? ? number.to_i.to_s : format("%.1f", number)
+    end
+
     def expand_reps(rep_pattern, set_count, line_number)
       pattern = rep_pattern.to_s.strip
       count = set_count.to_s.strip

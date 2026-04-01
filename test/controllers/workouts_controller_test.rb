@@ -56,6 +56,36 @@ class WorkoutsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".panel-label", "Log extra set"
     assert_select "input[value='Log set']"
     assert_select "input[name='execution[actual_reps]']"
+    assert_select "button[data-autosave-target='status']", count: Workout.find(workouts(:active_session).id).workout_sets.count
+  end
+
+  test "show includes recent history panels for exercise selection" do
+    get workout_path(@workout)
+
+    assert_response :success
+    assert_select "[data-controller='exercise-history']", count: 1
+    assert_select ".exercise-history-empty", text: /Pick an exercise to see recent logged sets/
+  end
+
+  test "exercise history returns recent logged sets for the current user" do
+    get exercise_history_workout_path(@workout), params: { exercise_id: exercises(:bench_press).id }
+
+    assert_response :success
+    assert_select ".panel-label", "Recent history"
+    assert_select ".exercise-history-entry", count: 2
+    assert_match workouts(:completed_bench_session).workout_on.to_fs(:short), response.body
+    assert_match workouts(:completed_bench_session_two).workout_on.to_fs(:short), response.body
+    assert_match "9 x 28kg, 10 x 26kg", response.body
+    assert_match "3 x 8 x 24kg", response.body
+    assert_match workouts(:completed_bench_session).workout_on.to_fs(:short), response.body
+    assert_includes response.body, "exercise-history-reuse"
+  end
+
+  test "exercise history shows empty state when there is no logged history" do
+    get exercise_history_workout_path(@workout), params: { exercise_id: exercises(:lat_pulldown).id }
+
+    assert_response :success
+    assert_match "No logged history for Lat Pulldown yet.", response.body
   end
 
   test "create workout" do

@@ -512,6 +512,39 @@ select:focus {
   justify-content: stretch;
 }
 
+.autosave-status {
+  grid-column: 1 / -1;
+  justify-self: end;
+  min-height: 1.1rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink-soft);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.autosave-status[data-state="saving"] {
+  color: var(--ink-soft);
+}
+
+.autosave-status[data-state="saved"] {
+  color: #55735e;
+}
+
+.autosave-status[data-state="error"] {
+  color: #9f3a2f;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.autosave-status[data-state="error"]:focus-visible {
+  outline: 2px solid rgba(159, 58, 47, 0.28);
+  outline-offset: 2px;
+  border-radius: 999px;
+}
+
 .actual-field {
   position: relative;
 }
@@ -543,7 +576,7 @@ select:focus {
 }
 
 .actual-set-errors {
-  margin-top: 6px;
+  margin-top: 4px;
   color: #9f3a2f;
   font-size: 0.82rem;
 }
@@ -838,6 +871,68 @@ select:focus {
 .planner-hint {
   color: var(--ink-soft);
   font-size: 0.88rem;
+}
+
+.exercise-history-panel {
+  min-height: 1.2rem;
+}
+
+.exercise-history-preview {
+  display: grid;
+  gap: 6px;
+}
+
+.exercise-history-preview .panel-label,
+.exercise-history-session {
+  margin: 0;
+}
+
+.exercise-history-list {
+  display: grid;
+  gap: 6px;
+}
+
+.exercise-history-entry {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 8px;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.exercise-history-session {
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.exercise-history-value {
+  color: var(--ink);
+  min-width: 0;
+}
+
+.exercise-history-reuse {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--accent-deep);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.exercise-history-reuse:hover,
+.exercise-history-reuse:focus-visible {
+  text-decoration: underline;
+}
+
+.exercise-history-empty {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  line-height: 1.5;
 }
 
 .execution-builder-panel {

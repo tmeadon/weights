@@ -14,6 +14,22 @@ active_session:
   status: in_progress
   total_difficulty: 0
 
+completed_bench_session:
+  user: one
+  title: Push Session
+  workout_on: 2026-03-21
+  notes: Strong bench work.
+  status: completed
+  total_difficulty: 18.5
+
+completed_bench_session_two:
+  user: one
+  title: Push Session B
+  workout_on: 2026-03-18
+  notes: Repeat bench work.
+  status: completed
+  total_difficulty: 17.2
+
 completed_session:
   user: two
   title: Pull Day

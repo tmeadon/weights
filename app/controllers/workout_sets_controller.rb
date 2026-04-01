@@ -164,9 +164,10 @@ class WorkoutSetsController < ApplicationController
           format.html { redirect_to workout_path(@workout), notice: "Set updated." }
         end
       else
+        @exercise_groups = workout_set_groups_with_current_errors
         respond_to do |format|
           format.turbo_stream do
-            render turbo_stream: turbo_stream.update("planned_sets_list", partial: "workouts/planned_sets_list", locals: { workout: @workout }), status: :unprocessable_entity
+            render turbo_stream: turbo_stream.update("planned_sets_list", partial: "workouts/planned_sets_list", locals: { workout: @workout, exercise_groups: @exercise_groups }), status: :unprocessable_entity
           end
           format.html do
             @planned_entry = default_planned_entry
@@ -193,5 +194,11 @@ class WorkoutSetsController < ApplicationController
       @workout.workout_sets.reload.each_with_index do |workout_set, index|
         workout_set.update_column(:position, index + 1)
       end
+    end
+
+    def workout_set_groups_with_current_errors
+      @workout.workout_sets.to_a.map do |workout_set|
+        workout_set.id == @workout_set.id ? @workout_set : workout_set
+      end.group_by(&:exercise)
     end
 end

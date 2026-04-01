@@ -16,6 +16,10 @@ Rails.application.routes.draw do
     end
   end
   resources :workouts do
+    member do
+      get :exercise_history
+    end
+
     resources :workout_sets, except: %i[index show] do
       collection do
         delete :remove_exercise

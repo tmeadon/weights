@@ -21,3 +21,38 @@ active_squat:
   target_weight: 32
   target_reps: 8
   coach_notes: Stay tall.
+
+completed_bench_top_set:
+  workout: completed_bench_session
+  exercise: bench_press
+  position: 1
+  actual_weight: 28
+  actual_reps: 9
+
+completed_bench_backoff_set:
+  workout: completed_bench_session
+  exercise: bench_press
+  position: 2
+  actual_weight: 26
+  actual_reps: 10
+
+completed_bench_two_first_set:
+  workout: completed_bench_session_two
+  exercise: bench_press
+  position: 1
+  actual_weight: 24
+  actual_reps: 8
+
+completed_bench_two_second_set:
+  workout: completed_bench_session_two
+  exercise: bench_press
+  position: 2
+  actual_weight: 24
+  actual_reps: 8
+
+completed_bench_two_third_set:
+  workout: completed_bench_session_two
+  exercise: bench_press
+  position: 3
+  actual_weight: 24
+  actual_reps: 8

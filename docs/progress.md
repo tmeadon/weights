@@ -2,7 +2,7 @@
 
 ## Current Status
 
-Milestones 1 through 5 are now functionally in place, and Milestone 6 has started with initial difficulty calculations.
+Milestones 1 through 5 are functionally in place, Milestone 6 difficulty behavior is now established, and current work has shifted into execution ergonomics from Milestone 8.
 
 ## Completed So Far
 
@@ -67,15 +67,19 @@ Milestones 1 through 5 are now functionally in place, and Milestone 6 has starte
 - Added inline actual-result logging controls directly inside the workout set table for in-progress workouts
 - Added a quick "Log extra set" flow so new sets and new exercises can be recorded without leaving the workout page
 - Added autosave on change for actuals to keep logging lightweight
+- Hardened autosave with inline `Saving...`, `Saved`, and retry states so logging feedback is visible without interrupting the session flow
 - Tightened mobile row spacing and compacted planned text for readability
 - Preserved the existing planned-vs-actual split so draft planning data stays intact while performed results are captured separately
+- Added minimal exercise history previews on exercise selection for both planning and extra-set logging, including compact summaries of recent sessions and one-click reuse of recent reps and weight
 
-### Difficulty Engine (In Progress)
+### Difficulty Engine
 
 - Added per-set difficulty derived from weight and reps with actuals taking priority
 - Added planned vs actual difficulty totals on the workout page
 - Added tests for difficulty fallback behavior when data is missing
 - Planned difficulty now snapshots when a workout moves from draft to in-progress
+- Planned and actual difficulty are tracked separately
+- Actual difficulty continues to recalculate from logged results instead of freezing on completion
 
 ### Configuration and Developer Experience
 
@@ -152,16 +156,17 @@ Milestones 1 through 5 are now functionally in place, and Milestone 6 has starte
 
 ## Recommended Next Step
 
-Continue Milestone 6 by refining the scoring model:
+Continue Milestone 8 by improving in-session workflow around the active workout:
 
-- monitor the new intensity-weighted difficulty formula in real use and tune it if needed
-- add any required rounding or units for display
-- decide how completed workouts should lock or recalculate difficulty
+- add a stronger resume-active-workout entry point from home and navigation
+- keep tightening grouped exercise editing so the workout page becomes the main execution surface
+- consider extending the recent-history helpers into faster reuse flows during logging
 
 ## UI Direction Notes
 
 - Planned-set entry now favors a compact inline workout-page form instead of separate edit/create screens for every small change
 - Planned-set display now favors rows and columns over decorative pills so the later transition to planned-vs-actual logging is straightforward
 - Execution logging now uses the same compact row layout, and future refinements should keep prioritizing one-page workflow and mobile readability
+- Exercise selection now surfaces compact recent-history context so adding a movement does not require leaving the session page to remember prior loads
 - Input font sizes were raised to prevent iOS zoom on focus
 - Workout lists now use inline relative dates for near-term sessions to improve scanability

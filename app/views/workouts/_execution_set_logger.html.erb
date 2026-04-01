@@ -1,4 +1,4 @@
-<section class="builder-panel inline-builder-panel builder-panel-compact execution-builder-panel">
+<section class="builder-panel inline-builder-panel builder-panel-compact execution-builder-panel" data-controller="exercise-history" data-exercise-history-url-value="<%= exercise_history_workout_path(workout) %>">
   <% if workout.errors.any? %>
     <div class="flash flash-alert">
       <%= workout.errors.full_messages.to_sentence %>
@@ -12,9 +12,13 @@
   </div>
 
   <%= form_with url: workout_workout_sets_path(workout), scope: :execution, class: "planner-row execution-row", local: false, data: { turbo_frame: "execution_set_logger" } do |form| %>
-    <%= form.select :exercise_id, options_from_collection_for_select(exercises, :id, :name, execution_entry["exercise_id"]), { prompt: "Exercise" }, class: "planner-input" %>
-    <%= form.number_field :actual_reps, value: execution_entry["actual_reps"], min: 1, placeholder: "Reps", class: "planner-input planner-input-sets" %>
-    <%= form.number_field :actual_weight, value: execution_entry["actual_weight"], min: 0, step: 0.5, placeholder: "kg", class: "planner-input planner-input-weight" %>
+    <%= form.select :exercise_id, options_from_collection_for_select(exercises, :id, :name, execution_entry["exercise_id"]), { prompt: "Exercise" }, class: "planner-input", data: { action: "change->exercise-history#load", exercise_history_target: "select" } %>
+    <%= form.number_field :actual_reps, value: execution_entry["actual_reps"], min: 1, placeholder: "Reps", class: "planner-input planner-input-sets", data: { exercise_history_target: "repsInput" } %>
+    <%= form.number_field :actual_weight, value: execution_entry["actual_weight"], min: 0, step: 0.5, placeholder: "kg", class: "planner-input planner-input-weight", data: { exercise_history_target: "weightInput" } %>
     <%= form.submit "Log set", class: "button button-small" %>
   <% end %>
+
+  <div class="exercise-history-panel" data-exercise-history-target="panel">
+    <%= render "workouts/exercise_history", workout: workout, exercise: nil, history_groups: [] %>
+  </div>
 </section>

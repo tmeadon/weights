@@ -144,6 +144,22 @@ class WorkoutSetsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 34.0, @active_workout_set.actual_weight.to_f
   end
 
+  test "turbo update logged results returns validation errors for autosave" do
+    patch workout_workout_set_path(@active_workout, @active_workout_set),
+      params: {
+        execution: {
+          actual_reps: 0,
+          actual_weight: 34
+        }
+      },
+      headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+    assert_response :unprocessable_entity
+    assert_includes response.media_type, "turbo-stream"
+    assert_includes response.body, "planned_sets_list"
+    assert_includes response.body, "must be greater than 0"
+  end
+
   test "requires authentication" do
     sign_out
 

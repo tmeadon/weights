@@ -1,6 +1,8 @@
-<% if workout.workout_sets.any? %>
+<% exercise_groups = local_assigns[:exercise_groups] || @exercise_groups || workout.planned_exercise_groups %>
+
+<% if exercise_groups.any? %>
   <div class="exercise-list workout-list">
-    <% workout.planned_exercise_groups.each do |exercise, grouped_sets| %>
+    <% exercise_groups.each do |exercise, grouped_sets| %>
       <article class="workout-row planned-group-row">
         <div class="exercise-heading">
           <h3><%= exercise.name %></h3>
@@ -41,6 +43,7 @@
                       <%= form.number_field :actual_reps, value: workout_set.actual_reps, min: 1, placeholder: reps_placeholder, class: "planner-input actual-set-input", data: { action: "input->autosave#queue blur->autosave#submit" } %>
                       <span class="actual-field-unit">reps</span>
                     </div>
+                    <button type="button" class="autosave-status" data-action="click->autosave#retry" data-autosave-target="status" hidden disabled aria-live="polite"></button>
                   <% end %>
 
                   <% if workout_set.errors.any? %>

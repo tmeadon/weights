@@ -1,4 +1,4 @@
-<section class="builder-panel inline-builder-panel builder-panel-compact">
+<section class="builder-panel inline-builder-panel builder-panel-compact" data-controller="exercise-history" data-exercise-history-url-value="<%= exercise_history_workout_path(workout) %>">
   <% if workout.errors.any? %>
     <div class="flash flash-alert">
       <%= workout.errors.full_messages.to_sentence %>
@@ -12,10 +12,10 @@
   </div>
 
   <%= form_with url: workout_workout_sets_path(workout), scope: :planned_entry, class: "planner-row", local: false, data: { turbo_frame: "planned_set_planner" } do |form| %>
-    <%= form.select :exercise_id, options_from_collection_for_select(exercises, :id, :name, planned_entry["exercise_id"]), { prompt: "Exercise" }, class: "planner-input" %>
+    <%= form.select :exercise_id, options_from_collection_for_select(exercises, :id, :name, planned_entry["exercise_id"]), { prompt: "Exercise" }, class: "planner-input", data: { action: "change->exercise-history#load", exercise_history_target: "select" } %>
     <%= form.number_field :set_count, value: planned_entry["set_count"], min: 1, placeholder: "Sets", class: "planner-input planner-input-sets" %>
-    <%= form.text_field :rep_pattern, value: planned_entry["rep_pattern"], placeholder: "Reps (8 or 9,9,8)", class: "planner-input planner-input-reps" %>
-    <%= form.number_field :target_weight, value: planned_entry["target_weight"], min: 0, step: 0.5, placeholder: "kg", class: "planner-input planner-input-weight" %>
+    <%= form.text_field :rep_pattern, value: planned_entry["rep_pattern"], placeholder: "Reps (8 or 9,9,8)", class: "planner-input planner-input-reps", data: { exercise_history_target: "repsInput" } %>
+    <%= form.number_field :target_weight, value: planned_entry["target_weight"], min: 0, step: 0.5, placeholder: "kg", class: "planner-input planner-input-weight", data: { exercise_history_target: "weightInput" } %>
     <%= form.submit "Add", class: "button button-small" %>
     <span class="planner-hint">`3` + `8` or `9,9,8`</span>
 
@@ -24,4 +24,8 @@
       <%= form.text_field :coach_notes, value: planned_entry["coach_notes"], placeholder: "Tempo or cues", class: "planner-input planner-input-note" %>
     </details>
   <% end %>
+
+  <div class="exercise-history-panel" data-exercise-history-target="panel">
+    <%= render "workouts/exercise_history", workout: workout, exercise: nil, history_groups: [] %>
+  </div>
 </section>

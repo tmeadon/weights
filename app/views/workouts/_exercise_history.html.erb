@@ -1,0 +1,19 @@
+<% if exercise.blank? %>
+  <p class="exercise-history-empty">Pick an exercise to see recent logged sets.</p>
+<% elsif history_groups.any? %>
+  <div class="exercise-history-preview">
+    <p class="panel-label">Recent history</p>
+    <div class="exercise-history-list">
+      <% history_groups.each do |history_group| %>
+        <div class="exercise-history-entry">
+          <span class="exercise-history-session"><%= history_group[:workout].workout_on.to_fs(:short) %></span>
+          <span class="exercise-history-value"><%= workout.summarize_recent_logged_sets(history_group[:sets]) %></span>
+          <% last_set = history_group[:sets].last %>
+          <button type="button" class="exercise-history-reuse" data-action="click->exercise-history#reuse" data-reps="<%= last_set.actual_reps %>" data-weight="<%= last_set.actual_weight.present? ? number_with_precision(last_set.actual_weight, precision: 1) : "" %>">Use</button>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% else %>
+  <p class="exercise-history-empty">No logged history for <%= exercise.name %> yet.</p>
+<% end %>
