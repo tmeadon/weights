@@ -3,10 +3,15 @@
 <% if exercise_groups.any? %>
   <div class="exercise-list workout-list">
     <% exercise_groups.each do |exercise, grouped_sets| %>
-      <article class="workout-row planned-group-row">
+      <article class="workout-row planned-group-row" data-controller="fill-down">
         <div class="exercise-heading">
           <h3><%= exercise.name %></h3>
-          <%= button_to "Remove exercise", remove_exercise_workout_workout_sets_path(workout, exercise_id: exercise.id), method: :delete, class: "link-button exercise-remove-link", form_class: "link-button-form" %>
+          <div class="exercise-actions">
+            <% if workout.status == "in_progress" %>
+              <button type="button" class="link-button exercise-fill-link" data-action="click->fill-down#fillDown">Fill down</button>
+            <% end %>
+            <%= button_to "Remove exercise", remove_exercise_workout_workout_sets_path(workout, exercise_id: exercise.id), method: :delete, class: "link-button exercise-remove-link", form_class: "link-button-form" %>
+          </div>
         </div>
 
         <div class="planned-set-table">
@@ -18,7 +23,7 @@
           </div>
 
           <% grouped_sets.each do |workout_set| %>
-            <div class="planned-set-row">
+            <div class="planned-set-row" data-fill-down-target="row" data-target-reps="<%= workout_set.target_reps %>" data-target-weight="<%= workout_set.target_weight %>">
               <span class="planned-set-index"><%= workout_set.position %></span>
               <div>
                 <% if workout_set.target_reps.present? || workout_set.target_weight.present? %>
@@ -36,11 +41,11 @@
                     <% weight_placeholder = "" %>
                     <% reps_placeholder = "" %>
                     <div class="actual-field">
-                      <%= form.number_field :actual_weight, value: workout_set.actual_weight, min: 0, step: 0.5, placeholder: weight_placeholder, class: "planner-input actual-set-input", data: { action: "input->autosave#queue blur->autosave#submit" } %>
+                      <%= form.number_field :actual_weight, value: workout_set.actual_weight, min: 0, step: 0.5, placeholder: weight_placeholder, class: "planner-input actual-set-input", data: { action: "focus->autosave#prefillFromAbove input->autosave#queue blur->autosave#submit" } %>
                       <span class="actual-field-unit">kg</span>
                     </div>
                     <div class="actual-field">
-                      <%= form.number_field :actual_reps, value: workout_set.actual_reps, min: 1, placeholder: reps_placeholder, class: "planner-input actual-set-input", data: { action: "input->autosave#queue blur->autosave#submit" } %>
+                      <%= form.number_field :actual_reps, value: workout_set.actual_reps, min: 1, placeholder: reps_placeholder, class: "planner-input actual-set-input", data: { action: "focus->autosave#prefillFromAbove input->autosave#queue blur->autosave#submit" } %>
                       <span class="actual-field-unit">reps</span>
                     </div>
                     <button type="button" class="autosave-status" data-action="click->autosave#retry" data-autosave-target="status" hidden disabled aria-live="polite"></button>

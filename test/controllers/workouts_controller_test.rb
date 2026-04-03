@@ -29,6 +29,7 @@ class WorkoutsControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[value='Add']"
     assert_select ".planned-set-row", /Planned/
     assert_select "button", "Remove exercise"
+    assert_select "button", text: "Fill down", count: 0
     assert_select "button", "Start workout"
     assert_select "button", "Cancel"
     assert_select "button", text: "Archive", count: 0
@@ -50,12 +51,20 @@ class WorkoutsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "show active workout includes execution logging controls" do
+    workouts(:active_session).workout_sets.create!(
+      exercise: exercises(:squat),
+      position: 2,
+      target_reps: 8,
+      target_weight: 32
+    )
+
     get workout_path(workouts(:active_session))
 
     assert_response :success
     assert_select ".panel-label", "Add exercise or set"
     assert_select "input[value='Add']"
     assert_select "input[name='execution[actual_reps]']"
+    assert_select "button", "Fill down"
     assert_select "button[data-autosave-target='status']", count: Workout.find(workouts(:active_session).id).workout_sets.count
   end
 

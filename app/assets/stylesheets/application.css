@@ -609,6 +609,16 @@ select:focus {
   width: 100%;
 }
 
+.exercise-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.exercise-fill-link {
+  font-size: 0.84rem;
+}
+
 .exercise-remove-link {
   font-size: 0.9rem;
 }

@@ -27,6 +27,35 @@ export default class extends Controller {
     this.submitNow()
   }
 
+  prefillFromAbove() {
+    if (this.element.dataset.prefilledFromAbove === "true") return
+
+    const previousForm = this.previousSetForm()
+    if (!previousForm) return
+
+    const currentWeightInput = this.element.querySelector("input[name='execution[actual_weight]']")
+    const currentRepsInput = this.element.querySelector("input[name='execution[actual_reps]']")
+    const previousWeightInput = previousForm.querySelector("input[name='execution[actual_weight]']")
+    const previousRepsInput = previousForm.querySelector("input[name='execution[actual_reps]']")
+
+    if (!currentWeightInput || !currentRepsInput || !previousWeightInput || !previousRepsInput) return
+    if (this.valuePresent(currentWeightInput.value) || this.valuePresent(currentRepsInput.value)) return
+    if (this.valueBlank(previousWeightInput.value) && this.valueBlank(previousRepsInput.value)) return
+
+    currentWeightInput.value = previousWeightInput.value
+    currentRepsInput.value = previousRepsInput.value
+    this.element.dataset.prefilledFromAbove = "true"
+    this.queue()
+  }
+
+  valuePresent(value) {
+    return value !== null && value !== undefined && value !== ""
+  }
+
+  valueBlank(value) {
+    return !this.valuePresent(value)
+  }
+
   async submitNow() {
     clearTimeout(this.timeout)
 
@@ -84,6 +113,22 @@ export default class extends Controller {
 
   formSignature() {
     return JSON.stringify(Object.fromEntries(new FormData(this.element).entries()))
+  }
+
+  previousSetForm() {
+    const currentRow = this.element.closest(".planned-set-row")
+    if (!currentRow) return null
+
+    let previousRow = currentRow.previousElementSibling
+
+    while (previousRow) {
+      const previousForm = previousRow.querySelector("form.actual-set-form")
+      if (previousForm) return previousForm
+
+      previousRow = previousRow.previousElementSibling
+    }
+
+    return null
   }
 
   hideStatus() {
