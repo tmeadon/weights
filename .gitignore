@@ -12,7 +12,7 @@
 /vendor/bundle
 /.env*
 /config/master.key
-/.kamal/secrets*
+/.kamal/secrets.local
 *.sqlite3
 *.sqlite3-*
 /coverage/
