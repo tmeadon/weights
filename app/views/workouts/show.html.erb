@@ -44,6 +44,11 @@
     </div>
 
     <div>
+      <dt>Workout type</dt>
+      <dd><%= @workout.workout_type_label %></dd>
+    </div>
+
+    <div>
       <dt>Active workout</dt>
       <dd><%= @workout.status == "in_progress" ? "Yes" : "No" %></dd>
     </div>

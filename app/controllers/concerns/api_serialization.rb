@@ -41,6 +41,7 @@ module ApiSerialization
         user_id: workout.user_id,
         title: workout.title,
         workout_on: workout.workout_on,
+        workout_type: workout.workout_type,
         notes: workout.notes,
         status: workout.status,
         deleted_at: workout.deleted_at,

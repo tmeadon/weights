@@ -10,10 +10,15 @@
     <%= form.text_field :title, required: true, autofocus: true, placeholder: "Upper body strength" %>
   </div>
 
-  <div class="form-grid-two">
+  <div class="form-grid-three">
     <div class="field">
       <%= form.label :workout_on, "Workout date" %>
       <%= form.date_field :workout_on, required: true %>
+    </div>
+
+    <div class="field">
+      <%= form.label :workout_type, "Workout type" %>
+      <%= form.select :workout_type, options_for_select([["Unspecified", ""]] + Workout::WORKOUT_TYPES.map { |value| [value.humanize, value] }, workout.workout_type) %>
     </div>
 
     <div class="field">

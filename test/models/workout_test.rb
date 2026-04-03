@@ -5,12 +5,26 @@ class WorkoutTest < ActiveSupport::TestCase
     workout = users(:one).workouts.create!(
       title: "  Upper   Body  ",
       workout_on: Date.new(2026, 3, 29),
+      workout_type: "  PuSh  ",
       notes: "  Keep the pace up.  ",
       status: "draft"
     )
 
     assert_equal "Upper Body", workout.title
+    assert_equal "push", workout.workout_type
     assert_equal "Keep the pace up.", workout.notes
+  end
+
+  test "validates workout type options" do
+    workout = users(:one).workouts.new(
+      title: "Odd split",
+      workout_on: Date.new(2026, 4, 1),
+      workout_type: "conditioning",
+      status: "draft"
+    )
+
+    assert_not workout.valid?
+    assert_includes workout.errors[:workout_type], "is not included in the list"
   end
 
   test "allows only one in-progress workout per user" do

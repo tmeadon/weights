@@ -23,6 +23,7 @@ class WorkoutsControllerTest < ActionDispatch::IntegrationTest
     assert_select "article.workout-row-next h3", /#{soon_workout.title}/
     assert_select "a", "Me"
     assert_select ".workout-row-date", /days ago|Today|Tomorrow|Yesterday|March/
+    assert_select "a", "Progression"
   end
 
   test "show" do
@@ -127,6 +128,7 @@ class WorkoutsControllerTest < ActionDispatch::IntegrationTest
         workout: {
           title: "Push Session",
           workout_on: "2026-03-30",
+          workout_type: "push",
           notes: "Start with bench.",
           status: "draft"
         }
@@ -136,6 +138,7 @@ class WorkoutsControllerTest < ActionDispatch::IntegrationTest
     workout = Workout.order(:id).last
     assert_redirected_to workout_path(workout)
     assert_equal 0, workout.workout_sets.count
+    assert_equal "push", workout.workout_type
   end
 
   test "update workout" do

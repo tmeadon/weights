@@ -478,6 +478,319 @@ select:focus {
   color: var(--ink-soft);
 }
 
+.progression-filter-grid {
+  margin-top: 12px;
+}
+
+.progression-filter-grid-single {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+.progression-tabs {
+  display: inline-flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.progression-chart-modes {
+  display: inline-flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.progression-filter-actions {
+  grid-column: 1 / -1;
+}
+
+.progression-summary-grid {
+  margin-top: 4px;
+}
+
+.progression-timeframe {
+  margin-top: 6px;
+}
+
+.progression-attainment {
+  margin-top: 12px;
+}
+
+.progression-chart-wrap {
+  margin-top: 14px;
+  height: 270px;
+  margin-left: -6px;
+  margin-right: -6px;
+  padding: 8px 6px 4px;
+  background: rgba(255, 255, 255, 0.52);
+}
+
+.progression-chart-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.progression-chart-axis {
+  stroke: rgba(92, 83, 71, 0.24);
+  stroke-width: 1;
+}
+
+.progression-chart-line {
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.progression-chart-line-planned {
+  stroke: rgba(180, 96, 61, 0.8);
+}
+
+.progression-chart-line-actual {
+  stroke: rgba(85, 115, 94, 0.95);
+}
+
+.progression-chart-line-delta {
+  stroke: rgba(95, 88, 80, 0.9);
+}
+
+.progression-chart-axis-mid {
+  stroke-dasharray: 3 3;
+}
+
+.progression-chart-legend {
+  display: flex;
+  gap: 14px;
+  margin-top: 8px;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+}
+
+.progression-chart-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.progression-chart-key {
+  display: inline-block;
+  width: 14px;
+  height: 0;
+  border-top: 2px solid currentColor;
+}
+
+.progression-chart-key-planned {
+  color: rgba(180, 96, 61, 0.9);
+}
+
+.progression-chart-key-actual {
+  color: rgba(85, 115, 94, 0.95);
+}
+
+.progression-chart-key-delta {
+  color: rgba(95, 88, 80, 0.9);
+}
+
+.progression-chart-label {
+  fill: var(--ink-soft);
+  font-size: 10px;
+  letter-spacing: 0.02em;
+}
+
+.progression-attainment-track {
+  display: flex;
+  position: relative;
+  width: 100%;
+  height: 12px;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid rgba(92, 83, 71, 0.16);
+  background: rgba(255, 255, 255, 0.65);
+}
+
+.progression-attainment-fill {
+  min-width: 0;
+}
+
+.progression-attainment-fill-under {
+  background: rgba(159, 58, 47, 0.35);
+}
+
+.progression-attainment-fill-over {
+  background: rgba(85, 115, 94, 0.58);
+}
+
+.progression-attainment-overflow {
+  background: rgba(85, 115, 94, 0.85);
+}
+
+.progression-attainment-target {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  right: 0;
+  width: 2px;
+  background: rgba(92, 83, 71, 0.55);
+}
+
+.progression-attainment-text {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 6px;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+}
+
+.progression-table-wrap {
+  margin-top: 12px;
+  overflow-x: auto;
+}
+
+.progression-mobile-list {
+  display: none;
+}
+
+.progression-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 620px;
+}
+
+.progression-table th,
+.progression-table td {
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.progression-table th {
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.progression-table th:not(:first-child),
+.progression-table td:not(:first-child) {
+  padding-left: 12px;
+}
+
+.progression-delta {
+  font-variant-numeric: tabular-nums;
+}
+
+.progression-delta-positive {
+  color: #55735e;
+}
+
+.progression-delta-negative {
+  color: #9f3a2f;
+}
+
+.progression-exercise-focus {
+  margin-top: 16px;
+}
+
+.progression-mobile-row {
+  border-top: 1px solid var(--line);
+  padding: 10px 0;
+}
+
+.progression-mobile-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.progression-mobile-title {
+  font-family: var(--font-serif);
+  font-size: 1.08rem;
+  font-weight: 700;
+}
+
+.progression-mobile-date {
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+  white-space: nowrap;
+}
+
+.progression-mobile-meta {
+  margin: 4px 0 0;
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+}
+
+.trend-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.trend-pill-neutral {
+  border: 1px solid rgba(92, 83, 71, 0.24);
+  background: rgba(92, 83, 71, 0.1);
+  color: var(--ink-soft);
+}
+
+.trend-pill-up {
+  border: 1px solid rgba(85, 115, 94, 0.28);
+  background: rgba(85, 115, 94, 0.16);
+  color: #55735e;
+}
+
+.trend-pill-down {
+  border: 1px solid rgba(159, 58, 47, 0.28);
+  background: rgba(159, 58, 47, 0.12);
+  color: #9f3a2f;
+}
+
+.progression-trend-change {
+  margin-left: 8px;
+  font-size: 0.84rem;
+}
+
+.progression-mobile-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.progression-mobile-label {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.progression-mobile-value {
+  margin: 2px 0 0;
+  font-size: 1.3rem;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.progression-mini-attainment {
+  display: flex;
+  position: relative;
+  height: 8px;
+  margin-top: 8px;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid rgba(92, 83, 71, 0.14);
+  background: rgba(255, 255, 255, 0.6);
+}
+
 .row-actions {
   display: grid;
   grid-column: 2;
@@ -1232,6 +1545,16 @@ select:focus {
   .workout-index-heading {
     gap: 8px;
   }
+
+  .progression-attainment-text {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .progression-chart-legend {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
 }
 
 @media (max-width: 640px) {
@@ -1330,5 +1653,21 @@ select:focus {
 
   .actual-set-form {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .progression-table-desktop {
+    display: none;
+  }
+
+  .progression-mobile-list {
+    display: grid;
+    margin-top: 12px;
+  }
+
+  .progression-chart-wrap {
+    height: 240px;
+    margin-left: -8px;
+    margin-right: -8px;
+    padding: 6px 4px 2px;
   }
 }

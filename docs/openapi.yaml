@@ -1000,6 +1000,10 @@ components:
       properties:
         title: { type: string }
         workout_on: { type: string, format: date }
+        workout_type:
+          type: string
+          enum: [push, pull, legs]
+          nullable: true
         notes: { type: string, nullable: true }
         status:
           type: string
@@ -1013,6 +1017,7 @@ components:
         user_id: { type: integer }
         title: { type: string }
         workout_on: { type: string, format: date }
+        workout_type: { type: string, enum: [push, pull, legs], nullable: true }
         notes: { type: string, nullable: true }
         status: { type: string, enum: [draft, in_progress, completed, cancelled] }
         deleted_at: { type: string, format: date-time, nullable: true }

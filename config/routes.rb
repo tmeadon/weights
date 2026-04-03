@@ -15,6 +15,7 @@ Rails.application.routes.draw do
       patch :restore
     end
   end
+  resources :progressions, only: :index
   resources :workouts do
     member do
       get :exercise_history

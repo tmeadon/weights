@@ -1,5 +1,6 @@
 class Workout < ApplicationRecord
   STATUSES = %w[draft in_progress completed cancelled].freeze
+  WORKOUT_TYPES = %w[push pull legs].freeze
 
   belongs_to :user
   has_many :workout_sets, -> { ordered }, dependent: :destroy
@@ -7,10 +8,12 @@ class Workout < ApplicationRecord
 
   normalizes :title, with: ->(value) { value.to_s.strip.squeeze(" ") }
   normalizes :notes, with: ->(value) { value.to_s.strip.presence }
+  normalizes :workout_type, with: ->(value) { value.to_s.strip.downcase.presence }
 
   validates :title, presence: true
   validates :workout_on, presence: true
   validates :status, inclusion: { in: STATUSES }
+  validates :workout_type, inclusion: { in: WORKOUT_TYPES }, allow_nil: true
   validates :total_difficulty, numericality: { greater_than_or_equal_to: 0 }
   validates :planned_total_difficulty, numericality: { greater_than_or_equal_to: 0 }
   validate :status_transition_is_allowed, if: :will_save_change_to_status?
@@ -28,6 +31,10 @@ class Workout < ApplicationRecord
 
   def self.current_for(user)
     active.find_by(user:, status: "in_progress")
+  end
+
+  def workout_type_label
+    workout_type&.humanize || "Unspecified"
   end
 
   def discarded?

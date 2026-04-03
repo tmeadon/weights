@@ -33,6 +33,7 @@
             <nav class="topbar-nav" aria-label="Primary">
               <%= link_to "Workouts", workouts_path, class: ["topbar-pill", (current_page?(workouts_path) ? "topbar-pill-active" : nil)] %>
               <%= link_to "Exercises", exercises_path, class: ["topbar-pill", (current_page?(exercises_path) ? "topbar-pill-active" : nil)] %>
+              <%= link_to "Progression", progressions_path, class: ["topbar-pill", (current_page?(progressions_path) ? "topbar-pill-active" : nil)] %>
               <span class="topbar-nav-spacer"></span>
               <%= link_to "Me", account_path, class: ["topbar-link", (current_page?(account_path) ? "topbar-link-active" : nil)] %>
             </nav>

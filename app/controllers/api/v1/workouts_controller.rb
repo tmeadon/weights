@@ -66,7 +66,7 @@ module Api
         end
 
         def workout_params
-          params.require(:workout).permit(:title, :workout_on, :notes, :status)
+          params.require(:workout).permit(:title, :workout_on, :workout_type, :notes, :status)
         end
     end
   end
