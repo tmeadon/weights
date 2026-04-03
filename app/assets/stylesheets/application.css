@@ -333,6 +333,15 @@ select:focus {
   gap: 0;
 }
 
+.workout-index-card .workout-list {
+  margin-top: 12px;
+}
+
+.workout-index-heading {
+  gap: 10px;
+  margin-bottom: 2px;
+}
+
 .exercise-row {
   padding: 14px 0;
   border-top: 1px solid var(--line);
@@ -347,6 +356,53 @@ select:focus {
   gap: 6px;
   padding: 18px 0;
   border-top: 1px solid var(--line);
+}
+
+.workout-row-next {
+  position: relative;
+  margin: 0 -10px;
+  padding: 14px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(180, 96, 61, 0.24);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.56));
+}
+
+.workout-row + .workout-row-next::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 10px;
+  right: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.workout-row + .workout-row-next,
+.workout-row-next + .workout-row {
+  margin-top: 8px;
+}
+
+.workout-row-next:first-child {
+  margin-top: 0;
+}
+
+.workout-next-pill {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 10px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(180, 96, 61, 0.28);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--accent-deep);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transform: translateY(-2px);
+}
+
+.workout-row-next .exercise-edit-link {
+  margin-top: 4px;
 }
 
 .workout-row-date {
@@ -364,6 +420,10 @@ select:focus {
 
 .workout-row:last-child {
   padding-bottom: 0;
+}
+
+.workout-row-next:last-child {
+  padding-bottom: 14px;
 }
 
 .exercise-heading {
@@ -1167,6 +1227,10 @@ select:focus {
 
   .set-builder-header {
     display: none;
+  }
+
+  .workout-index-heading {
+    gap: 8px;
   }
 }
 

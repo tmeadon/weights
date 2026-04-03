@@ -15,8 +15,8 @@
   </section>
 <% end %>
 
-<section class="card panel-card">
-  <div class="section-heading">
+<section class="card panel-card workout-index-card">
+  <div class="section-heading workout-index-heading">
     <div>
       <h1>Workouts</h1>
       <p class="supporting-text"><%= pluralize(@workouts.count, "workout") %> tracked.</p>
@@ -30,12 +30,15 @@
   <% if @workouts.any? %>
     <div class="exercise-list workout-list">
       <% @workouts.each do |workout| %>
-        <article class="workout-row">
+        <article class="workout-row<%= " workout-row-next" if workout == @next_workout %>">
           <div class="exercise-heading">
             <h3>
               <%= link_to workout_path(workout) do %>
                 <%= workout.title %>
                 <span class="workout-row-date"><%= workout_relative_date(workout.workout_on) %></span>
+              <% end %>
+              <% if workout == @next_workout %>
+                <span class="workout-next-pill">Next up</span>
               <% end %>
             </h3>
             <%= link_to "Edit", edit_workout_path(workout), class: "exercise-edit-link" %>

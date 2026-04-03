@@ -8,12 +8,19 @@ class WorkoutsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "index" do
+    soon_workout = @user.workouts.create!(title: "Soon Session", workout_on: Date.current + 2, status: "draft")
+    later_workout = @user.workouts.create!(title: "Later Session", workout_on: Date.current + 6, status: "draft")
+
     get workouts_path
 
     assert_response :success
     assert_select "h1", "Workouts"
     assert_select "h3 a", /Upper Body A/
     assert_select "h2 a", /Lower Body Session/
+    assert_select "h3 a", /#{soon_workout.title}/
+    assert_select "h3 a", /#{later_workout.title}/
+    assert_select ".workout-next-pill", text: "Next up", count: 1
+    assert_select "article.workout-row-next h3", /#{soon_workout.title}/
     assert_select "a", "Me"
     assert_select ".workout-row-date", /days ago|Today|Tomorrow|Yesterday|March/
   end

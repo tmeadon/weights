@@ -5,6 +5,7 @@ class WorkoutsController < ApplicationController
   def index
     @workouts = Current.user.workouts.active.ordered
     @active_workout = Workout.current_for(Current.user)
+    @next_workout = find_next_workout(@workouts)
   end
 
   def show
@@ -72,5 +73,11 @@ class WorkoutsController < ApplicationController
 
     def default_execution_entry
       { "exercise_id" => "", "actual_weight" => "", "actual_reps" => "" }
+    end
+
+    def find_next_workout(workouts)
+      workouts
+        .select { |workout| workout.workout_on >= Date.current && workout.status.in?(%w[draft in_progress]) }
+        .min_by { |workout| [ workout.workout_on, workout.created_at ] }
     end
 end
