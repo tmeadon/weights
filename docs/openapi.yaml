@@ -14,6 +14,8 @@ info:
 servers:
   - url: http://localhost:3001
     description: Local development
+  - url: https://weights.meadon.net
+    description: Production
 tags:
   - name: Authentication
   - name: Account
