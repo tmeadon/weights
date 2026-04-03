@@ -2,8 +2,10 @@
 
 one:
   email_address: one@example.com
+  api_key: user-one-api-key
   password_digest: <%= password_digest %>
 
 two:
   email_address: two@example.com
+  api_key: user-two-api-key
   password_digest: <%= password_digest %>

@@ -1,0 +1,1011 @@
+openapi: 3.1.0
+info:
+  title: Weights API
+  version: 1.0.0
+  description: |
+    JSON API for the Weights training tracker.
+
+    Authentication supports:
+    - signed session cookie (`session_id`) from `POST /api/v1/session`
+    - `X-Api-Key` header per user
+    - `Authorization: Bearer <api_key>`
+
+    Every user has an automatically generated API key.
+servers:
+  - url: http://localhost:3001
+    description: Local development
+tags:
+  - name: Authentication
+  - name: Account
+  - name: Passwords
+  - name: Exercises
+  - name: Workouts
+  - name: Workout Sets
+security:
+  - cookieAuth: []
+  - apiKeyHeaderAuth: []
+  - bearerApiKeyAuth: []
+paths:
+  /api/v1/registrations:
+    post:
+      tags: [Authentication]
+      summary: Register a user and start a session
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [user]
+              properties:
+                user:
+                  $ref: '#/components/schemas/RegistrationInput'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /api/v1/session:
+    post:
+      tags: [Authentication]
+      summary: Sign in
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionInput'
+      responses:
+        '200':
+          description: Signed in
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '429':
+          $ref: '#/components/responses/Error429'
+    delete:
+      tags: [Authentication]
+      summary: Sign out
+      responses:
+        '204':
+          description: Signed out
+        '401':
+          $ref: '#/components/responses/Error401'
+
+  /api/v1/account:
+    get:
+      tags: [Account]
+      summary: Get the authenticated user
+      responses:
+        '200':
+          description: Current user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Error401'
+
+  /api/v1/passwords:
+    post:
+      tags: [Passwords]
+      summary: Request a password reset email
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email_address]
+              properties:
+                email_address:
+                  type: string
+                  format: email
+      responses:
+        '202':
+          description: Request accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '429':
+          $ref: '#/components/responses/Error429'
+
+  /api/v1/passwords/{token}:
+    put:
+      tags: [Passwords]
+      summary: Reset password with token
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/token'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetInput'
+      responses:
+        '200':
+          description: Password reset
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    patch:
+      tags: [Passwords]
+      summary: Reset password with token
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/token'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetInput'
+      responses:
+        '200':
+          description: Password reset
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /api/v1/exercises:
+    get:
+      tags: [Exercises]
+      summary: List exercises with filtering
+      parameters:
+        - name: query
+          in: query
+          schema: { type: string }
+        - name: movement_category
+          in: query
+          schema: { type: string }
+        - name: primary_muscle_group
+          in: query
+          schema: { type: string }
+        - name: equipment_type
+          in: query
+          schema: { type: string }
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, archived, all]
+      responses:
+        '200':
+          description: Exercise list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  exercises:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Exercise'
+                  filters:
+                    type: object
+                    additionalProperties: true
+                  filter_options:
+                    $ref: '#/components/schemas/ExerciseFilterOptions'
+        '401':
+          $ref: '#/components/responses/Error401'
+    post:
+      tags: [Exercises]
+      summary: Create an exercise
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [exercise]
+              properties:
+                exercise:
+                  $ref: '#/components/schemas/ExerciseInput'
+      responses:
+        '201':
+          description: Exercise created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  exercise:
+                    $ref: '#/components/schemas/Exercise'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /api/v1/exercises/import:
+    post:
+      tags: [Exercises]
+      summary: Bulk import exercises from pipe-delimited text
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: object
+                  required: [text]
+                  properties:
+                    text:
+                      type: string
+                - type: object
+                  required: [import]
+                  properties:
+                    import:
+                      type: object
+                      required: [text]
+                      properties:
+                        text:
+                          type: string
+      responses:
+        '201':
+          description: Import completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  import_result:
+                    $ref: '#/components/schemas/ExerciseImportResult'
+        '401':
+          $ref: '#/components/responses/Error401'
+
+  /api/v1/exercises/{id}:
+    get:
+      tags: [Exercises]
+      summary: Get a single exercise
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Exercise
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  exercise:
+                    $ref: '#/components/schemas/Exercise'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'
+    patch:
+      tags: [Exercises]
+      summary: Update an exercise
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [exercise]
+              properties:
+                exercise:
+                  $ref: '#/components/schemas/ExerciseInput'
+      responses:
+        '200':
+          description: Exercise updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  exercise:
+                    $ref: '#/components/schemas/Exercise'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags: [Exercises]
+      summary: Archive an exercise (soft delete)
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Exercise archived
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  exercise:
+                    $ref: '#/components/schemas/Exercise'
+                  message:
+                    type: string
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'
+
+  /api/v1/exercises/{id}/restore:
+    patch:
+      tags: [Exercises]
+      summary: Restore an archived exercise
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Exercise restored
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  exercise:
+                    $ref: '#/components/schemas/Exercise'
+                  message:
+                    type: string
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'
+
+  /api/v1/workouts:
+    get:
+      tags: [Workouts]
+      summary: List active workouts for current user
+      responses:
+        '200':
+          description: Workout list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workouts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Workout'
+                  active_workout_id:
+                    type: integer
+                    nullable: true
+        '401':
+          $ref: '#/components/responses/Error401'
+    post:
+      tags: [Workouts]
+      summary: Create a workout
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [workout]
+              properties:
+                workout:
+                  $ref: '#/components/schemas/WorkoutInput'
+      responses:
+        '201':
+          description: Workout created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workout:
+                    $ref: '#/components/schemas/WorkoutWithSets'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /api/v1/workouts/active:
+    get:
+      tags: [Workouts]
+      summary: Get currently in-progress workout
+      responses:
+        '200':
+          description: Active workout or null
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workout:
+                    oneOf:
+                      - $ref: '#/components/schemas/WorkoutWithSets'
+                      - type: 'null'
+        '401':
+          $ref: '#/components/responses/Error401'
+
+  /api/v1/workouts/{id}:
+    get:
+      tags: [Workouts]
+      summary: Get workout with sets
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Workout details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workout:
+                    $ref: '#/components/schemas/WorkoutWithSets'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'
+    patch:
+      tags: [Workouts]
+      summary: Update workout metadata or lifecycle status
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [workout]
+              properties:
+                workout:
+                  $ref: '#/components/schemas/WorkoutInput'
+      responses:
+        '200':
+          description: Workout updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workout:
+                    $ref: '#/components/schemas/WorkoutWithSets'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags: [Workouts]
+      summary: Archive workout (soft delete)
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Workout archived
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workout:
+                    $ref: '#/components/schemas/Workout'
+                  message:
+                    type: string
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'
+
+  /api/v1/workouts/{id}/exercise_history:
+    get:
+      tags: [Workouts]
+      summary: Get recent logged history for an exercise in user context
+      parameters:
+        - $ref: '#/components/parameters/id'
+        - name: exercise_id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Recent exercise history groups
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  exercise:
+                    oneOf:
+                      - $ref: '#/components/schemas/Exercise'
+                      - type: 'null'
+                  history_groups:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ExerciseHistoryGroup'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'
+
+  /api/v1/workouts/{workout_id}/workout_sets:
+    post:
+      tags: [Workout Sets]
+      summary: Add planned sets, add execution set, or create one planned set
+      description: |
+        Exactly one of these payload styles should be sent:
+        - `planned_entry` to add grouped planned sets using rep pattern expansion
+        - `execution` to log an actual set for an in-progress workout
+        - `workout_set` to create a single explicit planned set
+      parameters:
+        - $ref: '#/components/parameters/workout_id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: object
+                  required: [planned_entry]
+                  properties:
+                    planned_entry:
+                      $ref: '#/components/schemas/PlannedEntryInput'
+                - type: object
+                  required: [execution]
+                  properties:
+                    execution:
+                      $ref: '#/components/schemas/ExecutionEntryInput'
+                - type: object
+                  required: [workout_set]
+                  properties:
+                    workout_set:
+                      $ref: '#/components/schemas/WorkoutSetInput'
+      responses:
+        '201':
+          description: Set(s) created
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/CreatePlannedSetsResponse'
+                  - $ref: '#/components/schemas/CreateExecutionSetResponse'
+                  - $ref: '#/components/schemas/CreateSingleWorkoutSetResponse'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /api/v1/workouts/{workout_id}/workout_sets/remove_exercise:
+    delete:
+      tags: [Workout Sets]
+      summary: Remove all sets for an exercise from a workout
+      parameters:
+        - $ref: '#/components/parameters/workout_id'
+        - name: exercise_id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Exercise removed from workout
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workout:
+                    $ref: '#/components/schemas/WorkoutWithSets'
+                  message:
+                    type: string
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'
+
+  /api/v1/workouts/{workout_id}/workout_sets/{id}:
+    patch:
+      tags: [Workout Sets]
+      summary: Update planned fields or update execution fields for one set
+      parameters:
+        - $ref: '#/components/parameters/workout_id'
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: object
+                  required: [workout_set]
+                  properties:
+                    workout_set:
+                      $ref: '#/components/schemas/WorkoutSetInput'
+                - type: object
+                  required: [execution]
+                  properties:
+                    execution:
+                      $ref: '#/components/schemas/ExecutionEntryInput'
+      responses:
+        '200':
+          description: Workout set updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workout_set:
+                    $ref: '#/components/schemas/WorkoutSet'
+                  workout:
+                    $ref: '#/components/schemas/WorkoutWithSets'
+                  message:
+                    type: string
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags: [Workout Sets]
+      summary: Delete one set from workout and reorder positions
+      parameters:
+        - $ref: '#/components/parameters/workout_id'
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Workout set removed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workout:
+                    $ref: '#/components/schemas/WorkoutWithSets'
+                  message:
+                    type: string
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: session_id
+    apiKeyHeaderAuth:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+    bearerApiKeyAuth:
+      type: http
+      scheme: bearer
+      description: API key sent as bearer token
+
+  parameters:
+    id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    workout_id:
+      name: workout_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    token:
+      name: token
+      in: path
+      required: true
+      schema:
+        type: string
+
+  responses:
+    Error401:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error404:
+      description: Record not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error429:
+      description: Rate limited
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ValidationError:
+      description: Validation failed or invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationErrorResponse'
+
+  schemas:
+    User:
+      type: object
+      required: [id, email_address, api_key, created_at, updated_at]
+      properties:
+        id: { type: integer }
+        email_address: { type: string, format: email }
+        api_key: { type: string }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    RegistrationInput:
+      type: object
+      required: [email_address, password, password_confirmation]
+      properties:
+        email_address: { type: string, format: email }
+        password: { type: string }
+        password_confirmation: { type: string }
+
+    SessionInput:
+      type: object
+      required: [email_address, password]
+      properties:
+        email_address: { type: string, format: email }
+        password: { type: string }
+
+    PasswordResetInput:
+      type: object
+      required: [password, password_confirmation]
+      properties:
+        password: { type: string }
+        password_confirmation: { type: string }
+
+    ExerciseInput:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string }
+        movement_category: { type: string, nullable: true }
+        primary_muscle_group: { type: string, nullable: true }
+        equipment_type: { type: string, nullable: true }
+        notes: { type: string, nullable: true }
+
+    Exercise:
+      type: object
+      required: [id, public_id, name, created_at, updated_at]
+      properties:
+        id: { type: integer }
+        public_id: { type: string }
+        name: { type: string }
+        movement_category: { type: string, nullable: true }
+        primary_muscle_group: { type: string, nullable: true }
+        equipment_type: { type: string, nullable: true }
+        notes: { type: string, nullable: true }
+        archived_at: { type: string, format: date-time, nullable: true }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    ExerciseFilterOptions:
+      type: object
+      properties:
+        movement_categories:
+          type: array
+          items: { type: string }
+        primary_muscle_groups:
+          type: array
+          items: { type: string }
+        equipment_types:
+          type: array
+          items: { type: string }
+
+    ExerciseImportResult:
+      type: object
+      properties:
+        created_count: { type: integer }
+        duplicate_names:
+          type: array
+          items: { type: string }
+        invalid_rows:
+          type: array
+          items: { type: string }
+
+    WorkoutInput:
+      type: object
+      properties:
+        title: { type: string }
+        workout_on: { type: string, format: date }
+        notes: { type: string, nullable: true }
+        status:
+          type: string
+          enum: [draft, in_progress, completed, cancelled]
+
+    Workout:
+      type: object
+      required: [id, user_id, title, workout_on, status, execution_logging, planned_total_difficulty, actual_total_difficulty, total_difficulty, created_at, updated_at]
+      properties:
+        id: { type: integer }
+        user_id: { type: integer }
+        title: { type: string }
+        workout_on: { type: string, format: date }
+        notes: { type: string, nullable: true }
+        status: { type: string, enum: [draft, in_progress, completed, cancelled] }
+        deleted_at: { type: string, format: date-time, nullable: true }
+        execution_logging: { type: boolean }
+        planned_total_difficulty: { type: number, format: float }
+        actual_total_difficulty: { type: number, format: float }
+        total_difficulty: { type: number, format: float }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    WorkoutWithSets:
+      allOf:
+        - $ref: '#/components/schemas/Workout'
+        - type: object
+          properties:
+            workout_sets:
+              type: array
+              items:
+                $ref: '#/components/schemas/WorkoutSet'
+
+    WorkoutSetInput:
+      type: object
+      required: [exercise_id]
+      properties:
+        exercise_id: { type: integer }
+        position: { type: integer, minimum: 1 }
+        target_reps: { type: integer, nullable: true, minimum: 1 }
+        target_weight: { type: number, nullable: true, minimum: 0 }
+        coach_notes: { type: string, nullable: true }
+
+    PlannedEntryInput:
+      type: object
+      required: [exercise_id, rep_pattern]
+      properties:
+        exercise_id: { type: integer }
+        set_count:
+          oneOf:
+            - type: integer
+              minimum: 1
+            - type: string
+        rep_pattern:
+          type: string
+          description: 'Examples: "8", "3x8", "9,9,8"'
+        target_weight:
+          oneOf:
+            - type: number
+              minimum: 0
+            - type: string
+        coach_notes: { type: string, nullable: true }
+
+    ExecutionEntryInput:
+      type: object
+      required: [actual_reps]
+      properties:
+        exercise_id:
+          type: integer
+          nullable: true
+        actual_reps: { type: integer, minimum: 1 }
+        actual_weight: { type: number, nullable: true, minimum: 0 }
+
+    WorkoutSet:
+      type: object
+      required: [id, workout_id, exercise_id, exercise_name, position, planned_difficulty, actual_difficulty, difficulty, created_at, updated_at]
+      properties:
+        id: { type: integer }
+        workout_id: { type: integer }
+        exercise_id: { type: integer }
+        exercise_name: { type: string }
+        position: { type: integer }
+        target_reps: { type: integer, nullable: true }
+        target_weight: { type: number, format: float, nullable: true }
+        coach_notes: { type: string, nullable: true }
+        actual_reps: { type: integer, nullable: true }
+        actual_weight: { type: number, format: float, nullable: true }
+        planned_difficulty: { type: number, format: float }
+        actual_difficulty: { type: number, format: float }
+        difficulty: { type: number, format: float }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    ExerciseHistoryGroup:
+      type: object
+      properties:
+        workout:
+          $ref: '#/components/schemas/Workout'
+        sets:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkoutSet'
+        summary:
+          type: string
+
+    CreatePlannedSetsResponse:
+      type: object
+      properties:
+        created_count: { type: integer }
+        workout_sets:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkoutSet'
+        workout:
+          $ref: '#/components/schemas/WorkoutWithSets'
+        message:
+          type: string
+
+    CreateExecutionSetResponse:
+      type: object
+      properties:
+        workout_set:
+          $ref: '#/components/schemas/WorkoutSet'
+        workout:
+          $ref: '#/components/schemas/WorkoutWithSets'
+        message:
+          type: string
+
+    CreateSingleWorkoutSetResponse:
+      type: object
+      properties:
+        workout_set:
+          $ref: '#/components/schemas/WorkoutSet'
+        workout:
+          $ref: '#/components/schemas/WorkoutWithSets'
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+
+    ValidationErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+            details:
+              type: array
+              items:
+                type: string
