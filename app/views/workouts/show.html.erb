@@ -51,7 +51,11 @@
 
   <div>
     <p class="panel-label">Notes</p>
-    <p class="supporting-text"><%= @workout.notes.presence || "No notes yet." %></p>
+    <% if @workout.notes.present? %>
+      <div class="supporting-text workout-summary-notes workout-note-markdown"><%= render_markdown(@workout.notes) %></div>
+    <% else %>
+      <p class="supporting-text">No notes yet.</p>
+    <% end %>
   </div>
 </section>
 

@@ -37,6 +37,21 @@ class WorkoutsControllerTest < ActionDispatch::IntegrationTest
     assert_select "button", text: "Archive", count: 0
   end
 
+  test "show renders workout and coach notes as markdown" do
+    @workout.update!(notes: "Hello _hello_ - **Layla**\n\n1. Hehe\n2. Togo")
+    workout_sets(:draft_bench).update!(coach_notes: "**Brace** and [control](https://example.com).")
+
+    get workout_path(@workout)
+
+    assert_response :success
+    assert_select ".workout-summary-notes em", "hello"
+    assert_select ".workout-summary-notes strong", "Layla"
+    assert_select ".workout-summary-notes ol li", text: "Hehe"
+    assert_select ".workout-summary-notes ol li", text: "Togo"
+    assert_select ".workout-note-markdown strong", "Brace"
+    assert_select ".workout-note-markdown a[href='https://example.com']", "control"
+  end
+
   test "start workout from show" do
     workouts(:active_session).update!(status: "completed")
     patch workout_path(@workout), params: { workout: { status: "in_progress" } }

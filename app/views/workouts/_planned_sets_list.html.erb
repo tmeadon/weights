@@ -72,8 +72,9 @@
 
         <% notes = grouped_sets.map(&:coach_notes).compact.uniq %>
         <% if notes.any? %>
-          <% formatted_notes = notes.flat_map { |note| note.to_s.split(/\r?\n/) } %>
-          <div class="supporting-text workout-note-preview"><%= safe_join(formatted_notes, tag.br) %></div>
+          <div class="supporting-text workout-note-preview">
+            <%= safe_join(notes.map { |note| content_tag(:div, render_markdown(note), class: "workout-note-markdown") }) %>
+          </div>
         <% end %>
 
       </article>
