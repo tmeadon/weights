@@ -16,6 +16,7 @@ class ProgressionsControllerTest < ActionDispatch::IntegrationTest
     assert_select "turbo-frame#progression_panel", count: 1
     assert_select ".progression-timeframe", /Totals from/
     assert_select "select[name='workout_type']"
+    assert_select "a[aria-label='Reset workout filters']", count: 1
     assert_select "select[name='exercise_id']", count: 0
     assert_select ".progression-attainment-track", count: 1
     assert_select ".progression-chart-svg", count: 1

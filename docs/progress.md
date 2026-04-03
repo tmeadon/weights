@@ -2,7 +2,7 @@
 
 ## Current Status
 
-Milestones 1 through 5 are functionally in place, Milestone 6 difficulty behavior is now established, and current work has shifted into execution ergonomics from Milestone 8.
+Milestones 1 through 6 are established, execution ergonomics from Milestone 8 has advanced significantly, and a new progression surface (Milestone 7-style analysis) is now in place. A full API layer and OpenAPI contract are also implemented for external clients.
 
 ## Completed So Far
 
@@ -81,6 +81,33 @@ Milestones 1 through 5 are functionally in place, Milestone 6 difficulty behavio
 - Planned and actual difficulty are tracked separately
 - Actual difficulty continues to recalculate from logged results instead of freezing on completion
 
+### API Layer and External Integrations
+
+- Added a full `/api/v1` JSON API surface for auth, account, exercises, workouts, and workout sets
+- Added per-user API keys with automatic generation and API key authentication support
+- Added bulk planned-set upload endpoint so full workouts can be created in one API request
+- Added exercise block reordering endpoint (`move_exercise`) to match UI ordering controls
+- Added comprehensive OpenAPI documentation in `docs/openapi.yaml`
+- Updated the OpenAPI contract to satisfy ChatGPT action parser constraints (`operationId`, simplified object schemas, single advertised security scheme)
+- Added production server entry (`https://weights.meadon.net`) and expanded request/response schema coverage
+
+### Progression and History Analysis
+
+- Added `workout_type` on workouts (`push`, `pull`, `legs`) and surfaced it in workout create/edit/show flows
+- Added a top-level **Progression** navigation section and page with tabbed views (`Workouts` / `Exercises`)
+- Added workout-level progression metrics for planned vs actual totals, deltas, and timeframe coverage
+- Added charting in progression views with absolute and delta modes
+- Added exercise-level progression with trend indicators (up/down/flat) and exercise-specific workout history
+- Improved progression mobile UX with compact metric rows, better spacing, and reduced visual clutter
+- Removed workout list note previews to keep index cards focused and cleaner
+
+### Workout Execution Ergonomics (Recent)
+
+- Added "Copy from above" flow, then refined it into focus-based auto-prefill for empty actual fields
+- Added per-exercise "Fill down" action that can use first-set actuals or planned defaults
+- Added exercise up/down controls in the workout UI to reorder exercise blocks without drag-and-drop
+- Tightened autosave behavior for repeated clear/refill flows
+
 ### Configuration and Developer Experience
 
 - Added `.gitignore` entries for local bundle output, temp files, SQLite files, and secrets
@@ -103,16 +130,28 @@ Milestones 1 through 5 are functionally in place, Milestone 6 difficulty behavio
 - `app/controllers/exercises_controller.rb`
 - `app/controllers/registrations_controller.rb`
 - `app/controllers/workouts_controller.rb`
+- `app/controllers/progressions_controller.rb`
+- `app/controllers/api/v1/base_controller.rb`
+- `app/controllers/api/v1/exercises_controller.rb`
+- `app/controllers/api/v1/workouts_controller.rb`
+- `app/controllers/api/v1/workout_sets_controller.rb`
+- `app/controllers/api/v1/sessions_controller.rb`
+- `app/controllers/api/v1/registrations_controller.rb`
+- `app/controllers/api/v1/passwords_controller.rb`
+- `app/controllers/api/v1/accounts_controller.rb`
 - `app/models/exercise.rb`
 - `app/models/workout.rb`
+- `app/helpers/markdown_helper.rb`
 - `app/views/home/index.html.erb`
 - `app/views/exercises/index.html.erb`
 - `app/views/workouts/index.html.erb`
 - `app/views/workouts/show.html.erb`
+- `app/views/progressions/index.html.erb`
 - `app/views/registrations/new.html.erb`
 - `app/views/sessions/new.html.erb`
 - `app/views/passwords/new.html.erb`
 - `app/views/passwords/edit.html.erb`
+- `docs/openapi.yaml`
 - `db/seeds.rb`
 - `.gitignore`
 

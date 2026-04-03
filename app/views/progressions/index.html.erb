@@ -8,7 +8,7 @@
     </div>
   </div>
 
-  <%= turbo_frame_tag "progression_panel" do %>
+  <%= turbo_frame_tag "progression_panel", data: { turbo_action: "advance" } do %>
     <nav class="progression-tabs" aria-label="Progression sections">
       <%= link_to "Workouts", progressions_path(tab: "workouts", workout_type: @selected_workout_type, chart_mode: @chart_mode), class: ["topbar-pill", (@tab == "workouts" ? "topbar-pill-active" : nil)], data: { turbo_frame: "progression_panel" } %>
       <%= link_to "Exercises", progressions_path(tab: "exercises", exercise_id: @selected_exercise_id, exercise_chart_mode: @exercise_chart_mode), class: ["topbar-pill", (@tab == "exercises" ? "topbar-pill-active" : nil)], data: { turbo_frame: "progression_panel" } %>
@@ -20,14 +20,24 @@
       <%= hidden_field_tag :exercise_chart_mode, @exercise_chart_mode %>
       <% if @tab == "workouts" %>
         <div class="field">
-          <%= label_tag :workout_type, "Workout type" %>
+          <div class="progression-filter-label-row">
+            <%= label_tag :workout_type, "Workout type" %>
+            <%= link_to progressions_path(tab: "workouts", chart_mode: @chart_mode), class: "progression-reset-icon", data: { turbo_frame: "progression_panel" }, aria: { label: "Reset workout filters" }, title: "Reset filters" do %>
+              ⟲
+            <% end %>
+          </div>
           <%= select_tag :workout_type, options_for_select([["All types", ""]] + @workout_types.map { |type| [type.humanize, type] }, @selected_workout_type), onchange: "this.form.requestSubmit()" %>
         </div>
       <% end %>
 
       <% if @tab == "exercises" %>
         <div class="field">
-          <%= label_tag :exercise_id, "Exercise" %>
+          <div class="progression-filter-label-row">
+            <%= label_tag :exercise_id, "Exercise" %>
+            <%= link_to progressions_path(tab: "exercises", exercise_chart_mode: @exercise_chart_mode), class: "progression-reset-icon", data: { turbo_frame: "progression_panel" }, aria: { label: "Reset exercise filters" }, title: "Reset filters" do %>
+              ⟲
+            <% end %>
+          </div>
           <%= select_tag :exercise_id, options_for_select([["All exercises", ""]] + @exercise_filter_options.map { |entry| ["#{entry[:exercise].name} (#{entry[:sessions]})", entry[:exercise].id] }, @selected_exercise_id), onchange: "this.form.requestSubmit()" %>
         </div>
       <% end %>
