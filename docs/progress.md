@@ -65,12 +65,12 @@ Milestones 1 through 5 are functionally in place, Milestone 6 difficulty behavio
 
 - Added `actual_reps` and `actual_weight` fields to `WorkoutSet`
 - Added inline actual-result logging controls directly inside the workout set table for in-progress workouts
-- Added a quick "Log extra set" flow so new sets and new exercises can be recorded without leaving the workout page
+- Unified in-progress adding around a single "Add exercise or set" flow so ad hoc gym changes can be logged without introducing planned targets
 - Added autosave on change for actuals to keep logging lightweight
 - Hardened autosave with inline `Saving...`, `Saved`, and retry states so logging feedback is visible without interrupting the session flow
 - Tightened mobile row spacing and compacted planned text for readability
 - Preserved the existing planned-vs-actual split so draft planning data stays intact while performed results are captured separately
-- Added minimal exercise history previews on exercise selection for both planning and extra-set logging, including compact summaries of recent sessions and one-click reuse of recent reps and weight
+- Added minimal exercise history previews on exercise selection for both planning and in-progress adding, including compact summaries of recent sessions and one-click reuse of recent reps and weight
 
 ### Difficulty Engine
 

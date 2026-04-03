@@ -53,8 +53,8 @@ class WorkoutsControllerTest < ActionDispatch::IntegrationTest
     get workout_path(workouts(:active_session))
 
     assert_response :success
-    assert_select ".panel-label", "Log extra set"
-    assert_select "input[value='Log set']"
+    assert_select ".panel-label", "Add exercise or set"
+    assert_select "input[value='Add']"
     assert_select "input[name='execution[actual_reps]']"
     assert_select "button[data-autosave-target='status']", count: Workout.find(workouts(:active_session).id).workout_sets.count
   end

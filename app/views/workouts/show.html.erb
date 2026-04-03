@@ -64,13 +64,7 @@
   </div>
 
   <%= turbo_frame_tag "planned_set_planner" do %>
-    <%= render "workouts/planned_set_planner", workout: @workout, exercises: @exercises, planned_entry: @planned_entry %>
-  <% end %>
-
-  <% if @workout.status == "in_progress" %>
-    <%= turbo_frame_tag "execution_set_logger" do %>
-      <%= render "workouts/execution_set_logger", workout: @workout, exercises: @exercises, execution_entry: @execution_entry %>
-    <% end %>
+    <%= render "workouts/planned_set_planner", workout: @workout, exercises: @exercises, planned_entry: @planned_entry, execution_entry: @execution_entry %>
   <% end %>
 
   <%= turbo_frame_tag "planned_sets_list" do %>

@@ -105,7 +105,7 @@ class WorkoutSetsController < ApplicationController
         respond_to do |format|
           format.turbo_stream do
             render turbo_stream: [
-              turbo_stream.replace("planned_set_planner", partial: "workouts/planned_set_planner", locals: { workout: @workout, exercises: @exercises, planned_entry: default_planned_entry }),
+              turbo_stream.replace("planned_set_planner", partial: "workouts/planned_set_planner", locals: { workout: @workout, exercises: @exercises, planned_entry: default_planned_entry, execution_entry: default_execution_entry }),
               turbo_stream.update("planned_sets_list", partial: "workouts/planned_sets_list", locals: { workout: @workout }),
               turbo_stream.update("planned_sets_count", partial: "workouts/planned_sets_count", locals: { workout: @workout }),
               turbo_stream.replace("workout_difficulty_totals", partial: "workouts/difficulty_totals", locals: { workout: @workout })
@@ -117,7 +117,7 @@ class WorkoutSetsController < ApplicationController
         @execution_entry = default_execution_entry
         respond_to do |format|
           format.turbo_stream do
-            render turbo_stream: turbo_stream.replace("planned_set_planner", partial: "workouts/planned_set_planner", locals: { workout: @workout, exercises: @exercises, planned_entry: @planned_entry }), status: :unprocessable_entity
+            render turbo_stream: turbo_stream.replace("planned_set_planner", partial: "workouts/planned_set_planner", locals: { workout: @workout, exercises: @exercises, planned_entry: @planned_entry, execution_entry: @execution_entry }), status: :unprocessable_entity
           end
           format.html { render "workouts/show", status: :unprocessable_entity }
         end
@@ -130,7 +130,7 @@ class WorkoutSetsController < ApplicationController
         respond_to do |format|
           format.turbo_stream do
             render turbo_stream: [
-              turbo_stream.replace("execution_set_logger", partial: "workouts/execution_set_logger", locals: { workout: @workout, exercises: @exercises, execution_entry: default_execution_entry }),
+              turbo_stream.replace("planned_set_planner", partial: "workouts/planned_set_planner", locals: { workout: @workout, exercises: @exercises, planned_entry: default_planned_entry, execution_entry: default_execution_entry }),
               turbo_stream.update("planned_sets_list", partial: "workouts/planned_sets_list", locals: { workout: @workout }),
               turbo_stream.update("planned_sets_count", partial: "workouts/planned_sets_count", locals: { workout: @workout }),
               turbo_stream.replace("workout_difficulty_totals", partial: "workouts/difficulty_totals", locals: { workout: @workout })
@@ -142,7 +142,7 @@ class WorkoutSetsController < ApplicationController
         @planned_entry = default_planned_entry
         respond_to do |format|
           format.turbo_stream do
-            render turbo_stream: turbo_stream.replace("execution_set_logger", partial: "workouts/execution_set_logger", locals: { workout: @workout, exercises: @exercises, execution_entry: @execution_entry }), status: :unprocessable_entity
+            render turbo_stream: turbo_stream.replace("planned_set_planner", partial: "workouts/planned_set_planner", locals: { workout: @workout, exercises: @exercises, planned_entry: @planned_entry, execution_entry: @execution_entry }), status: :unprocessable_entity
           end
           format.html { render "workouts/show", status: :unprocessable_entity }
         end
