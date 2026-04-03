@@ -24,14 +24,13 @@ tags:
   - name: Workouts
   - name: Workout Sets
 security:
-  - cookieAuth: []
   - apiKeyHeaderAuth: []
-  - bearerApiKeyAuth: []
 paths:
   /api/v1/registrations:
     post:
       tags: [Authentication]
       summary: Register a user and start a session
+      operationId: createRegistration
       security: []
       requestBody:
         required: true
@@ -60,6 +59,7 @@ paths:
     post:
       tags: [Authentication]
       summary: Sign in
+      operationId: createSession
       security: []
       requestBody:
         required: true
@@ -88,6 +88,7 @@ paths:
     delete:
       tags: [Authentication]
       summary: Sign out
+      operationId: destroySession
       responses:
         '204':
           description: Signed out
@@ -98,6 +99,7 @@ paths:
     get:
       tags: [Account]
       summary: Get the authenticated user
+      operationId: getAccount
       responses:
         '200':
           description: Current user
@@ -115,6 +117,7 @@ paths:
     post:
       tags: [Passwords]
       summary: Request a password reset email
+      operationId: createPasswordReset
       security: []
       requestBody:
         required: true
@@ -144,6 +147,7 @@ paths:
     put:
       tags: [Passwords]
       summary: Reset password with token
+      operationId: resetPasswordWithTokenPut
       security: []
       parameters:
         - $ref: '#/components/parameters/token'
@@ -168,6 +172,7 @@ paths:
     patch:
       tags: [Passwords]
       summary: Reset password with token
+      operationId: resetPasswordWithTokenPatch
       security: []
       parameters:
         - $ref: '#/components/parameters/token'
@@ -194,6 +199,7 @@ paths:
     get:
       tags: [Exercises]
       summary: List exercises with filtering
+      operationId: listExercises
       parameters:
         - name: query
           in: query
@@ -234,6 +240,7 @@ paths:
     post:
       tags: [Exercises]
       summary: Create an exercise
+      operationId: createExercise
       requestBody:
         required: true
         content:
@@ -261,6 +268,7 @@ paths:
     post:
       tags: [Exercises]
       summary: Bulk import exercises from pipe-delimited text
+      operationId: importExercises
       requestBody:
         required: true
         content:
@@ -298,6 +306,7 @@ paths:
     get:
       tags: [Exercises]
       summary: Get a single exercise
+      operationId: getExercise
       parameters:
         - $ref: '#/components/parameters/id'
       responses:
@@ -317,6 +326,7 @@ paths:
     patch:
       tags: [Exercises]
       summary: Update an exercise
+      operationId: updateExercise
       parameters:
         - $ref: '#/components/parameters/id'
       requestBody:
@@ -348,6 +358,7 @@ paths:
     delete:
       tags: [Exercises]
       summary: Archive an exercise (soft delete)
+      operationId: archiveExercise
       parameters:
         - $ref: '#/components/parameters/id'
       responses:
@@ -371,6 +382,7 @@ paths:
     patch:
       tags: [Exercises]
       summary: Restore an archived exercise
+      operationId: restoreExercise
       parameters:
         - $ref: '#/components/parameters/id'
       responses:
@@ -394,6 +406,7 @@ paths:
     get:
       tags: [Workouts]
       summary: List active workouts for current user
+      operationId: listWorkouts
       responses:
         '200':
           description: Workout list
@@ -414,6 +427,7 @@ paths:
     post:
       tags: [Workouts]
       summary: Create a workout
+      operationId: createWorkout
       requestBody:
         required: true
         content:
@@ -443,6 +457,7 @@ paths:
     get:
       tags: [Workouts]
       summary: Get currently in-progress workout
+      operationId: getActiveWorkout
       responses:
         '200':
           description: Active workout or null
@@ -462,6 +477,7 @@ paths:
     get:
       tags: [Workouts]
       summary: Get workout with sets
+      operationId: getWorkout
       parameters:
         - $ref: '#/components/parameters/id'
       responses:
@@ -481,6 +497,7 @@ paths:
     patch:
       tags: [Workouts]
       summary: Update workout metadata or lifecycle status
+      operationId: updateWorkout
       parameters:
         - $ref: '#/components/parameters/id'
       requestBody:
@@ -512,6 +529,7 @@ paths:
     delete:
       tags: [Workouts]
       summary: Archive workout (soft delete)
+      operationId: archiveWorkout
       parameters:
         - $ref: '#/components/parameters/id'
       responses:
@@ -535,6 +553,7 @@ paths:
     get:
       tags: [Workouts]
       summary: Get recent logged history for an exercise in user context
+      operationId: getWorkoutExerciseHistory
       parameters:
         - $ref: '#/components/parameters/id'
         - name: exercise_id
@@ -567,6 +586,7 @@ paths:
     post:
       tags: [Workout Sets]
       summary: Add planned sets, add execution set, or create one planned set
+      operationId: createWorkoutSet
       description: |
         Exactly one of these payload styles should be sent:
         - `planned_entry` to add grouped planned sets using rep pattern expansion
@@ -616,6 +636,7 @@ paths:
     delete:
       tags: [Workout Sets]
       summary: Remove all sets for an exercise from a workout
+      operationId: removeWorkoutExercise
       parameters:
         - $ref: '#/components/parameters/workout_id'
         - name: exercise_id
@@ -644,6 +665,7 @@ paths:
     patch:
       tags: [Workout Sets]
       summary: Update planned fields or update execution fields for one set
+      operationId: updateWorkoutSet
       parameters:
         - $ref: '#/components/parameters/workout_id'
         - $ref: '#/components/parameters/id'
@@ -686,6 +708,7 @@ paths:
     delete:
       tags: [Workout Sets]
       summary: Delete one set from workout and reorder positions
+      operationId: deleteWorkoutSet
       parameters:
         - $ref: '#/components/parameters/workout_id'
         - $ref: '#/components/parameters/id'
@@ -708,18 +731,10 @@ paths:
 
 components:
   securitySchemes:
-    cookieAuth:
-      type: apiKey
-      in: cookie
-      name: session_id
     apiKeyHeaderAuth:
       type: apiKey
       in: header
       name: X-Api-Key
-    bearerApiKeyAuth:
-      type: http
-      scheme: bearer
-      description: API key sent as bearer token
 
   parameters:
     id:
