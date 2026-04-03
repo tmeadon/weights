@@ -17,6 +17,19 @@ class ExerciseTest < ActiveSupport::TestCase
     assert_equal "Brace and row.", exercise.notes
   end
 
+  test "normalizes metadata casing" do
+    exercise = Exercise.create!(
+      name: "Kettlebell Swing",
+      movement_category: "hInGe",
+      primary_muscle_group: "gLuTeS",
+      equipment_type: "keTTleBell"
+    )
+
+    assert_equal "Hinge", exercise.movement_category
+    assert_equal "Glutes", exercise.primary_muscle_group
+    assert_equal "Kettlebell", exercise.equipment_type
+  end
+
   test "requires a unique exercise name" do
     duplicate = Exercise.new(name: exercises(:bench_press).name.upcase)
 

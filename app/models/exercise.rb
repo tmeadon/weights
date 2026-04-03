@@ -7,9 +7,9 @@ class Exercise < ApplicationRecord
   has_secure_token :public_id
 
   normalizes :name, with: ->(value) { value.to_s.strip.squeeze(" ") }
-  normalizes :movement_category, with: ->(value) { value.to_s.strip.presence }
-  normalizes :primary_muscle_group, with: ->(value) { value.to_s.strip.presence }
-  normalizes :equipment_type, with: ->(value) { value.to_s.strip.presence }
+  normalizes :movement_category, with: ->(value) { normalize_metadata_label(value) }
+  normalizes :primary_muscle_group, with: ->(value) { normalize_metadata_label(value) }
+  normalizes :equipment_type, with: ->(value) { normalize_metadata_label(value) }
   normalizes :notes, with: ->(value) { value.to_s.strip.presence }
 
   validates :name, presence: true, uniqueness: { case_sensitive: false }
@@ -105,6 +105,13 @@ class Exercise < ApplicationRecord
       equipment_type: values[3],
       notes: values[4]
     }
+  end
+
+  def self.normalize_metadata_label(value)
+    cleaned = value.to_s.strip.squeeze(" ").presence
+    return if cleaned.blank?
+
+    cleaned.downcase.split.map(&:capitalize).join(" ")
   end
   private_class_method :attributes_from_import_line
 end
