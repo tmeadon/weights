@@ -45,9 +45,6 @@
             <%= workout.workout_on.to_fs(:long) %> / <%= workout.status.humanize %> / Difficulty <%= number_with_precision(workout.total_difficulty, precision: 1) %>
           </p>
 
-          <% if workout.notes.present? %>
-            <p class="supporting-text workout-note-preview"><%= workout.notes %></p>
-          <% end %>
         </article>
       <% end %>
     </div>
