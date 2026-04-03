@@ -1,0 +1,83 @@
+<% return if points.blank? %>
+
+<% chart_width = 640 %>
+<% chart_height = 230 %>
+<% pad_left = 34 %>
+<% pad_right = 10 %>
+<% pad_top = 16 %>
+<% pad_bottom = 34 %>
+<% plot_width = chart_width - pad_left - pad_right %>
+<% plot_height = chart_height - pad_top - pad_bottom %>
+<% step_x = points.size > 1 ? (plot_width.to_f / (points.size - 1)) : 0 %>
+<% first_label = points.first[:label] %>
+<% last_label = points.last[:label] %>
+
+<% if mode == "delta" %>
+  <% max_abs = points.map { |point| point[:delta].to_f.abs }.max.to_f %>
+  <% max_abs = 1.0 if max_abs <= 0 %>
+  <% y_top = if max_abs < 100 then max_abs.ceil else ((max_abs / 50.0).ceil * 50) end %>
+  <% y_bottom = -y_top %>
+  <% mid_y = pad_top + (plot_height / 2.0) %>
+
+  <% delta_points = points.each_with_index.map do |point, index|
+    x = pad_left + (step_x * index)
+    y = mid_y - ((point[:delta].to_f / y_top) * (plot_height / 2.0))
+    format("%.2f,%.2f", x, y)
+  end.join(" ") %>
+
+  <div class="progression-chart-legend">
+    <span class="progression-chart-legend-item"><span class="progression-chart-key progression-chart-key-delta"></span>Delta (actual - planned)</span>
+  </div>
+
+  <div class="progression-chart-wrap" role="img" aria-label="<%= aria_label || "Delta difficulty trend" %>">
+    <svg viewBox="0 0 <%= chart_width %> <%= chart_height %>" class="progression-chart-svg" preserveAspectRatio="none" aria-hidden="true">
+      <line x1="<%= pad_left %>" y1="<%= pad_top + plot_height %>" x2="<%= chart_width - pad_right %>" y2="<%= pad_top + plot_height %>" class="progression-chart-axis" />
+      <line x1="<%= pad_left %>" y1="<%= pad_top %>" x2="<%= pad_left %>" y2="<%= pad_top + plot_height %>" class="progression-chart-axis" />
+      <line x1="<%= pad_left %>" y1="<%= mid_y %>" x2="<%= chart_width - pad_right %>" y2="<%= mid_y %>" class="progression-chart-axis progression-chart-axis-mid" />
+      <polyline points="<%= delta_points %>" class="progression-chart-line progression-chart-line-delta" />
+      <text x="<%= pad_left - 6 %>" y="<%= pad_top + 4 %>" text-anchor="end" class="progression-chart-label"><%= number_with_precision(y_top, precision: 0) %></text>
+      <text x="<%= pad_left - 6 %>" y="<%= mid_y + 4 %>" text-anchor="end" class="progression-chart-label">0</text>
+      <text x="<%= pad_left - 6 %>" y="<%= pad_top + plot_height + 4 %>" text-anchor="end" class="progression-chart-label"><%= number_with_precision(y_bottom, precision: 0) %></text>
+      <text x="<%= pad_left %>" y="<%= chart_height - 8 %>" text-anchor="start" class="progression-chart-label"><%= first_label %></text>
+      <% if points.size > 1 %>
+        <text x="<%= chart_width - pad_right %>" y="<%= chart_height - 8 %>" text-anchor="end" class="progression-chart-label"><%= last_label %></text>
+      <% end %>
+    </svg>
+  </div>
+<% else %>
+  <% max_value = points.flat_map { |point| [point[:planned].to_f, point[:actual].to_f] }.max.to_f %>
+  <% max_value = 1.0 if max_value <= 0 %>
+  <% y_top = if max_value < 100 then max_value.ceil else ((max_value / 50.0).ceil * 50) end %>
+
+  <% planned_points = points.each_with_index.map do |point, index|
+    x = pad_left + (step_x * index)
+    y = pad_top + plot_height - ((point[:planned].to_f / y_top) * plot_height)
+    format("%.2f,%.2f", x, y)
+  end.join(" ") %>
+
+  <% actual_points = points.each_with_index.map do |point, index|
+    x = pad_left + (step_x * index)
+    y = pad_top + plot_height - ((point[:actual].to_f / y_top) * plot_height)
+    format("%.2f,%.2f", x, y)
+  end.join(" ") %>
+
+  <div class="progression-chart-legend">
+    <span class="progression-chart-legend-item"><span class="progression-chart-key progression-chart-key-planned"></span>Planned</span>
+    <span class="progression-chart-legend-item"><span class="progression-chart-key progression-chart-key-actual"></span>Actual</span>
+  </div>
+
+  <div class="progression-chart-wrap" role="img" aria-label="<%= aria_label || "Planned and actual difficulty trend" %>">
+    <svg viewBox="0 0 <%= chart_width %> <%= chart_height %>" class="progression-chart-svg" preserveAspectRatio="none" aria-hidden="true">
+      <line x1="<%= pad_left %>" y1="<%= pad_top + plot_height %>" x2="<%= chart_width - pad_right %>" y2="<%= pad_top + plot_height %>" class="progression-chart-axis" />
+      <line x1="<%= pad_left %>" y1="<%= pad_top %>" x2="<%= pad_left %>" y2="<%= pad_top + plot_height %>" class="progression-chart-axis" />
+      <polyline points="<%= planned_points %>" class="progression-chart-line progression-chart-line-planned" />
+      <polyline points="<%= actual_points %>" class="progression-chart-line progression-chart-line-actual" />
+      <text x="<%= pad_left - 6 %>" y="<%= pad_top + 4 %>" text-anchor="end" class="progression-chart-label"><%= number_with_precision(y_top, precision: 0) %></text>
+      <text x="<%= pad_left - 6 %>" y="<%= pad_top + plot_height + 4 %>" text-anchor="end" class="progression-chart-label">0</text>
+      <text x="<%= pad_left %>" y="<%= chart_height - 8 %>" text-anchor="start" class="progression-chart-label"><%= first_label %></text>
+      <% if points.size > 1 %>
+        <text x="<%= chart_width - pad_right %>" y="<%= chart_height - 8 %>" text-anchor="end" class="progression-chart-label"><%= last_label %></text>
+      <% end %>
+    </svg>
+  </div>
+<% end %>

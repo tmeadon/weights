@@ -4,18 +4,26 @@ class ProgressionsController < ApplicationController
   def index
     @tab = normalized_tab(params[:tab])
     @chart_mode = normalized_chart_mode(params[:chart_mode])
+    @exercise_chart_mode = normalized_chart_mode(params[:exercise_chart_mode])
     @workout_types = Current.user.workouts.active.where.not(workout_type: nil).distinct.order(:workout_type).pluck(:workout_type)
-    @selected_workout_type = normalized_workout_type(params[:workout_type])
+    @selected_workout_type = @tab == "workouts" ? normalized_workout_type(params[:workout_type]) : nil
     @selected_workout_type = nil unless @workout_types.include?(@selected_workout_type)
 
     @progress_workouts = progress_workouts_scope.to_a
     @difficulty_summary = build_difficulty_summary(@progress_workouts)
     @workout_chart_points = build_workout_chart_points(@progress_workouts)
-    @exercise_stats = build_exercise_stats(@progress_workouts)
+    all_exercise_stats = build_exercise_stats(@progress_workouts)
+    @exercise_filter_options = all_exercise_stats
 
     @selected_exercise_id = params[:exercise_id].presence&.to_i
-    @selected_exercise = @exercise_stats.find { |entry| entry[:exercise].id == @selected_exercise_id }&.fetch(:exercise, nil)
+    @selected_exercise = all_exercise_stats.find { |entry| entry[:exercise].id == @selected_exercise_id }&.fetch(:exercise, nil)
+    @exercise_stats = if @selected_exercise_id.present?
+      all_exercise_stats.select { |entry| entry[:exercise].id == @selected_exercise_id }
+    else
+      all_exercise_stats
+    end
     @exercise_progress_rows = build_exercise_rows(@progress_workouts, @selected_exercise_id)
+    @exercise_chart_points = build_exercise_chart_points(@exercise_progress_rows)
   end
 
   private
@@ -147,6 +155,20 @@ class ProgressionsController < ApplicationController
             planned:,
             actual:,
             delta: actual - planned
+          }
+        end
+    end
+
+    def build_exercise_chart_points(rows)
+      Array(rows)
+        .sort_by { |row| [ row[:workout].workout_on, row[:workout].created_at ] }
+        .last(24)
+        .map do |row|
+          {
+            label: row[:workout].workout_on.to_fs(:short),
+            planned: row[:planned_total].to_d.to_f,
+            actual: row[:actual_total].to_d.to_f,
+            delta: row[:delta_total].to_d.to_f
           }
         end
     end

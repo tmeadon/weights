@@ -164,4 +164,14 @@ class WorkoutTest < ActiveSupport::TestCase
     workout.reload
     assert_equal snapshot, workout.planned_total_difficulty
   end
+
+  test "summarize recent logged sets skips blank actuals" do
+    workout = workouts(:draft_session)
+
+    first = WorkoutSet.new(actual_reps: nil, actual_weight: nil)
+    second = WorkoutSet.new(actual_reps: 3, actual_weight: 12)
+
+    assert_equal "1 x 3 x 12kg", workout.summarize_recent_logged_sets([ first, second ])
+    assert_equal "No logged sets", workout.summarize_recent_logged_sets([ first ])
+  end
 end

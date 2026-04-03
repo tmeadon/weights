@@ -488,6 +488,16 @@ select:focus {
   gap: 16px;
 }
 
+.progression-panel-section {
+  margin-top: 14px;
+}
+
+.progression-panel-section + .progression-panel-section {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
 .progression-tabs {
   display: inline-flex;
   gap: 8px;
@@ -693,9 +703,27 @@ select:focus {
   margin-top: 16px;
 }
 
+.progression-history-block {
+  margin-top: 14px;
+  padding: 14px 0 0;
+  border-top: 1px solid var(--line);
+}
+
+.progression-history-heading {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 1.22rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.progression-history-subtitle {
+  margin: 8px 0 6px;
+}
+
 .progression-mobile-row {
   border-top: 1px solid var(--line);
-  padding: 10px 0;
+  padding: 14px 0;
 }
 
 .progression-mobile-head {
@@ -718,7 +746,7 @@ select:focus {
 }
 
 .progression-mobile-meta {
-  margin: 4px 0 0;
+  margin: 8px 0 0;
   color: var(--ink-soft);
   font-size: 0.92rem;
 }
@@ -761,8 +789,8 @@ select:focus {
 .progression-mobile-metrics {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  margin-top: 8px;
+  gap: 14px;
+  margin-top: 12px;
 }
 
 .progression-mobile-label {
@@ -774,7 +802,7 @@ select:focus {
 }
 
 .progression-mobile-value {
-  margin: 2px 0 0;
+  margin: 4px 0 0;
   font-size: 1.3rem;
   line-height: 1.1;
   font-variant-numeric: tabular-nums;
@@ -1669,5 +1697,13 @@ select:focus {
     margin-left: -8px;
     margin-right: -8px;
     padding: 6px 4px 2px;
+  }
+
+  .progression-history-block {
+    padding: 16px 0 0;
+  }
+
+  .progression-mobile-row {
+    padding: 16px 0;
   }
 }

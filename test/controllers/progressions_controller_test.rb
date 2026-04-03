@@ -98,6 +98,36 @@ class ProgressionsControllerTest < ActionDispatch::IntegrationTest
     assert_select "select[name='exercise_id']"
   end
 
+  test "exercise tab shows chart when exercise selected" do
+    get progressions_path, params: { tab: "exercises", exercise_id: exercises(:bench_press).id }
+
+    assert_response :success
+    assert_select ".progression-chart-svg", count: 1
+    assert_select "a", text: "Absolute"
+    assert_select "a", text: "Delta"
+  end
+
+  test "exercise filter narrows main exercise table" do
+    pull_workout = @user.workouts.create!(
+      title: "Pull Session",
+      workout_on: Date.new(2026, 4, 10),
+      workout_type: "pull",
+      status: "completed"
+    )
+    pull_workout.workout_sets.create!(
+      exercise: exercises(:lat_pulldown),
+      position: 1,
+      actual_reps: 10,
+      actual_weight: 42
+    )
+
+    get progressions_path, params: { tab: "exercises", exercise_id: exercises(:bench_press).id }
+
+    assert_response :success
+    assert_select "td", text: "Dumbbell Bench Press"
+    assert_select "td", text: "Lat Pulldown", count: 0
+  end
+
   test "requires authentication" do
     sign_out
 

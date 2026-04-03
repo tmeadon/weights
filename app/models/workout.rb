@@ -223,14 +223,17 @@ class Workout < ApplicationRecord
     sets = Array(workout_sets)
     return "" if sets.empty?
 
-    reps = sets.map(&:actual_reps).compact
-    weights = sets.map(&:actual_weight).compact
+    logged_sets = sets.select { |workout_set| workout_set.actual_reps.present? || workout_set.actual_weight.present? }
+    return "No logged sets" if logged_sets.empty?
 
-    if reps.size == sets.size && weights.size == sets.size && reps.uniq.one? && weights.uniq.one?
-      "#{sets.size} x #{reps.first} x #{format_weight(weights.first)}kg"
+    reps = logged_sets.map(&:actual_reps).compact
+    weights = logged_sets.map(&:actual_weight).compact
+
+    if reps.size == logged_sets.size && weights.size == logged_sets.size && reps.uniq.one? && weights.uniq.one?
+      "#{logged_sets.size} x #{reps.first} x #{format_weight(weights.first)}kg"
     else
-      sets.map do |workout_set|
-        "#{workout_set.actual_reps || "-"} x #{workout_set.actual_weight.present? ? format_weight(workout_set.actual_weight) : "-"}kg"
+      logged_sets.map do |workout_set|
+        "#{workout_set.actual_reps || "?"} x #{workout_set.actual_weight.present? ? format_weight(workout_set.actual_weight) : "?"}kg"
       end.join(", ")
     end
   end
