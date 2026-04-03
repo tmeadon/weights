@@ -150,7 +150,11 @@ paths:
       operationId: resetPasswordWithTokenPut
       security: []
       parameters:
-        - $ref: '#/components/parameters/token'
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -175,7 +179,11 @@ paths:
       operationId: resetPasswordWithTokenPatch
       security: []
       parameters:
-        - $ref: '#/components/parameters/token'
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -274,21 +282,18 @@ paths:
         content:
           application/json:
             schema:
-              oneOf:
-                - type: object
-                  required: [text]
+              type: object
+              properties:
+                text:
+                  type: string
+                  description: Pipe-delimited import payload.
+                import:
+                  type: object
                   properties:
                     text:
                       type: string
-                - type: object
-                  required: [import]
-                  properties:
-                    import:
-                      type: object
-                      required: [text]
-                      properties:
-                        text:
-                          type: string
+                      description: Pipe-delimited import payload.
+              description: Provide `text` or `import.text`.
       responses:
         '201':
           description: Import completed
@@ -308,7 +313,11 @@ paths:
       summary: Get a single exercise
       operationId: getExercise
       parameters:
-        - $ref: '#/components/parameters/id'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         '200':
           description: Exercise
@@ -328,7 +337,11 @@ paths:
       summary: Update an exercise
       operationId: updateExercise
       parameters:
-        - $ref: '#/components/parameters/id'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         required: true
         content:
@@ -360,7 +373,11 @@ paths:
       summary: Archive an exercise (soft delete)
       operationId: archiveExercise
       parameters:
-        - $ref: '#/components/parameters/id'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         '200':
           description: Exercise archived
@@ -384,7 +401,11 @@ paths:
       summary: Restore an archived exercise
       operationId: restoreExercise
       parameters:
-        - $ref: '#/components/parameters/id'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         '200':
           description: Exercise restored
@@ -479,7 +500,11 @@ paths:
       summary: Get workout with sets
       operationId: getWorkout
       parameters:
-        - $ref: '#/components/parameters/id'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         '200':
           description: Workout details
@@ -499,7 +524,11 @@ paths:
       summary: Update workout metadata or lifecycle status
       operationId: updateWorkout
       parameters:
-        - $ref: '#/components/parameters/id'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         required: true
         content:
@@ -531,7 +560,11 @@ paths:
       summary: Archive workout (soft delete)
       operationId: archiveWorkout
       parameters:
-        - $ref: '#/components/parameters/id'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         '200':
           description: Workout archived
@@ -555,7 +588,11 @@ paths:
       summary: Get recent logged history for an exercise in user context
       operationId: getWorkoutExerciseHistory
       parameters:
-        - $ref: '#/components/parameters/id'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
         - name: exercise_id
           in: query
           required: true
@@ -593,28 +630,25 @@ paths:
         - `execution` to log an actual set for an in-progress workout
         - `workout_set` to create a single explicit planned set
       parameters:
-        - $ref: '#/components/parameters/workout_id'
+        - name: workout_id
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              oneOf:
-                - type: object
-                  required: [planned_entry]
-                  properties:
-                    planned_entry:
-                      $ref: '#/components/schemas/PlannedEntryInput'
-                - type: object
-                  required: [execution]
-                  properties:
-                    execution:
-                      $ref: '#/components/schemas/ExecutionEntryInput'
-                - type: object
-                  required: [workout_set]
-                  properties:
-                    workout_set:
-                      $ref: '#/components/schemas/WorkoutSetInput'
+              type: object
+              properties:
+                planned_entry:
+                  $ref: '#/components/schemas/PlannedEntryInput'
+                execution:
+                  $ref: '#/components/schemas/ExecutionEntryInput'
+                workout_set:
+                  $ref: '#/components/schemas/WorkoutSetInput'
+              description: Provide exactly one of `planned_entry`, `execution`, or `workout_set`.
       responses:
         '201':
           description: Set(s) created
@@ -638,7 +672,11 @@ paths:
       summary: Remove all sets for an exercise from a workout
       operationId: removeWorkoutExercise
       parameters:
-        - $ref: '#/components/parameters/workout_id'
+        - name: workout_id
+          in: path
+          required: true
+          schema:
+            type: integer
         - name: exercise_id
           in: query
           required: true
@@ -667,24 +705,28 @@ paths:
       summary: Update planned fields or update execution fields for one set
       operationId: updateWorkoutSet
       parameters:
-        - $ref: '#/components/parameters/workout_id'
-        - $ref: '#/components/parameters/id'
+        - name: workout_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              oneOf:
-                - type: object
-                  required: [workout_set]
-                  properties:
-                    workout_set:
-                      $ref: '#/components/schemas/WorkoutSetInput'
-                - type: object
-                  required: [execution]
-                  properties:
-                    execution:
-                      $ref: '#/components/schemas/ExecutionEntryInput'
+              type: object
+              properties:
+                workout_set:
+                  $ref: '#/components/schemas/WorkoutSetInput'
+                execution:
+                  $ref: '#/components/schemas/ExecutionEntryInput'
+              description: Provide one of `workout_set` or `execution`.
       responses:
         '200':
           description: Workout set updated
@@ -710,8 +752,16 @@ paths:
       summary: Delete one set from workout and reorder positions
       operationId: deleteWorkoutSet
       parameters:
-        - $ref: '#/components/parameters/workout_id'
-        - $ref: '#/components/parameters/id'
+        - name: workout_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         '200':
           description: Workout set removed
