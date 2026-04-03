@@ -93,6 +93,34 @@ module Api
         assert_equal "Set logged.", json_response["message"]
       end
 
+      test "bulk create planned sets through api" do
+        sign_in_as(@user)
+
+        assert_difference("WorkoutSet.count", 6) do
+          post bulk_create_api_v1_workout_workout_sets_path(@draft_workout),
+            params: {
+              planned_entries: [
+                {
+                  exercise_id: exercises(:bench_press).id,
+                  rep_pattern: "3x8",
+                  target_weight: 30,
+                  coach_notes: "Steady tempo"
+                },
+                {
+                  exercise_id: exercises(:squat).id,
+                  rep_pattern: "9,9,8",
+                  target_weight: 40
+                }
+              ]
+            },
+            as: :json
+        end
+
+        assert_response :created
+        assert_equal 6, json_response["created_count"]
+        assert_equal "Planned sets added.", json_response["message"]
+      end
+
       test "exercise import returns duplicate and created summary" do
         sign_in_as(@user)
 

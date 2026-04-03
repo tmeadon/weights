@@ -14,6 +14,25 @@ module Api
         end
       end
 
+      def bulk_create
+        entries = planned_entries_params
+        before_count = @workout.workout_sets.count
+
+        if @workout.append_planned_entries(entries)
+          @workout.reload
+          created_sets = @workout.workout_sets.order(:position).offset(before_count)
+
+          render json: {
+            created_count: created_sets.size,
+            workout_sets: created_sets.map { |workout_set| serialize_workout_set(workout_set) },
+            workout: serialize_workout(@workout, include_sets: true),
+            message: "Planned sets added."
+          }, status: :created
+        else
+          render_model_errors(@workout)
+        end
+      end
+
       def update
         if params[:execution].present?
           update_execution_set
@@ -139,6 +158,21 @@ module Api
 
         def planned_entry_params
           params.require(:planned_entry).permit(:exercise_id, :set_count, :rep_pattern, :target_weight, :coach_notes)
+        end
+
+        def planned_entries_params
+          entries = params.require(:planned_entries)
+          entries = [ entries ] unless entries.is_a?(Array)
+
+          entries.map do |entry|
+            permitted = if entry.is_a?(ActionController::Parameters)
+              entry.permit(:exercise_id, :set_count, :rep_pattern, :target_weight, :coach_notes)
+            else
+              ActionController::Parameters.new(entry).permit(:exercise_id, :set_count, :rep_pattern, :target_weight, :coach_notes)
+            end
+
+            permitted.to_h.symbolize_keys
+          end
         end
 
         def reorder_positions

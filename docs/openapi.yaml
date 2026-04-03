@@ -666,6 +666,44 @@ paths:
         '422':
           $ref: '#/components/responses/ValidationError'
 
+  /api/v1/workouts/{workout_id}/workout_sets/bulk_create:
+    post:
+      tags: [Workout Sets]
+      summary: Add many planned exercise entries to a workout in one request
+      operationId: bulkCreateWorkoutSets
+      parameters:
+        - name: workout_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [planned_entries]
+              properties:
+                planned_entries:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/PlannedEntryInput'
+              description: Array of planned exercise entries for full-workout upload.
+      responses:
+        '201':
+          description: Planned sets created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatePlannedSetsResponse'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
   /api/v1/workouts/{workout_id}/workout_sets/remove_exercise:
     delete:
       tags: [Workout Sets]
