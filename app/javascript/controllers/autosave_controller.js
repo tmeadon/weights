@@ -28,8 +28,6 @@ export default class extends Controller {
   }
 
   prefillFromAbove() {
-    if (this.element.dataset.prefilledFromAbove === "true") return
-
     const previousForm = this.previousSetForm()
     if (!previousForm) return
 
@@ -44,7 +42,6 @@ export default class extends Controller {
 
     currentWeightInput.value = previousWeightInput.value
     currentRepsInput.value = previousRepsInput.value
-    this.element.dataset.prefilledFromAbove = "true"
     this.queue()
   }
 

@@ -45,7 +45,6 @@ export default class extends Controller {
       }
 
       if (changed) {
-        form.dataset.prefilledFromAbove = "true"
         this.dispatchInput(weightInput)
         this.dispatchInput(repsInput)
       }
