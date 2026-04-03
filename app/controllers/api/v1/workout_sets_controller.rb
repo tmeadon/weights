@@ -52,6 +52,18 @@ module Api
         }
       end
 
+      def move_exercise
+        if @workout.move_exercise_block(exercise_id: params[:exercise_id], direction: params[:direction])
+          @workout.reload
+          render json: {
+            workout: serialize_workout(@workout, include_sets: true),
+            message: "Exercise order updated."
+          }
+        else
+          render_model_errors(@workout)
+        end
+      end
+
       def remove_exercise
         @workout.workout_sets.where(exercise_id: params[:exercise_id]).destroy_all
         reorder_positions

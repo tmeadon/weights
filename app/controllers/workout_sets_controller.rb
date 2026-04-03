@@ -64,6 +64,30 @@ class WorkoutSetsController < ApplicationController
     end
   end
 
+  def move_exercise
+    moved = @workout.move_exercise_block(exercise_id: params[:exercise_id], direction: params[:direction])
+    @workout.reload
+
+    respond_to do |format|
+      if moved
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.update("planned_sets_list", partial: "workouts/planned_sets_list", locals: { workout: @workout }),
+            turbo_stream.update("planned_sets_count", partial: "workouts/planned_sets_count", locals: { workout: @workout }),
+            turbo_stream.replace("workout_difficulty_totals", partial: "workouts/difficulty_totals", locals: { workout: @workout })
+          ]
+        end
+        format.html { redirect_to workout_path(@workout), notice: "Exercise order updated." }
+      else
+        format.turbo_stream do
+          flash.now[:alert] = @workout.errors.full_messages.to_sentence
+          render turbo_stream: turbo_stream.update("planned_sets_list", partial: "workouts/planned_sets_list", locals: { workout: @workout }), status: :unprocessable_entity
+        end
+        format.html { redirect_to workout_path(@workout), alert: @workout.errors.full_messages.to_sentence }
+      end
+    end
+  end
+
   private
     def set_workout
       @workout = Current.user.workouts.active.find(params[:workout_id])

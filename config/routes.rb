@@ -22,6 +22,7 @@ Rails.application.routes.draw do
 
     resources :workout_sets, except: %i[index show] do
       collection do
+        patch :move_exercise
         delete :remove_exercise
       end
     end
@@ -56,6 +57,7 @@ Rails.application.routes.draw do
         resources :workout_sets, except: %i[index show new edit] do
           collection do
             post :bulk_create
+            patch :move_exercise
             delete :remove_exercise
           end
         end

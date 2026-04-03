@@ -42,6 +42,37 @@ class Workout < ApplicationRecord
     workout_sets.group_by(&:exercise)
   end
 
+  def ordered_exercise_ids
+    workout_sets.ordered.map(&:exercise_id).uniq
+  end
+
+  def move_exercise_block(exercise_id:, direction:)
+    exercise_ids = ordered_exercise_ids
+    return true if exercise_ids.size <= 1
+
+    current_index = exercise_ids.index(exercise_id.to_i)
+    unless current_index
+      errors.add(:base, "Exercise is not part of this workout.")
+      return false
+    end
+
+    target_index = case direction.to_s
+    when "up"
+      current_index - 1
+    when "down"
+      current_index + 1
+    else
+      errors.add(:base, "Direction must be up or down.")
+      return false
+    end
+
+    return true if target_index.negative? || target_index >= exercise_ids.size
+
+    exercise_ids[current_index], exercise_ids[target_index] = exercise_ids[target_index], exercise_ids[current_index]
+    apply_exercise_order(exercise_ids)
+    true
+  end
+
   def summarize_planned_group(workout_sets)
     reps = workout_sets.map(&:target_reps).compact
     weight = workout_sets.map(&:target_weight).compact.uniq
@@ -198,6 +229,24 @@ class Workout < ApplicationRecord
   end
 
   private
+    def apply_exercise_order(exercise_ids)
+      sets_by_exercise = workout_sets.ordered.group_by(&:exercise_id)
+      next_position = 1
+
+      transaction do
+        workout_sets.each_with_index do |workout_set, index|
+          workout_set.update_column(:position, -(index + 1))
+        end
+
+        exercise_ids.each do |ordered_exercise_id|
+          Array(sets_by_exercise[ordered_exercise_id]).each do |workout_set|
+            workout_set.update_column(:position, next_position)
+            next_position += 1
+          end
+        end
+      end
+    end
+
     def format_weight(weight)
       number = weight.to_d
       number.frac.zero? ? number.to_i.to_s : format("%.1f", number)

@@ -2,11 +2,16 @@
 
 <% if exercise_groups.any? %>
   <div class="exercise-list workout-list">
-    <% exercise_groups.each do |exercise, grouped_sets| %>
+    <% exercise_groups.each_with_index do |(exercise, grouped_sets), index| %>
       <article class="workout-row planned-group-row" data-controller="fill-down">
         <div class="exercise-heading">
           <h3><%= exercise.name %></h3>
           <div class="exercise-actions">
+            <% can_reorder = workout.status.in?(%w[draft in_progress]) %>
+            <% if can_reorder %>
+              <%= button_to "↑", move_exercise_workout_workout_sets_path(workout, exercise_id: exercise.id, direction: "up"), method: :patch, class: "link-button exercise-order-link", form_class: "link-button-form", aria: { label: "Move #{exercise.name} up" }, disabled: index.zero? %>
+              <%= button_to "↓", move_exercise_workout_workout_sets_path(workout, exercise_id: exercise.id, direction: "down"), method: :patch, class: "link-button exercise-order-link", form_class: "link-button-form", aria: { label: "Move #{exercise.name} down" }, disabled: index == exercise_groups.size - 1 %>
+            <% end %>
             <% if workout.status == "in_progress" %>
               <button type="button" class="link-button exercise-fill-link" data-action="click->fill-down#fillDown">Fill down</button>
             <% end %>

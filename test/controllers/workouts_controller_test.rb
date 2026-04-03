@@ -28,6 +28,8 @@ class WorkoutsControllerTest < ActionDispatch::IntegrationTest
     assert_select "summary", /Add note/
     assert_select "input[value='Add']"
     assert_select ".planned-set-row", /Planned/
+    assert_select "button", text: "↑"
+    assert_select "button", text: "↓"
     assert_select "button", "Remove exercise"
     assert_select "button", text: "Fill down", count: 0
     assert_select "button", "Start workout"

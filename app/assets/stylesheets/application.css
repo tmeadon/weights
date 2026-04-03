@@ -619,6 +619,19 @@ select:focus {
   font-size: 0.84rem;
 }
 
+.exercise-order-link {
+  min-width: 1.1rem;
+  justify-content: center;
+  font-size: 0.86rem;
+  line-height: 1;
+}
+
+.exercise-order-link:disabled {
+  opacity: 0.35;
+  cursor: default;
+  text-decoration: none;
+}
+
 .exercise-remove-link {
   font-size: 0.9rem;
 }

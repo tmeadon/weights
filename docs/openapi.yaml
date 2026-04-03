@@ -704,6 +704,49 @@ paths:
         '422':
           $ref: '#/components/responses/ValidationError'
 
+  /api/v1/workouts/{workout_id}/workout_sets/move_exercise:
+    patch:
+      tags: [Workout Sets]
+      summary: Move an exercise block up or down within a workout
+      operationId: moveWorkoutExercise
+      parameters:
+        - name: workout_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [exercise_id, direction]
+              properties:
+                exercise_id:
+                  type: integer
+                direction:
+                  type: string
+                  enum: [up, down]
+      responses:
+        '200':
+          description: Exercise order updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workout:
+                    $ref: '#/components/schemas/WorkoutWithSets'
+                  message:
+                    type: string
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
   /api/v1/workouts/{workout_id}/workout_sets/remove_exercise:
     delete:
       tags: [Workout Sets]

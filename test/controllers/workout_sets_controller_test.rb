@@ -53,6 +53,16 @@ class WorkoutSetsControllerTest < ActionDispatch::IntegrationTest
     assert_not @workout.workout_sets.reload.exists?(exercise_id: exercises(:bench_press).id)
   end
 
+  test "move exercise up reorders grouped exercise blocks" do
+    patch move_exercise_workout_workout_sets_path(@workout), params: {
+      exercise_id: exercises(:lat_pulldown).id,
+      direction: "up"
+    }
+
+    assert_redirected_to workout_path(@workout)
+    assert_equal [ exercises(:lat_pulldown).id, exercises(:bench_press).id ], @workout.workout_sets.reload.order(:position).pluck(:exercise_id).uniq
+  end
+
   test "invalid planned entry re-renders workout show" do
     assert_no_difference("WorkoutSet.count") do
       post workout_workout_sets_path(@workout), params: {

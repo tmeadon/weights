@@ -121,6 +121,21 @@ module Api
         assert_equal "Planned sets added.", json_response["message"]
       end
 
+      test "move exercise block through api" do
+        sign_in_as(@user)
+
+        patch move_exercise_api_v1_workout_workout_sets_path(@draft_workout),
+          params: {
+            exercise_id: exercises(:lat_pulldown).id,
+            direction: "up"
+          },
+          as: :json
+
+        assert_response :success
+        assert_equal "Exercise order updated.", json_response["message"]
+        assert_equal [ exercises(:lat_pulldown).id, exercises(:bench_press).id ], json_response.fetch("workout").fetch("workout_sets").map { |workout_set| workout_set["exercise_id"] }.uniq
+      end
+
       test "exercise import returns duplicate and created summary" do
         sign_in_as(@user)
 
