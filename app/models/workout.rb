@@ -201,6 +201,35 @@ class Workout < ApplicationRecord
     workout_sets.reduce(BigDecimal("0")) { |sum, workout_set| sum + workout_set.actual_difficulty }
   end
 
+  def previous_workout_of_type
+    return nil if workout_type.blank?
+
+    self.class.active
+      .where(user_id:, workout_type:)
+      .where.not(id:)
+      .where(
+        "workout_on < :workout_on OR (workout_on = :workout_on AND created_at < :created_at)",
+        workout_on:,
+        created_at:
+      )
+      .order(workout_on: :desc, created_at: :desc)
+      .first
+  end
+
+  def planned_difficulty_delta_from_previous
+    previous_workout = previous_workout_of_type
+    return nil unless previous_workout
+
+    planned_total_difficulty - previous_workout.planned_total_difficulty
+  end
+
+  def actual_difficulty_delta_from_previous
+    previous_workout = previous_workout_of_type
+    return nil unless previous_workout
+
+    actual_total_difficulty - previous_workout.actual_total_difficulty
+  end
+
   def recent_history_for_exercise(exercise_id, limit: 3)
     return [] if exercise_id.blank?
 

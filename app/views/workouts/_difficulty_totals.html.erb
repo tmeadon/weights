@@ -1,10 +1,22 @@
 <div id="workout_difficulty_totals" class="detail-grid-group">
   <div>
     <dt>Actual difficulty</dt>
-    <dd><%= number_with_precision(workout.actual_total_difficulty, precision: 1, strip_insignificant_zeros: true) %></dd>
+    <dd>
+      <%= number_with_precision(workout.actual_total_difficulty, precision: 1, strip_insignificant_zeros: true) %>
+      <% delta = workout.actual_difficulty_delta_from_previous %>
+      <% if delta.present? %>
+        <p class="supporting-text detail-delta">vs last <%= workout.workout_type_label.downcase %>: <%= delta.positive? ? "+" : "" %><%= number_with_precision(delta, precision: 1, strip_insignificant_zeros: true) %></p>
+      <% end %>
+    </dd>
   </div>
   <div>
     <dt>Planned difficulty</dt>
-    <dd><%= number_with_precision(workout.planned_total_difficulty, precision: 1, strip_insignificant_zeros: true) %></dd>
+    <dd>
+      <%= number_with_precision(workout.planned_total_difficulty, precision: 1, strip_insignificant_zeros: true) %>
+      <% delta = workout.planned_difficulty_delta_from_previous %>
+      <% if delta.present? %>
+        <p class="supporting-text detail-delta">vs last <%= workout.workout_type_label.downcase %>: <%= delta.positive? ? "+" : "" %><%= number_with_precision(delta, precision: 1, strip_insignificant_zeros: true) %></p>
+      <% end %>
+    </dd>
   </div>
 </div>

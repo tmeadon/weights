@@ -1152,6 +1152,11 @@ select:focus {
   line-height: 1.7;
 }
 
+.detail-delta {
+  margin-top: 4px;
+  font-size: 0.82rem;
+}
+
 .eyebrow,
 .panel-label {
   margin: 0 0 12px;
