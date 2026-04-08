@@ -3,6 +3,7 @@ module Api
     class WorkoutSetsController < BaseController
       before_action :set_workout
       before_action :set_workout_set, only: %i[update destroy]
+      before_action :ensure_editable_workout, only: %i[destroy remove_exercise]
 
       def create
         if params[:execution].present?
@@ -191,6 +192,13 @@ module Api
           @workout.workout_sets.reload.each_with_index do |workout_set, index|
             workout_set.update_column(:position, index + 1)
           end
+        end
+
+        def ensure_editable_workout
+          return if @workout.status.in?(%w[draft in_progress])
+
+          render_error("Completed workouts cannot remove sets.", :unprocessable_entity)
+          return
         end
     end
   end

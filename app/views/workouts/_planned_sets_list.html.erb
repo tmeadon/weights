@@ -70,7 +70,9 @@
                   <span class="planned-set-muted">—</span>
                 <% end %>
               </div>
-              <%= button_to "x", workout_workout_set_path(workout, workout_set), method: :delete, class: "chip-remove", form_class: "chip-remove-form", aria: { label: "Remove set #{workout_set.position}" } %>
+              <% if workout.status.in?(%w[draft in_progress]) %>
+                <%= button_to "x", workout_workout_set_path(workout, workout_set), method: :delete, class: "chip-remove", form_class: "chip-remove-form", aria: { label: "Remove set #{workout_set.position}" } %>
+              <% end %>
             </div>
           <% end %>
         </div>

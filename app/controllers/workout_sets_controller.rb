@@ -1,6 +1,7 @@
 class WorkoutSetsController < ApplicationController
   before_action :set_workout
   before_action :set_workout_set, only: %i[edit update destroy]
+  before_action :ensure_editable_workout, only: %i[destroy remove_exercise]
   before_action :load_exercises, only: %i[new create edit update]
 
   def new
@@ -89,6 +90,17 @@ class WorkoutSetsController < ApplicationController
   end
 
   private
+    def ensure_editable_workout
+      return if @workout.status.in?(%w[draft in_progress])
+
+      respond_to do |format|
+        format.turbo_stream { redirect_to workout_path(@workout), alert: "Completed workouts cannot remove sets.", status: :see_other }
+        format.html { redirect_to workout_path(@workout), alert: "Completed workouts cannot remove sets.", status: :see_other }
+      end
+
+      return
+    end
+
     def set_workout
       @workout = Current.user.workouts.active.find(params[:workout_id])
     end

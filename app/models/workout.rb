@@ -223,11 +223,25 @@ class Workout < ApplicationRecord
     planned_total_difficulty - previous_workout.planned_total_difficulty
   end
 
+  def planned_difficulty_percent_delta_from_previous
+    previous_workout = previous_workout_of_type
+    return nil unless previous_workout
+
+    percent_delta_for(planned_total_difficulty, previous_workout.planned_total_difficulty)
+  end
+
   def actual_difficulty_delta_from_previous
     previous_workout = previous_workout_of_type
     return nil unless previous_workout
 
     actual_total_difficulty - previous_workout.actual_total_difficulty
+  end
+
+  def actual_difficulty_percent_delta_from_previous
+    previous_workout = previous_workout_of_type
+    return nil unless previous_workout
+
+    percent_delta_for(actual_total_difficulty, previous_workout.actual_total_difficulty)
   end
 
   def recent_history_for_exercise(exercise_id, limit: 3)
@@ -289,6 +303,13 @@ class Workout < ApplicationRecord
     def format_weight(weight)
       number = weight.to_d
       number.frac.zero? ? number.to_i.to_s : format("%.1f", number)
+    end
+
+    def percent_delta_for(current_value, previous_value)
+      previous = previous_value.to_d
+      return nil if previous.zero?
+
+      ((current_value.to_d - previous) / previous) * 100
     end
 
     def expand_reps(rep_pattern, set_count, line_number)

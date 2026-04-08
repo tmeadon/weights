@@ -5,7 +5,14 @@
       <%= number_with_precision(workout.actual_total_difficulty, precision: 1, strip_insignificant_zeros: true) %>
       <% delta = workout.actual_difficulty_delta_from_previous %>
       <% if delta.present? %>
-        <p class="supporting-text detail-delta">vs last <%= workout.workout_type_label.downcase %>: <%= delta.positive? ? "+" : "" %><%= number_with_precision(delta, precision: 1, strip_insignificant_zeros: true) %></p>
+        <% percent_delta = workout.actual_difficulty_percent_delta_from_previous %>
+        <p class="supporting-text detail-delta">
+          vs last <%= workout.workout_type_label.downcase %>:
+          <%= delta.positive? ? "+" : "" %><%= number_with_precision(delta, precision: 1, strip_insignificant_zeros: true) %>
+          <% if percent_delta.present? %>
+            (<%= percent_delta.positive? ? "+" : "" %><%= number_with_precision(percent_delta, precision: 1, strip_insignificant_zeros: true) %>%)
+          <% end %>
+        </p>
       <% end %>
     </dd>
   </div>
@@ -15,7 +22,14 @@
       <%= number_with_precision(workout.planned_total_difficulty, precision: 1, strip_insignificant_zeros: true) %>
       <% delta = workout.planned_difficulty_delta_from_previous %>
       <% if delta.present? %>
-        <p class="supporting-text detail-delta">vs last <%= workout.workout_type_label.downcase %>: <%= delta.positive? ? "+" : "" %><%= number_with_precision(delta, precision: 1, strip_insignificant_zeros: true) %></p>
+        <% percent_delta = workout.planned_difficulty_percent_delta_from_previous %>
+        <p class="supporting-text detail-delta">
+          vs last <%= workout.workout_type_label.downcase %>:
+          <%= delta.positive? ? "+" : "" %><%= number_with_precision(delta, precision: 1, strip_insignificant_zeros: true) %>
+          <% if percent_delta.present? %>
+            (<%= percent_delta.positive? ? "+" : "" %><%= number_with_precision(percent_delta, precision: 1, strip_insignificant_zeros: true) %>%)
+          <% end %>
+        </p>
       <% end %>
     </dd>
   </div>
