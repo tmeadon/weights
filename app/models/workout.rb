@@ -202,9 +202,10 @@ class Workout < ApplicationRecord
   end
 
   def previous_workout_of_type
-    return nil if workout_type.blank?
+    return @previous_workout_of_type if defined?(@previous_workout_of_type)
+    return @previous_workout_of_type = nil if workout_type.blank?
 
-    self.class.active
+    @previous_workout_of_type = self.class.active
       .where(user_id:, workout_type:)
       .where.not(id:)
       .where(
@@ -230,6 +231,20 @@ class Workout < ApplicationRecord
     percent_delta_for(planned_total_difficulty, previous_workout.planned_total_difficulty)
   end
 
+  def planned_difficulty_delta_from_previous_actual
+    previous_workout = previous_workout_of_type
+    return nil unless previous_workout
+
+    planned_total_difficulty - previous_workout.actual_total_difficulty
+  end
+
+  def planned_difficulty_percent_delta_from_previous_actual
+    previous_workout = previous_workout_of_type
+    return nil unless previous_workout
+
+    percent_delta_for(planned_total_difficulty, previous_workout.actual_total_difficulty)
+  end
+
   def actual_difficulty_delta_from_previous
     previous_workout = previous_workout_of_type
     return nil unless previous_workout
@@ -242,6 +257,20 @@ class Workout < ApplicationRecord
     return nil unless previous_workout
 
     percent_delta_for(actual_total_difficulty, previous_workout.actual_total_difficulty)
+  end
+
+  def actual_difficulty_delta_from_previous_planned
+    previous_workout = previous_workout_of_type
+    return nil unless previous_workout
+
+    actual_total_difficulty - previous_workout.planned_total_difficulty
+  end
+
+  def actual_difficulty_percent_delta_from_previous_planned
+    previous_workout = previous_workout_of_type
+    return nil unless previous_workout
+
+    percent_delta_for(actual_total_difficulty, previous_workout.planned_total_difficulty)
   end
 
   def recent_history_for_exercise(exercise_id, limit: 3)

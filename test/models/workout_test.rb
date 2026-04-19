@@ -165,6 +165,51 @@ class WorkoutTest < ActiveSupport::TestCase
     assert_equal snapshot, workout.planned_total_difficulty
   end
 
+  test "calculates previous actual and planned deltas for current workout totals" do
+    user = users(:one)
+    exercise = exercises(:bench_press)
+
+    previous_workout = user.workouts.create!(
+      title: "Push Session One",
+      workout_on: Date.new(2026, 3, 10),
+      workout_type: "push",
+      status: "completed",
+      planned_total_difficulty: 100
+    )
+    previous_workout.workout_sets.create!(
+      exercise:,
+      position: 1,
+      actual_reps: 1,
+      actual_weight: 100
+    )
+
+    current_workout = user.workouts.create!(
+      title: "Push Session Two",
+      workout_on: Date.new(2026, 3, 11),
+      workout_type: "push",
+      status: "completed",
+      planned_total_difficulty: 130
+    )
+    current_workout.workout_sets.create!(
+      exercise:,
+      position: 1,
+      actual_reps: 1,
+      actual_weight: 120
+    )
+
+    assert_in_delta 27.0, current_workout.actual_difficulty_delta_from_previous.to_f, 0.001
+    assert_in_delta 30.0, current_workout.planned_difficulty_delta_from_previous.to_f, 0.001
+
+    assert_in_delta 62.0, current_workout.actual_difficulty_delta_from_previous_planned.to_f, 0.001
+    assert_in_delta(-5.0, current_workout.planned_difficulty_delta_from_previous_actual.to_f, 0.001)
+
+    assert_in_delta 20.0, current_workout.actual_difficulty_percent_delta_from_previous.to_f, 0.001
+    assert_in_delta 30.0, current_workout.planned_difficulty_percent_delta_from_previous.to_f, 0.001
+
+    assert_in_delta 62.0, current_workout.actual_difficulty_percent_delta_from_previous_planned.to_f, 0.001
+    assert_in_delta(-3.7037, current_workout.planned_difficulty_percent_delta_from_previous_actual.to_f, 0.001)
+  end
+
   test "summarize recent logged sets skips blank actuals" do
     workout = workouts(:draft_session)
 

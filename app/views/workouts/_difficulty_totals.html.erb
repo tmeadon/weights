@@ -3,16 +3,30 @@
     <dt>Actual difficulty</dt>
     <dd>
       <%= number_with_precision(workout.actual_total_difficulty, precision: 1, strip_insignificant_zeros: true) %>
-      <% delta = workout.actual_difficulty_delta_from_previous %>
-      <% if delta.present? %>
-        <% percent_delta = workout.actual_difficulty_percent_delta_from_previous %>
-        <p class="supporting-text detail-delta">
-          vs last <%= workout.workout_type_label.downcase %>:
-          <%= delta.positive? ? "+" : "" %><%= number_with_precision(delta, precision: 1, strip_insignificant_zeros: true) %>
-          <% if percent_delta.present? %>
-            (<%= percent_delta.positive? ? "+" : "" %><%= number_with_precision(percent_delta, precision: 1, strip_insignificant_zeros: true) %>%)
-          <% end %>
-        </p>
+      <% previous_actual_delta = workout.actual_difficulty_delta_from_previous %>
+      <% previous_actual_percent_delta = workout.actual_difficulty_percent_delta_from_previous %>
+      <% previous_planned_delta = workout.actual_difficulty_delta_from_previous_planned %>
+      <% previous_planned_percent_delta = workout.actual_difficulty_percent_delta_from_previous_planned %>
+      <% if previous_actual_delta.present? || previous_planned_delta.present? %>
+        <% if previous_actual_delta.present? %>
+          <p class="supporting-text detail-delta">
+            vs last <%= workout.workout_type_label.downcase %> actual:
+            <%= previous_actual_delta.positive? ? "+" : "" %><%= number_with_precision(previous_actual_delta, precision: 1, strip_insignificant_zeros: true) %>
+            <% if previous_actual_percent_delta.present? %>
+              (<%= previous_actual_percent_delta.positive? ? "+" : "" %><%= number_with_precision(previous_actual_percent_delta, precision: 1, strip_insignificant_zeros: true) %>%)
+            <% end %>
+          </p>
+        <% end %>
+
+        <% if previous_planned_delta.present? %>
+          <p class="supporting-text detail-delta">
+            vs last <%= workout.workout_type_label.downcase %> planned:
+            <%= previous_planned_delta.positive? ? "+" : "" %><%= number_with_precision(previous_planned_delta, precision: 1, strip_insignificant_zeros: true) %>
+            <% if previous_planned_percent_delta.present? %>
+              (<%= previous_planned_percent_delta.positive? ? "+" : "" %><%= number_with_precision(previous_planned_percent_delta, precision: 1, strip_insignificant_zeros: true) %>%)
+            <% end %>
+          </p>
+        <% end %>
       <% end %>
     </dd>
   </div>
@@ -20,16 +34,30 @@
     <dt>Planned difficulty</dt>
     <dd>
       <%= number_with_precision(workout.planned_total_difficulty, precision: 1, strip_insignificant_zeros: true) %>
-      <% delta = workout.planned_difficulty_delta_from_previous %>
-      <% if delta.present? %>
-        <% percent_delta = workout.planned_difficulty_percent_delta_from_previous %>
-        <p class="supporting-text detail-delta">
-          vs last <%= workout.workout_type_label.downcase %>:
-          <%= delta.positive? ? "+" : "" %><%= number_with_precision(delta, precision: 1, strip_insignificant_zeros: true) %>
-          <% if percent_delta.present? %>
-            (<%= percent_delta.positive? ? "+" : "" %><%= number_with_precision(percent_delta, precision: 1, strip_insignificant_zeros: true) %>%)
-          <% end %>
-        </p>
+      <% previous_planned_delta = workout.planned_difficulty_delta_from_previous %>
+      <% previous_planned_percent_delta = workout.planned_difficulty_percent_delta_from_previous %>
+      <% previous_actual_delta = workout.planned_difficulty_delta_from_previous_actual %>
+      <% previous_actual_percent_delta = workout.planned_difficulty_percent_delta_from_previous_actual %>
+      <% if previous_planned_delta.present? || previous_actual_delta.present? %>
+        <% if previous_planned_delta.present? %>
+          <p class="supporting-text detail-delta">
+            vs last <%= workout.workout_type_label.downcase %> planned:
+            <%= previous_planned_delta.positive? ? "+" : "" %><%= number_with_precision(previous_planned_delta, precision: 1, strip_insignificant_zeros: true) %>
+            <% if previous_planned_percent_delta.present? %>
+              (<%= previous_planned_percent_delta.positive? ? "+" : "" %><%= number_with_precision(previous_planned_percent_delta, precision: 1, strip_insignificant_zeros: true) %>%)
+            <% end %>
+          </p>
+        <% end %>
+
+        <% if previous_actual_delta.present? %>
+          <p class="supporting-text detail-delta">
+            vs last <%= workout.workout_type_label.downcase %> actual:
+            <%= previous_actual_delta.positive? ? "+" : "" %><%= number_with_precision(previous_actual_delta, precision: 1, strip_insignificant_zeros: true) %>
+            <% if previous_actual_percent_delta.present? %>
+              (<%= previous_actual_percent_delta.positive? ? "+" : "" %><%= number_with_precision(previous_actual_percent_delta, precision: 1, strip_insignificant_zeros: true) %>%)
+            <% end %>
+          </p>
+        <% end %>
       <% end %>
     </dd>
   </div>
