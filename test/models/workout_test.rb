@@ -200,13 +200,11 @@ class WorkoutTest < ActiveSupport::TestCase
     assert_in_delta 27.0, current_workout.actual_difficulty_delta_from_previous.to_f, 0.001
     assert_in_delta 30.0, current_workout.planned_difficulty_delta_from_previous.to_f, 0.001
 
-    assert_in_delta 62.0, current_workout.actual_difficulty_delta_from_previous_planned.to_f, 0.001
     assert_in_delta(-5.0, current_workout.planned_difficulty_delta_from_previous_actual.to_f, 0.001)
 
     assert_in_delta 20.0, current_workout.actual_difficulty_percent_delta_from_previous.to_f, 0.001
     assert_in_delta 30.0, current_workout.planned_difficulty_percent_delta_from_previous.to_f, 0.001
 
-    assert_in_delta 62.0, current_workout.actual_difficulty_percent_delta_from_previous_planned.to_f, 0.001
     assert_in_delta(-3.7037, current_workout.planned_difficulty_percent_delta_from_previous_actual.to_f, 0.001)
   end
 

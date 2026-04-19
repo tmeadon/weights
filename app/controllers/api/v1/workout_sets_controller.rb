@@ -198,7 +198,6 @@ module Api
           return if @workout.status.in?(%w[draft in_progress])
 
           render_error("Completed workouts cannot remove sets.", :unprocessable_entity)
-          return
         end
     end
   end

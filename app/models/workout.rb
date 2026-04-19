@@ -259,20 +259,6 @@ class Workout < ApplicationRecord
     percent_delta_for(actual_total_difficulty, previous_workout.actual_total_difficulty)
   end
 
-  def actual_difficulty_delta_from_previous_planned
-    previous_workout = previous_workout_of_type
-    return nil unless previous_workout
-
-    actual_total_difficulty - previous_workout.planned_total_difficulty
-  end
-
-  def actual_difficulty_percent_delta_from_previous_planned
-    previous_workout = previous_workout_of_type
-    return nil unless previous_workout
-
-    percent_delta_for(actual_total_difficulty, previous_workout.planned_total_difficulty)
-  end
-
   def recent_history_for_exercise(exercise_id, limit: 3)
     return [] if exercise_id.blank?
 

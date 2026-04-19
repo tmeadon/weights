@@ -97,8 +97,6 @@ class WorkoutSetsController < ApplicationController
         format.turbo_stream { redirect_to workout_path(@workout), alert: "Completed workouts cannot remove sets.", status: :see_other }
         format.html { redirect_to workout_path(@workout), alert: "Completed workouts cannot remove sets.", status: :see_other }
       end
-
-      return
     end
 
     def set_workout
