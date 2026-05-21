@@ -1,6 +1,4 @@
 class ProgressionsController < ApplicationController
-  TREND_EPSILON = BigDecimal("0.5")
-
   def index
     @tab = normalized_tab(params[:tab])
     @chart_mode = normalized_chart_mode(params[:chart_mode])
@@ -9,9 +7,10 @@ class ProgressionsController < ApplicationController
     @selected_workout_type = @tab == "workouts" ? normalized_workout_type(params[:workout_type]) : nil
     @selected_workout_type = nil unless @workout_types.include?(@selected_workout_type)
 
-    @progress_workouts = progress_workouts_scope.to_a
-    @difficulty_summary = build_difficulty_summary(@progress_workouts)
-    @workout_chart_points = build_workout_chart_points(@progress_workouts)
+    @progress_workouts = progress_workouts_scope.to_a.sort_by { |workout| [ workout.workout_on, workout.created_at ] }
+    @workout_progress_rows = build_workout_progress_rows(@progress_workouts)
+    @difficulty_summary = build_difficulty_summary(@workout_progress_rows)
+    @workout_chart_points = build_workout_chart_points(@workout_progress_rows)
     all_exercise_stats = build_exercise_stats(@progress_workouts)
     @exercise_filter_options = all_exercise_stats
 
@@ -50,22 +49,44 @@ class ProgressionsController < ApplicationController
     end
 
     def normalized_chart_mode(value)
-      value.to_s.strip.downcase == "delta" ? "delta" : "absolute"
+      value.to_s.strip.downcase == "relative" ? "relative" : "absolute"
     end
 
-    def build_difficulty_summary(workouts)
-      session_count = workouts.size
-      planned_total = workouts.sum { |workout| workout.planned_total_difficulty.to_d }
-      actual_total = workouts.sum { |workout| workout.actual_total_difficulty.to_d }
+    def build_difficulty_summary(rows)
+      session_count = rows.size
+      absolute_total = rows.sum { |row| row[:absolute_total].to_d }
+      latest_row = rows.last
+      recent_relative = rows.last(4).filter_map { |row| row[:relative_percent]&.to_d }
+      positive_relative_sessions = rows.count { |row| row[:relative_percent].to_d.positive? }
+      comparable_sessions = rows.count { |row| row[:relative_percent].present? }
 
       {
         sessions: session_count,
-        planned_total:,
-        actual_total:,
-        delta_total: actual_total - planned_total,
-        planned_average: session_count.zero? ? 0 : planned_total / session_count,
-        actual_average: session_count.zero? ? 0 : actual_total / session_count
+        absolute_total:,
+        absolute_average: session_count.zero? ? 0 : absolute_total / session_count,
+        latest_absolute: latest_row&.dig(:absolute_total),
+        latest_relative: latest_row&.dig(:relative_percent),
+        rolling_relative_average: recent_relative.any? ? recent_relative.sum / recent_relative.size : nil,
+        positive_relative_rate: comparable_sessions.zero? ? nil : (BigDecimal(positive_relative_sessions.to_s) / comparable_sessions) * 100
       }
+    end
+
+    def build_workout_progress_rows(workouts)
+      previous_absolute = nil
+
+      workouts.map do |workout|
+        absolute_total = workout.actual_total_difficulty.to_d
+        relative_percent = percent_change_for(absolute_total, previous_absolute)
+
+        row = {
+          workout:,
+          absolute_total:,
+          relative_percent:
+        }
+
+        previous_absolute = absolute_total
+        row
+      end
     end
 
     def build_exercise_stats(workouts)
@@ -78,53 +99,34 @@ class ProgressionsController < ApplicationController
       end
 
       grouped.map do |exercise, entries|
-        workout_count = entries.map(&:first).uniq.size
-        planned_total = entries.sum { |(_workout, workout_set)| workout_set.planned_difficulty.to_d }
-        actual_total = entries.sum { |(_workout, workout_set)| workout_set.actual_difficulty.to_d }
-        trend = trend_for_entries(entries)
+        workout_totals = entries
+          .group_by(&:first)
+          .map do |workout, workout_entries|
+            total = workout_entries.sum { |(_entry_workout, workout_set)| workout_set.actual_difficulty.to_d }
+            { workout:, total: }
+          end
+          .sort_by { |row| [ row[:workout].workout_on, row[:workout].created_at ] }
+
+        latest_total = workout_totals.last&.dig(:total)
+        previous_total = workout_totals[-2]&.dig(:total)
+        latest_relative = percent_change_for(latest_total, previous_total)
+        comparable_totals = workout_totals.each_cons(2).map { |previous, current| percent_change_for(current[:total], previous[:total]) }.compact
 
         {
           exercise:,
-          sessions: workout_count,
-          planned_total:,
-          actual_total:,
-          delta_total: actual_total - planned_total,
-          trend_direction: trend[:direction],
-          trend_delta: trend[:delta]
+          sessions: workout_totals.size,
+          absolute_total: workout_totals.sum { |row| row[:total] },
+          latest_absolute: latest_total,
+          latest_relative: latest_relative,
+          average_relative: comparable_totals.any? ? comparable_totals.sum / comparable_totals.size : nil
         }
-      end.sort_by { |entry| [ -entry[:sessions], -entry[:actual_total], entry[:exercise].name ] }
-    end
-
-    def trend_for_entries(entries)
-      workout_totals = entries
-        .group_by(&:first)
-        .map do |workout, workout_entries|
-          total = workout_entries.sum { |(_entry_workout, workout_set)| workout_set.actual_difficulty.to_d }
-          { workout:, total: }
-        end
-        .sort_by { |row| [ row[:workout].workout_on, row[:workout].created_at ] }
-
-      return { direction: :neutral, delta: BigDecimal("0") } if workout_totals.size < 2
-
-      previous = workout_totals[-2][:total]
-      latest = workout_totals[-1][:total]
-      delta = latest - previous
-
-      direction = if delta > TREND_EPSILON
-        :up
-      elsif delta < -TREND_EPSILON
-        :down
-      else
-        :neutral
-      end
-
-      { direction:, delta: }
+      end.sort_by { |entry| [ -entry[:sessions], -entry[:latest_absolute].to_d, entry[:exercise].name ] }
     end
 
     def build_exercise_rows(workouts, exercise_id)
       return [] if exercise_id.blank?
 
-      workouts.filter_map do |workout|
+      rows = workouts.filter_map do |workout|
         sets = workout.workout_sets.select { |workout_set| workout_set.exercise_id == exercise_id }
         next if sets.empty?
 
@@ -136,40 +138,45 @@ class ProgressionsController < ApplicationController
           sets:,
           planned_total:,
           actual_total:,
-          delta_total: actual_total - planned_total,
           actual_summary: workout.summarize_recent_logged_sets(sets)
+        }
+      end
+
+      sorted_rows = rows.sort_by { |row| [ row[:workout].workout_on, row[:workout].created_at ] }
+
+      sorted_rows.each_with_index.map do |row, index|
+        previous_total = index.zero? ? nil : sorted_rows[index - 1][:actual_total]
+
+        row.merge(relative_percent: percent_change_for(row[:actual_total], previous_total))
+      end
+    end
+
+    def build_workout_chart_points(rows)
+      rows.last(24).map do |row|
+        {
+          label: row[:workout].workout_on.to_fs(:short),
+          absolute: row[:absolute_total].to_d.to_f,
+          relative: row[:relative_percent]&.to_d&.to_f
         }
       end
     end
 
-    def build_workout_chart_points(workouts)
-      workouts
-        .sort_by { |workout| [ workout.workout_on, workout.created_at ] }
-        .last(24)
-        .map do |workout|
-          planned = workout.planned_total_difficulty.to_d.to_f
-          actual = workout.actual_total_difficulty.to_d.to_f
-
-          {
-            label: workout.workout_on.to_fs(:short),
-            planned:,
-            actual:,
-            delta: actual - planned
-          }
-        end
+    def build_exercise_chart_points(rows)
+      Array(rows).last(24).map do |row|
+        {
+          label: row[:workout].workout_on.to_fs(:short),
+          absolute: row[:actual_total].to_d.to_f,
+          relative: row[:relative_percent]&.to_d&.to_f
+        }
+      end
     end
 
-    def build_exercise_chart_points(rows)
-      Array(rows)
-        .sort_by { |row| [ row[:workout].workout_on, row[:workout].created_at ] }
-        .last(24)
-        .map do |row|
-          {
-            label: row[:workout].workout_on.to_fs(:short),
-            planned: row[:planned_total].to_d.to_f,
-            actual: row[:actual_total].to_d.to_f,
-            delta: row[:delta_total].to_d.to_f
-          }
-        end
+    def percent_change_for(current_value, previous_value)
+      return nil if current_value.nil? || previous_value.nil?
+
+      previous = previous_value.to_d
+      return nil if previous.zero?
+
+      ((current_value.to_d - previous) / previous) * 100
     end
 end

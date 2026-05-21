@@ -11,17 +11,16 @@ class ProgressionsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h1", "Progression"
-    assert_select "h2", "Planned vs actual by workout"
-    assert_select "h2", text: "Exercise-level progression", count: 0
+    assert_select "h2", "Absolute and relative progression"
+    assert_select "h2", text: "Absolute and relative exercise progression", count: 0
     assert_select "turbo-frame#progression_panel", count: 1
-    assert_select ".progression-timeframe", /Totals from/
+    assert_select ".progression-timeframe", /Data from/
     assert_select "select[name='workout_type']"
     assert_select "a[aria-label='Reset workout filters']", count: 1
     assert_select "select[name='exercise_id']", count: 0
-    assert_select ".progression-attainment-track", count: 1
     assert_select ".progression-chart-svg", count: 1
     assert_select "a", "Absolute"
-    assert_select "a", "Delta"
+    assert_select "a", "Relative"
     assert_select "a", "Workouts"
     assert_select "a", "Exercises"
   end
@@ -49,7 +48,7 @@ class ProgressionsControllerTest < ActionDispatch::IntegrationTest
     assert_select "td", text: "Pull Session", count: 0
   end
 
-  test "index shows exercise trend indicator" do
+  test "index shows exercise relative metrics" do
     first = @user.workouts.create!(
       title: "Bench One",
       workout_on: Date.new(2026, 4, 1),
@@ -79,23 +78,23 @@ class ProgressionsControllerTest < ActionDispatch::IntegrationTest
     get progressions_path, params: { tab: "exercises", workout_type: "push" }
 
     assert_response :success
-    assert_select "h2", "Exercise-level progression"
-    assert_select ".trend-pill-up", text: /Up/
+    assert_select "h2", "Absolute and relative exercise progression"
+    assert_select "th", "Latest relative"
     assert_select ".progression-chart-svg", count: 0
   end
 
-  test "index supports delta chart mode" do
-    get progressions_path, params: { tab: "workouts", chart_mode: "delta" }
+  test "index supports relative chart mode" do
+    get progressions_path, params: { tab: "workouts", chart_mode: "relative" }
 
     assert_response :success
-    assert_select ".progression-chart-legend-item", text: /Delta \(actual - planned\)/
+    assert_select ".progression-chart-legend-item", text: /Relative change \(%\)/
   end
 
   test "exercise tab shows exercise filter" do
     get progressions_path, params: { tab: "exercises" }
 
     assert_response :success
-    assert_select "h2", "Exercise-level progression"
+    assert_select "h2", "Absolute and relative exercise progression"
     assert_select "select[name='exercise_id']"
   end
 
@@ -105,7 +104,7 @@ class ProgressionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select ".progression-chart-svg", count: 1
     assert_select "a", text: "Absolute"
-    assert_select "a", text: "Delta"
+    assert_select "a", text: "Relative"
   end
 
   test "exercise filter narrows main exercise table" do

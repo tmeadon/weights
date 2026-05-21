@@ -4,7 +4,7 @@
   <div class="section-heading">
     <div>
       <h1>Progression</h1>
-      <p class="supporting-text">Track planned vs actual workload and drill into per-exercise trends.</p>
+      <p class="supporting-text">Track absolute scores and relative change to understand momentum over time.</p>
     </div>
   </div>
 
@@ -18,6 +18,7 @@
       <%= hidden_field_tag :tab, @tab %>
       <%= hidden_field_tag :chart_mode, @chart_mode %>
       <%= hidden_field_tag :exercise_chart_mode, @exercise_chart_mode %>
+
       <% if @tab == "workouts" %>
         <div class="field">
           <div class="progression-filter-label-row">
@@ -41,351 +42,242 @@
           <%= select_tag :exercise_id, options_for_select([["All exercises", ""]] + @exercise_filter_options.map { |entry| ["#{entry[:exercise].name} (#{entry[:sessions]})", entry[:exercise].id] }, @selected_exercise_id), onchange: "this.form.requestSubmit()" %>
         </div>
       <% end %>
-
     <% end %>
-<% if @tab == "workouts" %>
-<section class="progression-panel-section">
-  <div class="section-heading">
-    <div>
-      <p class="panel-label">Difficulty</p>
-      <h2>Planned vs actual by workout</h2>
-      <% if @progress_workouts.any? %>
-        <% oldest = @progress_workouts.min_by { |workout| [workout.workout_on, workout.created_at] } %>
-        <% newest = @progress_workouts.max_by { |workout| [workout.workout_on, workout.created_at] } %>
-        <p class="supporting-text progression-timeframe">
-          Totals from <%= oldest.workout_on.to_fs(:long) %> to <%= newest.workout_on.to_fs(:long) %>.
-        </p>
-      <% else %>
-        <p class="supporting-text progression-timeframe">Totals update once completed workouts are available.</p>
-      <% end %>
-    </div>
-  </div>
 
-  <div class="detail-grid progression-summary-grid">
-    <div>
-      <dt>Sessions</dt>
-      <dd><%= @difficulty_summary[:sessions] %></dd>
-    </div>
-    <div>
-      <dt>Planned total</dt>
-      <dd><%= number_with_precision(@difficulty_summary[:planned_total], precision: 1) %></dd>
-    </div>
-    <div>
-      <dt>Actual total</dt>
-      <dd><%= number_with_precision(@difficulty_summary[:actual_total], precision: 1) %></dd>
-    </div>
-    <div>
-      <dt>Delta</dt>
-      <dd class="progression-delta <%= @difficulty_summary[:delta_total] >= 0 ? "progression-delta-positive" : "progression-delta-negative" %>">
-        <%= number_with_precision(@difficulty_summary[:delta_total], precision: 1) %>
-      </dd>
-    </div>
-  </div>
-
-  <% planned_total = @difficulty_summary[:planned_total].to_d %>
-  <% actual_total = @difficulty_summary[:actual_total].to_d %>
-  <% attainment_percent = if planned_total.positive?
-    (actual_total / planned_total * 100)
-  elsif actual_total.positive?
-    BigDecimal("100")
-  else
-    BigDecimal("100")
-  end %>
-  <% capped_fill = [[attainment_percent.to_f, 0.0].max, 100.0].min %>
-  <% overflow = planned_total.positive? ? [attainment_percent.to_f - 100.0, 0.0].max : 0.0 %>
-  <% overflow_capped = [overflow, 100.0].min %>
-  <% attainment_note = if planned_total.zero? && actual_total.positive?
-    "No planned load set; this is all unplanned work."
-  elsif planned_total.zero?
-    "No planned load yet."
-  elsif attainment_percent >= 100
-    "#{number_with_precision(attainment_percent - 100, precision: 1)}% above plan"
-  else
-    "#{number_with_precision(100 - attainment_percent, precision: 1)}% below plan"
-  end %>
-
-  <div class="progression-attainment" role="img" aria-label="Actual is <%= number_with_precision(attainment_percent, precision: 1) %> percent of planned load">
-    <div class="progression-attainment-track">
-      <span class="progression-attainment-fill <%= attainment_percent >= 100 ? "progression-attainment-fill-over" : "progression-attainment-fill-under" %>" style="width: <%= capped_fill %>%"></span>
-      <% if overflow_capped.positive? %>
-        <span class="progression-attainment-overflow" style="width: <%= overflow_capped %>%"></span>
-      <% end %>
-      <span class="progression-attainment-target" aria-hidden="true"></span>
-    </div>
-    <div class="progression-attainment-text">
-      <span><strong>Attainment</strong> <%= number_with_precision(attainment_percent, precision: 1) %>% of plan</span>
-      <span><%= attainment_note %></span>
-    </div>
-  </div>
-
-  <% if @workout_chart_points.any? %>
-    <nav class="progression-chart-modes" aria-label="Chart mode">
-      <%= link_to "Absolute", progressions_path(tab: "workouts", workout_type: @selected_workout_type, chart_mode: "absolute"), class: ["topbar-pill", (@chart_mode == "absolute" ? "topbar-pill-active" : nil)], data: { turbo_frame: "progression_panel" } %>
-      <%= link_to "Delta", progressions_path(tab: "workouts", workout_type: @selected_workout_type, chart_mode: "delta"), class: ["topbar-pill", (@chart_mode == "delta" ? "topbar-pill-active" : nil)], data: { turbo_frame: "progression_panel" } %>
-    </nav>
-
-    <%= render "progressions/trend_chart", points: @workout_chart_points, mode: @chart_mode, aria_label: "Workout difficulty trend" %>
-  <% end %>
-
-  <% if @progress_workouts.any? %>
-    <div class="progression-table-wrap progression-table-desktop">
-      <table class="progression-table">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Workout</th>
-            <th>Type</th>
-            <th>Planned</th>
-            <th>Actual</th>
-            <th>Delta</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% @progress_workouts.first(24).each do |workout| %>
-            <% delta = workout.actual_total_difficulty.to_d - workout.planned_total_difficulty.to_d %>
-            <tr>
-              <td><%= workout.workout_on.to_fs(:short) %></td>
-              <td><%= link_to workout.title, workout_path(workout), data: { turbo_frame: "_top" } %></td>
-              <td><%= workout.workout_type_label %></td>
-              <td><%= number_with_precision(workout.planned_total_difficulty, precision: 1) %></td>
-              <td><%= number_with_precision(workout.actual_total_difficulty, precision: 1) %></td>
-              <td class="progression-delta <%= delta >= 0 ? "progression-delta-positive" : "progression-delta-negative" %>"><%= number_with_precision(delta, precision: 1) %></td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="progression-mobile-list">
-      <% @progress_workouts.first(24).each do |workout| %>
-        <% planned = workout.planned_total_difficulty.to_d %>
-        <% actual = workout.actual_total_difficulty.to_d %>
-        <% delta = actual - planned %>
-        <% row_attainment = if planned.positive?
-          (actual / planned * 100)
-        elsif actual.positive?
-          BigDecimal("100")
-        else
-          BigDecimal("100")
-        end %>
-        <% row_fill = [[row_attainment.to_f, 0.0].max, 100.0].min %>
-        <% row_overflow = planned.positive? ? [row_attainment.to_f - 100.0, 0.0].max : 0.0 %>
-        <% row_overflow_capped = [row_overflow, 100.0].min %>
-        <article class="progression-mobile-row">
-          <div class="progression-mobile-head">
-            <%= link_to workout.title, workout_path(workout), class: "progression-mobile-title", data: { turbo_frame: "_top" } %>
-            <span class="progression-mobile-date"><%= workout.workout_on.to_fs(:short) %></span>
-          </div>
-          <p class="progression-mobile-meta"><%= workout.workout_type_label %></p>
-          <div class="progression-mobile-metrics">
-            <div>
-              <p class="progression-mobile-label">Planned</p>
-              <p class="progression-mobile-value"><%= number_with_precision(planned, precision: 1) %></p>
-            </div>
-            <div>
-              <p class="progression-mobile-label">Actual</p>
-              <p class="progression-mobile-value"><%= number_with_precision(actual, precision: 1) %></p>
-            </div>
-            <div>
-              <p class="progression-mobile-label">Delta</p>
-              <p class="progression-mobile-value progression-delta <%= delta >= 0 ? "progression-delta-positive" : "progression-delta-negative" %>"><%= number_with_precision(delta, precision: 1) %></p>
-            </div>
-          </div>
-          <div class="progression-mini-attainment" aria-hidden="true">
-            <span class="progression-attainment-fill <%= row_attainment >= 100 ? "progression-attainment-fill-over" : "progression-attainment-fill-under" %>" style="width: <%= row_fill %>%"></span>
-            <% if row_overflow_capped.positive? %>
-              <span class="progression-attainment-overflow" style="width: <%= row_overflow_capped %>%"></span>
+    <% if @tab == "workouts" %>
+      <section class="progression-panel-section">
+        <div class="section-heading">
+          <div>
+            <p class="panel-label">Workouts</p>
+            <h2>Absolute and relative progression</h2>
+            <% if @workout_progress_rows.any? %>
+              <% oldest = @workout_progress_rows.first[:workout] %>
+              <% newest = @workout_progress_rows.last[:workout] %>
+              <p class="supporting-text progression-timeframe">Data from <%= oldest.workout_on.to_fs(:long) %> to <%= newest.workout_on.to_fs(:long) %>.</p>
+            <% else %>
+              <p class="supporting-text progression-timeframe">Complete workouts to start seeing progression.</p>
             <% end %>
-            <span class="progression-attainment-target" aria-hidden="true"></span>
           </div>
-          <p class="progression-mobile-meta">Attainment <%= number_with_precision(row_attainment, precision: 0) %>%</p>
-        </article>
-      <% end %>
-    </div>
-  <% else %>
-    <p class="supporting-text">No matching logged workouts yet. Complete a workout to start seeing progression.</p>
-  <% end %>
-</section>
-<% end %>
-
-<% if @tab == "exercises" %>
-<section class="progression-panel-section">
-  <div class="section-heading">
-    <div>
-      <p class="panel-label">Exercises</p>
-      <h2>Exercise-level progression</h2>
-    </div>
-  </div>
-
-  <% if @selected_exercise.present? && @exercise_chart_points.any? %>
-    <nav class="progression-chart-modes" aria-label="Exercise chart mode">
-      <%= link_to "Absolute", progressions_path(tab: "exercises", exercise_id: @selected_exercise_id, exercise_chart_mode: "absolute"), class: ["topbar-pill", (@exercise_chart_mode == "absolute" ? "topbar-pill-active" : nil)], data: { turbo_frame: "progression_panel" } %>
-      <%= link_to "Delta", progressions_path(tab: "exercises", exercise_id: @selected_exercise_id, exercise_chart_mode: "delta"), class: ["topbar-pill", (@exercise_chart_mode == "delta" ? "topbar-pill-active" : nil)], data: { turbo_frame: "progression_panel" } %>
-    </nav>
-
-    <%= render "progressions/trend_chart", points: @exercise_chart_points, mode: @exercise_chart_mode, aria_label: "#{@selected_exercise.name} progression trend" %>
-  <% end %>
-
-  <% if @exercise_stats.any? %>
-    <div class="progression-table-wrap progression-table-desktop">
-      <table class="progression-table">
-        <thead>
-          <tr>
-            <th>Exercise</th>
-            <th>Sessions</th>
-            <th>Trend</th>
-            <th>Planned</th>
-            <th>Actual</th>
-            <th>Delta</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% @exercise_stats.each do |entry| %>
-            <tr>
-              <td><%= link_to entry[:exercise].name, progressions_path(tab: "exercises", exercise_id: entry[:exercise].id, exercise_chart_mode: @exercise_chart_mode), data: { turbo_frame: "progression_panel" } %></td>
-              <td><%= entry[:sessions] %></td>
-              <td>
-                <% trend_class = case entry[:trend_direction]
-                when :up then "trend-pill-up"
-                when :down then "trend-pill-down"
-                else "trend-pill-neutral"
-                end %>
-                <% trend_label = case entry[:trend_direction]
-                when :up then "Up"
-                when :down then "Down"
-                else "Flat"
-                end %>
-                <% trend_symbol = case entry[:trend_direction]
-                when :up then "▲"
-                when :down then "▼"
-                else "•"
-                end %>
-                <span class="trend-pill <%= trend_class %>">
-                  <span aria-hidden="true"><%= trend_symbol %></span>
-                  <%= trend_label %>
-                </span>
-              </td>
-              <td><%= number_with_precision(entry[:planned_total], precision: 1) %></td>
-              <td><%= number_with_precision(entry[:actual_total], precision: 1) %></td>
-              <td class="progression-delta <%= entry[:delta_total] >= 0 ? "progression-delta-positive" : "progression-delta-negative" %>"><%= number_with_precision(entry[:delta_total], precision: 1) %></td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="progression-mobile-list">
-      <% @exercise_stats.each do |entry| %>
-        <article class="progression-mobile-row">
-          <div class="progression-mobile-head">
-            <%= link_to entry[:exercise].name, progressions_path(tab: "exercises", exercise_id: entry[:exercise].id, exercise_chart_mode: @exercise_chart_mode), class: "progression-mobile-title", data: { turbo_frame: "progression_panel" } %>
-            <span class="progression-mobile-date"><%= pluralize(entry[:sessions], "session") %></span>
-          </div>
-          <p class="progression-mobile-meta">
-            <% trend_class = case entry[:trend_direction]
-            when :up then "trend-pill-up"
-            when :down then "trend-pill-down"
-            else "trend-pill-neutral"
-            end %>
-            <% trend_label = case entry[:trend_direction]
-            when :up then "Up"
-            when :down then "Down"
-            else "Flat"
-            end %>
-            <% trend_symbol = case entry[:trend_direction]
-            when :up then "▲"
-            when :down then "▼"
-            else "•"
-            end %>
-            <span class="trend-pill <%= trend_class %>">
-              <span aria-hidden="true"><%= trend_symbol %></span>
-              <%= trend_label %>
-            </span>
-            <span class="progression-trend-change"><%= number_with_precision(entry[:trend_delta], precision: 1) %> vs last</span>
-          </p>
-          <div class="progression-mobile-metrics">
-            <div>
-              <p class="progression-mobile-label">Planned</p>
-              <p class="progression-mobile-value"><%= number_with_precision(entry[:planned_total], precision: 1) %></p>
-            </div>
-            <div>
-              <p class="progression-mobile-label">Actual</p>
-              <p class="progression-mobile-value"><%= number_with_precision(entry[:actual_total], precision: 1) %></p>
-            </div>
-            <div>
-              <p class="progression-mobile-label">Delta</p>
-              <p class="progression-mobile-value progression-delta <%= entry[:delta_total] >= 0 ? "progression-delta-positive" : "progression-delta-negative" %>"><%= number_with_precision(entry[:delta_total], precision: 1) %></p>
-            </div>
-          </div>
-        </article>
-      <% end %>
-    </div>
-  <% else %>
-    <p class="supporting-text">No exercise progression available for this filter yet.</p>
-  <% end %>
-
-  <% if @selected_exercise.present? && @exercise_progress_rows.any? %>
-    <div class="progression-exercise-focus">
-      <div class="progression-history-block">
-        <p class="panel-label">Workout history</p>
-        <h3 class="progression-history-heading">Recent workout history</h3>
-        <p class="supporting-text progression-history-subtitle"><%= @selected_exercise.name %> · <%= pluralize(@exercise_progress_rows.size, "session") %></p>
-        <div class="progression-table-wrap progression-table-desktop">
-          <table class="progression-table">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Workout</th>
-              <th>Planned</th>
-              <th>Actual</th>
-              <th>Delta</th>
-              <th>Actual sets</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @exercise_progress_rows.each do |row| %>
-              <tr>
-                <td><%= row[:workout].workout_on.to_fs(:short) %></td>
-                <td><%= link_to row[:workout].title, workout_path(row[:workout]), data: { turbo_frame: "_top" } %></td>
-                <td><%= number_with_precision(row[:planned_total], precision: 1) %></td>
-                <td><%= number_with_precision(row[:actual_total], precision: 1) %></td>
-                <td class="progression-delta <%= row[:delta_total] >= 0 ? "progression-delta-positive" : "progression-delta-negative" %>"><%= number_with_precision(row[:delta_total], precision: 1) %></td>
-                <td><%= row[:actual_summary] %></td>
-              </tr>
-            <% end %>
-          </tbody>
-          </table>
         </div>
 
-        <div class="progression-mobile-list">
-          <% @exercise_progress_rows.each do |row| %>
-            <article class="progression-mobile-row">
-              <div class="progression-mobile-head">
-                <%= link_to row[:workout].title, workout_path(row[:workout]), class: "progression-mobile-title", data: { turbo_frame: "_top" } %>
-                <span class="progression-mobile-date"><%= row[:workout].workout_on.to_fs(:short) %></span>
-              </div>
-              <div class="progression-mobile-metrics">
-                <div>
-                  <p class="progression-mobile-label">Planned</p>
-                  <p class="progression-mobile-value"><%= number_with_precision(row[:planned_total], precision: 1) %></p>
-                </div>
-                <div>
-                  <p class="progression-mobile-label">Actual</p>
-                  <p class="progression-mobile-value"><%= number_with_precision(row[:actual_total], precision: 1) %></p>
-                </div>
-                <div>
-                  <p class="progression-mobile-label">Delta</p>
-                  <p class="progression-mobile-value progression-delta <%= row[:delta_total] >= 0 ? "progression-delta-positive" : "progression-delta-negative" %>"><%= number_with_precision(row[:delta_total], precision: 1) %></p>
-                </div>
-              </div>
-              <p class="progression-mobile-meta"><strong>Sets:</strong> <%= row[:actual_summary] %></p>
-            </article>
-          <% end %>
+        <div class="detail-grid progression-summary-grid">
+          <div>
+            <dt>Sessions</dt>
+            <dd><%= @difficulty_summary[:sessions] %></dd>
+          </div>
+          <div>
+            <dt>Latest score</dt>
+            <dd><%= @difficulty_summary[:latest_absolute].present? ? number_with_precision(@difficulty_summary[:latest_absolute], precision: 1) : "-" %></dd>
+          </div>
+          <div>
+            <dt>Change vs previous</dt>
+            <% latest_relative = @difficulty_summary[:latest_relative] %>
+            <dd class="progression-delta <%= latest_relative.to_d >= 0 ? "progression-delta-positive" : "progression-delta-negative" %>">
+              <%= latest_relative.present? ? number_with_precision(latest_relative, precision: 1) + "%" : "-" %>
+            </dd>
+          </div>
+          <div>
+            <dt>4-session avg</dt>
+            <% rolling_relative = @difficulty_summary[:rolling_relative_average] %>
+            <dd class="progression-delta <%= rolling_relative.to_d >= 0 ? "progression-delta-positive" : "progression-delta-negative" %>">
+              <%= rolling_relative.present? ? number_with_precision(rolling_relative, precision: 1) + "%" : "-" %>
+            </dd>
+          </div>
         </div>
-      </div>
-    </div>
-  <% end %>
-</section>
-<% end %>
+
+        <% if @workout_chart_points.any? %>
+          <nav class="progression-chart-modes" aria-label="Chart mode">
+            <%= link_to "Absolute", progressions_path(tab: "workouts", workout_type: @selected_workout_type, chart_mode: "absolute"), class: ["topbar-pill", (@chart_mode == "absolute" ? "topbar-pill-active" : nil)], data: { turbo_frame: "progression_panel" } %>
+            <%= link_to "Relative", progressions_path(tab: "workouts", workout_type: @selected_workout_type, chart_mode: "relative"), class: ["topbar-pill", (@chart_mode == "relative" ? "topbar-pill-active" : nil)], data: { turbo_frame: "progression_panel" } %>
+          </nav>
+
+          <%= render "progressions/trend_chart", points: @workout_chart_points, mode: @chart_mode, aria_label: "Workout progression trend" %>
+        <% end %>
+
+        <% if @workout_progress_rows.any? %>
+          <div class="progression-table-wrap progression-table-desktop">
+            <table class="progression-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Workout</th>
+                  <th>Type</th>
+                  <th>Absolute</th>
+                  <th>Relative</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @workout_progress_rows.last(24).reverse_each do |row| %>
+                  <tr>
+                    <td><%= row[:workout].workout_on.to_fs(:short) %></td>
+                    <td><%= link_to row[:workout].title, workout_path(row[:workout]), data: { turbo_frame: "_top" } %></td>
+                    <td><%= row[:workout].workout_type_label %></td>
+                    <td><%= number_with_precision(row[:absolute_total], precision: 1) %></td>
+                    <% relative = row[:relative_percent] %>
+                    <td class="progression-delta <%= relative.to_d >= 0 ? "progression-delta-positive" : "progression-delta-negative" %>"><%= relative.present? ? number_with_precision(relative, precision: 1) + "%" : "-" %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="progression-mobile-list">
+            <% @workout_progress_rows.last(24).reverse_each do |row| %>
+              <article class="progression-mobile-row">
+                <div class="progression-mobile-head">
+                  <%= link_to row[:workout].title, workout_path(row[:workout]), class: "progression-mobile-title", data: { turbo_frame: "_top" } %>
+                  <span class="progression-mobile-date"><%= row[:workout].workout_on.to_fs(:short) %></span>
+                </div>
+                <p class="progression-mobile-meta"><%= row[:workout].workout_type_label %></p>
+                <div class="progression-mobile-metrics">
+                  <div>
+                    <p class="progression-mobile-label">Absolute</p>
+                    <p class="progression-mobile-value"><%= number_with_precision(row[:absolute_total], precision: 1) %></p>
+                  </div>
+                  <div>
+                    <p class="progression-mobile-label">Relative</p>
+                    <% relative = row[:relative_percent] %>
+                    <p class="progression-mobile-value progression-delta <%= relative.to_d >= 0 ? "progression-delta-positive" : "progression-delta-negative" %>"><%= relative.present? ? number_with_precision(relative, precision: 1) + "%" : "-" %></p>
+                  </div>
+                </div>
+              </article>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="supporting-text">No matching logged workouts yet.</p>
+        <% end %>
+      </section>
+    <% end %>
+
+    <% if @tab == "exercises" %>
+      <section class="progression-panel-section">
+        <div class="section-heading">
+          <div>
+            <p class="panel-label">Exercises</p>
+            <h2>Absolute and relative exercise progression</h2>
+          </div>
+        </div>
+
+        <% if @selected_exercise.present? && @exercise_chart_points.any? %>
+          <nav class="progression-chart-modes" aria-label="Exercise chart mode">
+            <%= link_to "Absolute", progressions_path(tab: "exercises", exercise_id: @selected_exercise_id, exercise_chart_mode: "absolute"), class: ["topbar-pill", (@exercise_chart_mode == "absolute" ? "topbar-pill-active" : nil)], data: { turbo_frame: "progression_panel" } %>
+            <%= link_to "Relative", progressions_path(tab: "exercises", exercise_id: @selected_exercise_id, exercise_chart_mode: "relative"), class: ["topbar-pill", (@exercise_chart_mode == "relative" ? "topbar-pill-active" : nil)], data: { turbo_frame: "progression_panel" } %>
+          </nav>
+
+          <%= render "progressions/trend_chart", points: @exercise_chart_points, mode: @exercise_chart_mode, aria_label: "#{@selected_exercise.name} progression trend" %>
+        <% end %>
+
+        <% if @exercise_stats.any? %>
+          <div class="progression-table-wrap progression-table-desktop">
+            <table class="progression-table">
+              <thead>
+                <tr>
+                  <th>Exercise</th>
+                  <th>Sessions</th>
+                  <th>Latest absolute</th>
+                  <th>Latest relative</th>
+                  <th>Avg relative</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @exercise_stats.each do |entry| %>
+                  <tr>
+                    <td><%= link_to entry[:exercise].name, progressions_path(tab: "exercises", exercise_id: entry[:exercise].id, exercise_chart_mode: @exercise_chart_mode), data: { turbo_frame: "progression_panel" } %></td>
+                    <td><%= entry[:sessions] %></td>
+                    <td><%= entry[:latest_absolute].present? ? number_with_precision(entry[:latest_absolute], precision: 1) : "-" %></td>
+                    <% latest_relative = entry[:latest_relative] %>
+                    <td class="progression-delta <%= latest_relative.to_d >= 0 ? "progression-delta-positive" : "progression-delta-negative" %>"><%= latest_relative.present? ? number_with_precision(latest_relative, precision: 1) + "%" : "-" %></td>
+                    <% average_relative = entry[:average_relative] %>
+                    <td class="progression-delta <%= average_relative.to_d >= 0 ? "progression-delta-positive" : "progression-delta-negative" %>"><%= average_relative.present? ? number_with_precision(average_relative, precision: 1) + "%" : "-" %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="progression-mobile-list">
+            <% @exercise_stats.each do |entry| %>
+              <article class="progression-mobile-row">
+                <div class="progression-mobile-head">
+                  <%= link_to entry[:exercise].name, progressions_path(tab: "exercises", exercise_id: entry[:exercise].id, exercise_chart_mode: @exercise_chart_mode), class: "progression-mobile-title", data: { turbo_frame: "progression_panel" } %>
+                  <span class="progression-mobile-date"><%= pluralize(entry[:sessions], "session") %></span>
+                </div>
+                <div class="progression-mobile-metrics">
+                  <div>
+                    <p class="progression-mobile-label">Latest absolute</p>
+                    <p class="progression-mobile-value"><%= entry[:latest_absolute].present? ? number_with_precision(entry[:latest_absolute], precision: 1) : "-" %></p>
+                  </div>
+                  <div>
+                    <p class="progression-mobile-label">Latest relative</p>
+                    <% latest_relative = entry[:latest_relative] %>
+                    <p class="progression-mobile-value progression-delta <%= latest_relative.to_d >= 0 ? "progression-delta-positive" : "progression-delta-negative" %>"><%= latest_relative.present? ? number_with_precision(latest_relative, precision: 1) + "%" : "-" %></p>
+                  </div>
+                </div>
+              </article>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="supporting-text">No exercise progression available for this filter yet.</p>
+        <% end %>
+
+        <% if @selected_exercise.present? && @exercise_progress_rows.any? %>
+          <div class="progression-exercise-focus">
+            <div class="progression-history-block">
+              <p class="panel-label">Workout history</p>
+              <h3 class="progression-history-heading">Recent workout history</h3>
+              <p class="supporting-text progression-history-subtitle"><%= @selected_exercise.name %> · <%= pluralize(@exercise_progress_rows.size, "session") %></p>
+              <div class="progression-table-wrap progression-table-desktop">
+                <table class="progression-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Workout</th>
+                      <th>Absolute</th>
+                      <th>Relative</th>
+                      <th>Actual sets</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% @exercise_progress_rows.reverse_each do |row| %>
+                      <tr>
+                        <td><%= row[:workout].workout_on.to_fs(:short) %></td>
+                        <td><%= link_to row[:workout].title, workout_path(row[:workout]), data: { turbo_frame: "_top" } %></td>
+                        <td><%= number_with_precision(row[:actual_total], precision: 1) %></td>
+                        <% relative = row[:relative_percent] %>
+                        <td class="progression-delta <%= relative.to_d >= 0 ? "progression-delta-positive" : "progression-delta-negative" %>"><%= relative.present? ? number_with_precision(relative, precision: 1) + "%" : "-" %></td>
+                        <td><%= row[:actual_summary] %></td>
+                      </tr>
+                    <% end %>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="progression-mobile-list">
+                <% @exercise_progress_rows.reverse_each do |row| %>
+                  <article class="progression-mobile-row">
+                    <div class="progression-mobile-head">
+                      <%= link_to row[:workout].title, workout_path(row[:workout]), class: "progression-mobile-title", data: { turbo_frame: "_top" } %>
+                      <span class="progression-mobile-date"><%= row[:workout].workout_on.to_fs(:short) %></span>
+                    </div>
+                    <div class="progression-mobile-metrics">
+                      <div>
+                        <p class="progression-mobile-label">Absolute</p>
+                        <p class="progression-mobile-value"><%= number_with_precision(row[:actual_total], precision: 1) %></p>
+                      </div>
+                      <div>
+                        <p class="progression-mobile-label">Relative</p>
+                        <% relative = row[:relative_percent] %>
+                        <p class="progression-mobile-value progression-delta <%= relative.to_d >= 0 ? "progression-delta-positive" : "progression-delta-negative" %>"><%= relative.present? ? number_with_precision(relative, precision: 1) + "%" : "-" %></p>
+                      </div>
+                    </div>
+                    <p class="progression-mobile-meta"><strong>Sets:</strong> <%= row[:actual_summary] %></p>
+                  </article>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </section>
+    <% end %>
   <% end %>
 </section>
