@@ -19,6 +19,13 @@
           </div>
         </div>
 
+        <% notes = grouped_sets.map(&:coach_notes).compact.uniq %>
+        <% if notes.any? %>
+          <div class="supporting-text workout-note-preview">
+            <%= safe_join(notes.map { |note| content_tag(:div, render_markdown(note), class: "workout-note-markdown") }) %>
+          </div>
+        <% end %>
+
         <div class="planned-set-table">
           <div class="planned-set-row planned-set-header">
             <span>Set</span>
@@ -73,13 +80,6 @@
         </div>
 
         <%= render "workouts/exercise_progress_hint", workout: workout, exercise: exercise, grouped_sets: grouped_sets %>
-
-        <% notes = grouped_sets.map(&:coach_notes).compact.uniq %>
-        <% if notes.any? %>
-          <div class="supporting-text workout-note-preview">
-            <%= safe_join(notes.map { |note| content_tag(:div, render_markdown(note), class: "workout-note-markdown") }) %>
-          </div>
-        <% end %>
 
       </article>
     <% end %>
