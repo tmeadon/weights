@@ -154,6 +154,19 @@ class WorkoutSetsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 34.0, @active_workout_set.actual_weight.to_f
   end
 
+  test "turbo update logged results succeeds without replacing form fragments" do
+    patch workout_workout_set_path(@active_workout, @active_workout_set),
+      params: {
+        execution: {
+          actual_reps: 10,
+          actual_weight: 34
+        }
+      },
+      headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+    assert_response :no_content
+  end
+
   test "turbo update logged results returns validation errors for autosave" do
     patch workout_workout_set_path(@active_workout, @active_workout_set),
       params: {

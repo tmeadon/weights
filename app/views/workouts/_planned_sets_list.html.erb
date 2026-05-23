@@ -19,11 +19,6 @@
           </div>
         </div>
 
-        <% last_history = workout.recent_history_for_exercise(exercise.id, limit: 1).first %>
-        <% if last_history.present? %>
-          <p class="exercise-history-inline">Last time (<%= last_history[:workout].workout_on.to_fs(:short) %>): <%= workout.summarize_recent_logged_sets(last_history[:sets]) %></p>
-        <% end %>
-
         <div class="planned-set-table">
           <div class="planned-set-row planned-set-header">
             <span>Set</span>
@@ -76,6 +71,8 @@
             </div>
           <% end %>
         </div>
+
+        <%= render "workouts/exercise_progress_hint", workout: workout, exercise: exercise, grouped_sets: grouped_sets %>
 
         <% notes = grouped_sets.map(&:coach_notes).compact.uniq %>
         <% if notes.any? %>

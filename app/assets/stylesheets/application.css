@@ -1059,6 +1059,10 @@ select:focus {
   width: 100%;
 }
 
+.planned-group-row .exercise-heading h3 {
+  margin: 0.42rem 0;
+}
+
 .exercise-history-inline {
   margin: 4px 0 0;
   color: var(--ink-soft);

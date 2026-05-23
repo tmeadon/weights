@@ -1,0 +1,29 @@
+<% achieved_difficulty = grouped_sets.sum { |workout_set| workout_set.actual_difficulty.to_d } %>
+<% previous_history = workout.recent_history_for_exercise(exercise.id, limit: 1).first %>
+<% previous_difficulty = if previous_history.present?
+  previous_history[:sets].sum { |workout_set| workout_set.actual_difficulty.to_d }
+end %>
+
+<div
+  id="exercise_progress_hint_<%= exercise.id %>"
+  data-controller="exercise-progress"
+  data-exercise-progress-previous-difficulty-value="<%= previous_difficulty&.to_s || "" %>">
+  <p class="exercise-history-inline">
+    Achieved difficulty:
+    <span data-exercise-progress-target="achieved"><%= number_with_precision(achieved_difficulty, precision: 1, strip_insignificant_zeros: true) %></span>
+    <% if previous_difficulty.present? && !previous_difficulty.to_d.zero? %>
+      <% percent_delta = ((achieved_difficulty - previous_difficulty) / previous_difficulty) * 100 %>
+      <span data-exercise-progress-target="deltaWrap">
+        (<span data-exercise-progress-target="deltaValue"><%= percent_delta.positive? ? "+" : "" %><%= number_with_precision(percent_delta, precision: 1, strip_insignificant_zeros: true) %>%</span>)
+      </span>
+    <% end %>
+  </p>
+
+  <% if previous_history.present? %>
+    <p class="exercise-history-inline">
+      Last time (<%= previous_history[:workout].workout_on.to_fs(:short) %>):
+      <%= workout.summarize_recent_logged_sets(previous_history[:sets]) %>
+      · Difficulty <%= number_with_precision(previous_difficulty, precision: 1, strip_insignificant_zeros: true) %>
+    </p>
+  <% end %>
+</div>

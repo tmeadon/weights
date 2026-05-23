@@ -149,7 +149,7 @@ export default class extends Controller {
     if (state === "saved") {
       this.statusTimeout = setTimeout(() => {
         this.hideStatus()
-      }, 1500)
+      }, 700)
     }
   }
 }
