@@ -26,6 +26,8 @@ export default class extends Controller {
     if (!this.groupRow || !this.hasAchievedTarget) return
 
     const achieved = this.achievedDifficulty()
+    if (achieved === null) return
+
     this.achievedTarget.textContent = this.format(achieved)
 
     if (!this.hasDeltaWrapTarget || !this.hasDeltaValueTarget) return
@@ -39,6 +41,7 @@ export default class extends Controller {
 
   achievedDifficulty() {
     const forms = this.groupRow.querySelectorAll("form.actual-set-form")
+    if (forms.length === 0) return null
 
     return Array.from(forms).reduce((total, form) => {
       const reps = Number(form.querySelector("input[name='execution[actual_reps]']")?.value)
