@@ -25,5 +25,6 @@ module Weights
     # config.eager_load_paths << Rails.root.join("extras")
 
     config.x.registrations_enabled = false
+    config.x.password_resets_enabled = false
   end
 end

@@ -36,6 +36,17 @@ module Api
         assert_equal "Account creation is currently disabled.", json_response.dig("error", "message")
       end
 
+      test "password reset create returns not found when password resets are disabled" do
+        assert_enqueued_emails 0 do
+          post api_v1_passwords_path,
+            params: { email_address: @user.email_address },
+            as: :json
+        end
+
+        assert_response :not_found
+        assert_equal "Password reset is currently disabled.", json_response.dig("error", "message")
+      end
+
       test "workouts index requires authentication" do
         get api_v1_workouts_path, as: :json
 

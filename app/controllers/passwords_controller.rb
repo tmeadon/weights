@@ -1,7 +1,8 @@
 class PasswordsController < ApplicationController
   allow_unauthenticated_access
+  before_action :ensure_password_resets_enabled
   before_action :set_user_by_token, only: %i[ edit update ]
-  rate_limit to: 10, within: 3.minutes, only: :create, with: -> { redirect_to new_password_path, alert: "Try again later." }
+  rate_limit to: 10, within: 3.minutes, only: :create, with: -> { redirect_to new_session_path, alert: "Try again later." }
 
   def new
   end
@@ -30,6 +31,12 @@ class PasswordsController < ApplicationController
     def set_user_by_token
       @user = User.find_by_password_reset_token!(params[:token])
     rescue ActiveSupport::MessageVerifier::InvalidSignature
-      redirect_to new_password_path, alert: "Password reset link is invalid or has expired."
+      redirect_to new_session_path, alert: "Password reset link is invalid or has expired."
+    end
+
+    def ensure_password_resets_enabled
+      return if password_resets_enabled?
+
+      redirect_to new_session_path, alert: "Password reset is currently disabled."
     end
 end
