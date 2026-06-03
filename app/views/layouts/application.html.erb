@@ -43,7 +43,6 @@
         <div class="topbar-secondary">
           <% unless authenticated? %>
             <%= link_to "Sign in", new_session_path, class: "topbar-link" %>
-            <%= link_to "Create account", new_registration_path, class: "topbar-pill topbar-pill-active" %>
           <% end %>
         </div>
       </header>

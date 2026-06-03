@@ -23,5 +23,7 @@ module Weights
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    config.x.registrations_enabled = false
   end
 end

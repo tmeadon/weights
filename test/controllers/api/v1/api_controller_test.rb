@@ -19,6 +19,23 @@ module Api
         assert_equal @user.api_key, json_response.dig("user", "api_key")
       end
 
+      test "registration create returns not found when registrations are disabled" do
+        assert_no_difference("User.count") do
+          post api_v1_registrations_path,
+            params: {
+              user: {
+                email_address: "new@example.com",
+                password: "password",
+                password_confirmation: "password"
+              }
+            },
+            as: :json
+        end
+
+        assert_response :not_found
+        assert_equal "Account creation is currently disabled.", json_response.dig("error", "message")
+      end
+
       test "workouts index requires authentication" do
         get api_v1_workouts_path, as: :json
 

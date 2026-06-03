@@ -16,8 +16,7 @@
         <%= link_to "Open workouts", workouts_path, class: "button button-ghost" %>
         <%= link_to "Open exercise library", exercises_path, class: "button" %>
       <% else %>
-        <%= link_to "Create account", new_registration_path, class: "button" %>
-        <%= link_to "Sign in", new_session_path, class: "button button-ghost" %>
+        <%= link_to "Sign in", new_session_path, class: "button" %>
       <% end %>
     </div>
   </div>
@@ -36,8 +35,8 @@
 <section class="milestone-grid">
   <article class="card">
     <p class="panel-label">Authentication</p>
-    <h2>Account creation, sign in, and password reset.</h2>
-    <p class="supporting-text">Rails authentication is wired into the app shell so later milestones can protect workout data by default.</p>
+    <h2>Sign in and password reset.</h2>
+    <p class="supporting-text">Authentication is built into the app shell so workout data stays tied to the right account.</p>
   </article>
 
   <article class="card">

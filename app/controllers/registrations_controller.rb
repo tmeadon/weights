@@ -1,5 +1,6 @@
 class RegistrationsController < ApplicationController
   allow_unauthenticated_access only: %i[new create]
+  before_action :ensure_registrations_enabled
 
   def new
     @user = User.new
@@ -21,5 +22,11 @@ class RegistrationsController < ApplicationController
 
   def user_params
     params.expect(user: [ :email_address, :password, :password_confirmation ])
+  end
+
+  def ensure_registrations_enabled
+    return if registrations_enabled?
+
+    redirect_to new_session_path, alert: "Account creation is currently disabled."
   end
 end
