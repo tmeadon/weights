@@ -2,17 +2,17 @@
 
 <section class="hero card">
   <div class="hero-copy">
-    <p class="eyebrow">Milestone 3</p>
+    <p class="eyebrow">Weights</p>
     <h1>Strength tracking that feels calm, focused, and easy to keep up with.</h1>
     <p class="hero-text">
       Capture workouts with a simple structure, durable history, and fast session logging.
-      The foundation is in place so the next milestones can layer on exercise management and workout flows.
+      Built for steady, practical tracking instead of dashboard clutter.
     </p>
 
     <div class="hero-actions">
       <% if authenticated? %>
         <span class="status-pill">Signed in</span>
-        <p class="supporting-text">Your authenticated shell is ready for exercise and workout features.</p>
+        <p class="supporting-text">You're signed in and ready to log workouts and review progress.</p>
         <%= link_to "Open workouts", workouts_path, class: "button button-ghost" %>
         <%= link_to "Open exercise library", exercises_path, class: "button" %>
       <% else %>
@@ -47,8 +47,8 @@
   </article>
 
   <article class="card">
-    <p class="panel-label">Next up</p>
-    <h2>Workout CRUD is ready for planning layers.</h2>
-    <p class="supporting-text">Milestone 3 adds user-owned workouts with dates, status, notes, and an active workout concept for the next set-planning slice.</p>
+    <p class="panel-label">Workouts</p>
+    <h2>Plan sessions, log results, and keep a durable history.</h2>
+    <p class="supporting-text">Track workouts with clear structure, quick updates during a session, and historical records that stay readable over time.</p>
   </article>
 </section>
