@@ -1,24 +1,28 @@
-# README
+# Weights
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Weights is a small personal Rails app I use to track my weight lifting progress.
 
-Things you may want to cover:
+It lets me keep an exercise library, plan workouts, log what I actually did, and review progression over time.
 
-* Ruby version
+## Stack
 
-* System dependencies
+- Ruby 3.4
+- Rails 8
+- SQLite
+- Minitest
+- Turbo + Stimulus + Importmap
 
-* Configuration
+## Running locally
 
-* Database creation
+```bash
+bin/setup --skip-server
+bin/dev
+```
 
-* Database initialization
+## Checks
 
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+```bash
+bin/rubocop
+bin/rails test
+bin/ci
+```
