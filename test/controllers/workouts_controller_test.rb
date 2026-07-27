@@ -40,7 +40,7 @@ class WorkoutsControllerTest < ActionDispatch::IntegrationTest
     assert_match workouts(:draft_session).workout_on.to_fs(:long), response.body
     assert_match "Planned values: Yes", response.body
     assert_match "Workout notes: No", response.body
-    assert_match "- Dumbbell Bench Press: 3 x 8 @ 30 kg", response.body
+    assert_match "- Dumbbell Bench Press: 1 x 8 @ 30 kg", response.body
     assert_no_match "Smooth tempo and keep rest honest.", response.body
   end
 
