@@ -7,7 +7,7 @@ image: ghcr.io/tmeadon/weights
 # Deploy to these servers.
 servers:
   web:
-    - ocivps
+    - ovhvps
   # job:
   #   hosts:
   #     - 192.168.0.1

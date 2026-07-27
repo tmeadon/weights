@@ -22,7 +22,8 @@
       <p class="supporting-text"><%= pluralize(@workouts.count, "workout") %> tracked.</p>
     </div>
 
-    <div>
+    <div class="button-row">
+      <%= link_to "Export markdown", export_workouts_path, class: "button button-ghost" %>
       <%= link_to "New workout", new_workout_path, class: "button" %>
     </div>
   </div>

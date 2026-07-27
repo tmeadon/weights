@@ -42,7 +42,8 @@ export default class extends Controller {
 
     currentWeightInput.value = previousWeightInput.value
     currentRepsInput.value = previousRepsInput.value
-    this.queue()
+    currentWeightInput.dispatchEvent(new Event("input", { bubbles: true }))
+    currentRepsInput.dispatchEvent(new Event("input", { bubbles: true }))
   }
 
   valuePresent(value) {

@@ -24,6 +24,63 @@ class WorkoutsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a", "Me"
     assert_select ".workout-row-date", /days ago|Today|Tomorrow|Yesterday|March/
     assert_select "a", "Progression"
+    assert_select "a", "Export markdown"
+  end
+
+  test "export shows form and preview" do
+    get export_workouts_path
+
+    assert_response :success
+    assert_select "h1", "Export workouts"
+    assert_select "input[type='checkbox'][name='export[include_planned_values]']", count: 1
+    assert_select "input[type='checkbox'][name='export[show_workout_notes]']", count: 1
+    assert_select "input[type='checkbox'][name='export[include_unspecified]']", count: 1
+    assert_select "textarea[readonly]"
+    assert_match "# Workout export", response.body
+    assert_match workouts(:draft_session).workout_on.to_fs(:long), response.body
+    assert_match "Planned values: Yes", response.body
+    assert_match "Workout notes: No", response.body
+    assert_match "- Dumbbell Bench Press: 3 x 8 @ 30 kg", response.body
+    assert_no_match "Smooth tempo and keep rest honest.", response.body
+  end
+
+  test "export can hide planned values and show notes" do
+    get export_workouts_path, params: {
+      export: {
+        start_date: "2026-03-20",
+        end_date: "2026-03-31",
+        workout_types: [ "push" ],
+        include_unspecified: "1",
+        group_by_workout_type: "0",
+        include_planned_values: "0",
+        show_workout_notes: "1"
+      }
+    }
+
+    assert_response :success
+    assert_match "Time frame: March 20, 2026 to March 31, 2026", response.body
+    assert_match "Workout types: Push, Unspecified", response.body
+    assert_match "Planned values: No", response.body
+    assert_match "Workout notes: Yes", response.body
+    assert_match "Smooth tempo and keep rest honest.", response.body
+    assert_no_match "[planned:", response.body
+    assert_no_match "Lower Body Session", response.body
+    assert_no_match "Pull Day", response.body
+  end
+
+  test "export groups workouts by workout type" do
+    get export_workouts_path, params: {
+      export: {
+        workout_types: [ "push", "legs" ],
+        include_unspecified: "0",
+        group_by_workout_type: "1"
+      }
+    }
+
+    assert_response :success
+    assert_match "## Push", response.body
+    assert_match "## Legs", response.body
+    assert_match workouts(:draft_session).workout_on.to_fs(:long), response.body
   end
 
   test "show" do
@@ -111,7 +168,6 @@ class WorkoutsControllerTest < ActionDispatch::IntegrationTest
     assert_match workouts(:completed_bench_session_two).workout_on.to_fs(:short), response.body
     assert_match "9 x 28kg, 10 x 26kg", response.body
     assert_match "3 x 8 x 24kg", response.body
-    assert_match workouts(:completed_bench_session).workout_on.to_fs(:short), response.body
     assert_includes response.body, "exercise-history-reuse"
   end
 

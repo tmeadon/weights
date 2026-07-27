@@ -1479,6 +1479,27 @@ select:focus {
   border-color: var(--accent);
 }
 
+.export-checklist {
+  display: grid;
+  gap: 10px 16px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.export-checklist label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+.export-preview {
+  min-height: 380px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
 .button {
   display: inline-flex;
   justify-content: center;
@@ -1511,6 +1532,11 @@ select:focus {
 .button-ghost:hover,
 .button-ghost:focus-visible {
   background: rgba(255, 255, 255, 0.8);
+}
+
+.button-row .button,
+.button-row .button-ghost {
+  white-space: nowrap;
 }
 
 .status-pill {

@@ -1,0 +1,19 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: bash -lc "bundle install && bin/rails db:prepare && bin/rails server -b 0.0.0.0 -p 3000"
+    environment:
+      DATABASE_PATH: /rails/restore/_data/production.sqlite3
+      RAILS_ENV: development
+    ports:
+      - "3002:3000"
+    volumes:
+      - .:/rails
+      - bundle:/usr/local/bundle
+    stdin_open: true
+    tty: true
+
+volumes:
+  bundle:

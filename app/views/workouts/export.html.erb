@@ -1,0 +1,83 @@
+<% content_for :title, "Export workouts" %>
+
+<section class="card panel-card">
+  <div class="section-heading">
+    <div>
+      <h1>Export workouts</h1>
+      <p class="supporting-text">Choose a date range, workout types, and grouping to generate a markdown summary.</p>
+    </div>
+  </div>
+
+  <%= form_with url: export_workouts_path, method: :get, scope: :export, class: "stack-form", data: { turbo: false } do |form| %>
+    <div class="form-grid-three">
+      <div class="field">
+        <%= form.label :start_date, "Start date" %>
+        <%= form.date_field :start_date, value: @start_date %>
+      </div>
+
+      <div class="field">
+        <%= form.label :end_date, "End date" %>
+        <%= form.date_field :end_date, value: @end_date %>
+      </div>
+
+      <div class="field">
+        <%= form.label :group_by_workout_type, "Grouping" %>
+        <%= form.select :group_by_workout_type, options_for_select([["Group by workout type", true], ["Keep workouts in a single list", false]], @group_by_workout_type) %>
+      </div>
+    </div>
+
+    <div class="field">
+      <%= form.label :workout_types, "Workout types" %>
+      <div class="export-checklist">
+        <% Workout::WORKOUT_TYPES.each do |workout_type| %>
+          <label>
+            <%= check_box_tag "export[workout_types][]", workout_type, @submitted ? @selected_types.include?(workout_type) : true %>
+            <span><%= workout_type.humanize %></span>
+          </label>
+        <% end %>
+        <label>
+          <%= check_box_tag "export[include_unspecified]", "1", @include_unspecified %>
+          <span>Unspecified</span>
+        </label>
+      </div>
+      <p class="field-hint">Leave dates blank to export all workouts.</p>
+    </div>
+
+    <div class="field">
+      <label>Display options</label>
+      <div class="export-checklist">
+        <label>
+          <%= form.check_box :include_planned_values %>
+          <span>Show planned values</span>
+        </label>
+        <label>
+          <%= form.check_box :show_workout_notes %>
+          <span>Show workout notes</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="button-row">
+      <%= form.submit "Preview markdown", class: "button" %>
+      <%= button_tag "Download markdown", name: "download", value: "1", class: "button button-ghost" %>
+      <%= link_to "Reset", export_workouts_path, class: "button button-ghost" %>
+    </div>
+  <% end %>
+</section>
+
+<section class="card panel-card">
+  <% if @export_errors.any? %>
+    <div class="flash flash-alert"><%= @export_errors.to_sentence %></div>
+  <% end %>
+
+  <div class="section-heading">
+    <div>
+      <p class="panel-label">Markdown output</p>
+      <h2><%= pluralize(@workouts.count, "workout") %> matched</h2>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= text_area_tag :markdown, @markdown, rows: 24, readonly: true, class: "export-preview" %>
+  </div>
+</section>

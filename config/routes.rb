@@ -17,6 +17,10 @@ Rails.application.routes.draw do
   end
   resources :progressions, only: :index
   resources :workouts do
+    collection do
+      get :export
+    end
+
     member do
       get :exercise_history
     end
