@@ -27,6 +27,16 @@ class WorkoutsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a", "Export markdown"
   end
 
+  test "index shows personal best counts" do
+    pb_workout = @user.workouts.create!(title: "PB Session", workout_on: Date.current + 10, status: "completed")
+    pb_workout.workout_sets.create!(exercise: exercises(:bench_press), position: 1, actual_reps: 12, actual_weight: 40)
+
+    get workouts_path
+
+    assert_response :success
+    assert_select ".workout-pb-count", text: /PBs 1/
+  end
+
   test "export shows form and preview" do
     get export_workouts_path
 

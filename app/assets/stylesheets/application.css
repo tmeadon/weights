@@ -433,6 +433,48 @@ select:focus {
   gap: 12px;
 }
 
+.exercise-heading-main {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.exercise-pb-summary {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.exercise-pb-summary-visible {
+  display: flex;
+}
+
+.personal-best-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-deep);
+}
+
+.exercise-pb-summary-text {
+  white-space: nowrap;
+}
+
+.workout-pb-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
 .exercise-row:first-child {
   padding-top: 0;
   border-top: 0;

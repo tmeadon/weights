@@ -217,4 +217,38 @@ class WorkoutTest < ActiveSupport::TestCase
     assert_equal "1 x 3 x 12kg", workout.summarize_recent_logged_sets([ first, second ])
     assert_equal "No logged sets", workout.summarize_recent_logged_sets([ first ])
   end
+
+  test "recalculates personal bests and session counts for logged sets" do
+    user = users(:one)
+    exercise = exercises(:bench_press)
+
+    first_workout = user.workouts.create!(
+      title: "PB Session One",
+      workout_on: Date.new(2026, 3, 12),
+      status: "completed"
+    )
+    first_set = first_workout.workout_sets.create!(
+      exercise:,
+      position: 1,
+      actual_reps: 8,
+      actual_weight: 30
+    )
+
+    second_workout = user.workouts.create!(
+      title: "PB Session Two",
+      workout_on: Date.new(2026, 3, 13),
+      status: "completed"
+    )
+    second_set = second_workout.workout_sets.create!(
+      exercise:,
+      position: 1,
+      actual_reps: 8,
+      actual_weight: 32
+    )
+
+    assert first_set.reload.personal_best
+    assert second_set.reload.personal_best
+    assert_equal 1, first_workout.reload.personal_best_count
+    assert_equal 1, second_workout.reload.personal_best_count
+  end
 end

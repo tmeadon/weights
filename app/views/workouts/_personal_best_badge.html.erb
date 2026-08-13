@@ -1,0 +1,4 @@
+<div id="<%= personal_best_badge_dom_id(workout, exercise) %>" class="exercise-pb-summary<%= " exercise-pb-summary-visible" if has_personal_best %>">
+  <span class="personal-best-badge" aria-hidden="true"><%= "🏆" if has_personal_best %></span>
+  <span class="exercise-pb-summary-text"><%= personal_best_text if has_personal_best %></span>
+</div>

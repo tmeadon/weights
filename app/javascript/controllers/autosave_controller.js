@@ -73,14 +73,14 @@ export default class extends Controller {
         method: this.element.method,
         credentials: "same-origin",
         headers: {
-          Accept: "text/vnd.turbo-stream.html"
+          Accept: "application/json"
         },
         body: new FormData(this.element)
       })
 
-      const html = await response.text()
-      if (html.trim().length > 0 && window.Turbo?.renderStreamMessage) {
-        window.Turbo.renderStreamMessage(html)
+      if (response.headers.get("content-type")?.includes("application/json")) {
+        const payload = await response.json()
+        this.applySaveResult(payload)
       }
 
       if (response.ok) {
@@ -107,6 +107,36 @@ export default class extends Controller {
   disconnect() {
     clearTimeout(this.timeout)
     clearTimeout(this.statusTimeout)
+  }
+
+  applySaveResult(payload) {
+    if (!payload?.workout?.workout_sets) return
+
+    const groupRow = this.element.closest(".planned-group-row")
+    if (!groupRow) return
+
+    const exerciseId = Number(this.element.querySelector("select[name='execution[exercise_id]']")?.value)
+    if (!Number.isFinite(exerciseId)) return
+
+    const exerciseSets = payload.workout.workout_sets.filter((workoutSet) => Number(workoutSet.exercise_id) === exerciseId)
+    const pbSets = exerciseSets.filter((workoutSet) => workoutSet.personal_best)
+
+    const summary = groupRow.querySelector(".exercise-pb-summary")
+    const badge = groupRow.querySelector(".personal-best-badge")
+    const text = groupRow.querySelector(".exercise-pb-summary-text")
+
+    if (!summary || !badge || !text) return
+
+    const latestPb = pbSets.sort((a, b) => (a.position - b.position) || ((a.created_at || "").localeCompare(b.created_at || ""))).at(-1)
+    const visible = Boolean(latestPb)
+
+    summary.classList.toggle("exercise-pb-summary-visible", visible)
+    badge.textContent = visible ? "🏆" : ""
+    text.textContent = visible
+      ? (latestPb.personal_best_previous_label
+        ? `Previous PB: ${latestPb.personal_best_previous_label}`
+        : "New PB")
+      : ""
   }
 
   formSignature() {

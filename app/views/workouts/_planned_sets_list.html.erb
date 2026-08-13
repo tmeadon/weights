@@ -5,7 +5,9 @@
     <% exercise_groups.each_with_index do |(exercise, grouped_sets), index| %>
       <article class="workout-row planned-group-row" data-controller="fill-down">
         <div class="exercise-heading">
-          <h3><%= exercise.name %></h3>
+          <div class="exercise-heading-main">
+            <h3><%= exercise.name %></h3>
+          </div>
           <div class="exercise-actions">
             <% can_reorder = workout.status.in?(%w[draft in_progress]) %>
             <% if can_reorder %>
@@ -18,6 +20,13 @@
             <%= button_to "Remove exercise", remove_exercise_workout_workout_sets_path(workout, exercise_id: exercise.id), method: :delete, class: "link-button exercise-remove-link", form_class: "link-button-form" %>
           </div>
         </div>
+
+        <% personal_best_set = grouped_sets.select(&:personal_best?).max_by { |workout_set| [ workout_set.position, workout_set.created_at ] } %>
+        <%= render "workouts/personal_best_badge",
+          workout: workout,
+          exercise: exercise,
+          has_personal_best: personal_best_set.present?,
+          personal_best_text: personal_best_set&.personal_best_previous_label.present? ? "Previous PB: #{personal_best_set.personal_best_previous_label}" : "New PB" %>
 
         <% notes = grouped_sets.map(&:coach_notes).compact.uniq %>
         <% if notes.any? %>

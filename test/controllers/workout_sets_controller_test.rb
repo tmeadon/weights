@@ -154,7 +154,7 @@ class WorkoutSetsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 34.0, @active_workout_set.actual_weight.to_f
   end
 
-  test "turbo update logged results succeeds without replacing form fragments" do
+  test "json update logged results returns personal best metadata" do
     patch workout_workout_set_path(@active_workout, @active_workout_set),
       params: {
         execution: {
@@ -162,9 +162,11 @@ class WorkoutSetsControllerTest < ActionDispatch::IntegrationTest
           actual_weight: 34
         }
       },
-      headers: { "Accept" => "text/vnd.turbo-stream.html" }
+      as: :json
 
-    assert_response :no_content
+    assert_response :success
+    assert_equal 1, json_response.dig("workout", "personal_best_count")
+    assert_equal true, json_response.dig("workout", "workout_sets").any? { |workout_set| workout_set["exercise_id"] == exercises(:squat).id && workout_set["personal_best"] }
   end
 
   test "turbo update logged results returns validation errors for autosave" do

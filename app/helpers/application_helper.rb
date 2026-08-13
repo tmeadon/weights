@@ -24,4 +24,8 @@ module ApplicationHelper
 
     workout_date.to_fs(:long)
   end
+
+  def personal_best_badge_dom_id(workout, exercise)
+    "workout_#{workout.id}_exercise_#{exercise.id}_personal_best_badge"
+  end
 end

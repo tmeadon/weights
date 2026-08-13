@@ -30,6 +30,10 @@ module ApiSerialization
         planned_difficulty: decimal(workout_set.planned_difficulty),
         actual_difficulty: decimal(workout_set.actual_difficulty),
         difficulty: decimal(workout_set.difficulty),
+        personal_best: workout_set.personal_best,
+        personal_best_value: decimal_or_nil(workout_set.personal_best_value),
+        personal_best_previous_value: decimal_or_nil(workout_set.personal_best_previous_value),
+        personal_best_previous_label: workout_set.personal_best_previous_label,
         created_at: workout_set.created_at,
         updated_at: workout_set.updated_at
       }
@@ -49,6 +53,7 @@ module ApiSerialization
         planned_total_difficulty: decimal(workout.planned_total_difficulty),
         actual_total_difficulty: decimal(workout.actual_total_difficulty),
         total_difficulty: decimal(workout.total_difficulty),
+        personal_best_count: workout.personal_best_count,
         created_at: workout.created_at,
         updated_at: workout.updated_at
       }

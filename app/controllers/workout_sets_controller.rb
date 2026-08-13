@@ -1,4 +1,5 @@
 class WorkoutSetsController < ApplicationController
+  include ApiSerialization
   before_action :set_workout
   before_action :set_workout_set, only: %i[edit update destroy]
   before_action :ensure_editable_workout, only: %i[destroy remove_exercise]
@@ -191,7 +192,15 @@ class WorkoutSetsController < ApplicationController
 
       if @workout_set.update(execution_params.except(:exercise_id))
         @workout.reload
+        @workout_set.reload
         respond_to do |format|
+          format.json do
+            render json: {
+              workout_set: serialize_workout_set(@workout_set),
+              workout: serialize_workout(@workout, include_sets: true),
+              exercise_has_personal_best: @workout.workout_sets.where(exercise_id: @workout_set.exercise_id, personal_best: true).exists?
+            }
+          end
           format.turbo_stream do
             head :no_content
           end

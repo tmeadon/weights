@@ -46,7 +46,7 @@
           </div>
 
           <p class="exercise-meta">
-            <%= workout.workout_on.to_fs(:long) %> / <%= workout.status.humanize %> / Difficulty <%= number_with_precision(workout.total_difficulty, precision: 1) %>
+            <%= workout.workout_on.to_fs(:long) %> / <%= workout.status.humanize %> / <span class="workout-pb-count">PBs <%= workout.personal_best_count %></span> / Difficulty <%= number_with_precision(workout.total_difficulty, precision: 1) %>
           </p>
 
         </article>

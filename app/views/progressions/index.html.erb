@@ -234,6 +234,7 @@
                       <th>Workout</th>
                       <th>Absolute</th>
                       <th>Relative</th>
+                      <th>PBs</th>
                       <th>Actual sets</th>
                     </tr>
                   </thead>
@@ -245,6 +246,7 @@
                         <td><%= number_with_precision(row[:actual_total], precision: 1) %></td>
                         <% relative = row[:relative_percent] %>
                         <td class="progression-delta <%= relative.to_d >= 0 ? "progression-delta-positive" : "progression-delta-negative" %>"><%= relative.present? ? number_with_precision(relative, precision: 1) + "%" : "-" %></td>
+                        <td><%= row[:workout].personal_best_count %></td>
                         <td><%= row[:actual_summary] %></td>
                       </tr>
                     <% end %>
@@ -268,6 +270,10 @@
                         <p class="progression-mobile-label">Relative</p>
                         <% relative = row[:relative_percent] %>
                         <p class="progression-mobile-value progression-delta <%= relative.to_d >= 0 ? "progression-delta-positive" : "progression-delta-negative" %>"><%= relative.present? ? number_with_precision(relative, precision: 1) + "%" : "-" %></p>
+                      </div>
+                      <div>
+                        <p class="progression-mobile-label">PBs</p>
+                        <p class="progression-mobile-value"><%= row[:workout].personal_best_count %></p>
                       </div>
                     </div>
                     <p class="progression-mobile-meta"><strong>Sets:</strong> <%= row[:actual_summary] %></p>

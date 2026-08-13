@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_03_153000) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_04_120000) do
   create_table "exercises", force: :cascade do |t|
     t.datetime "archived_at"
     t.datetime "created_at", null: false
@@ -54,11 +54,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_03_153000) do
     t.text "coach_notes"
     t.datetime "created_at", null: false
     t.integer "exercise_id", null: false
+    t.boolean "personal_best", default: false, null: false
+    t.decimal "personal_best_previous_value", precision: 10, scale: 2
+    t.decimal "personal_best_value", precision: 10, scale: 2
     t.integer "position", null: false
     t.integer "target_reps"
     t.decimal "target_weight", precision: 8, scale: 2
     t.datetime "updated_at", null: false
     t.integer "workout_id", null: false
+    t.index ["exercise_id", "personal_best"], name: "index_workout_sets_on_exercise_id_and_personal_best"
     t.index ["exercise_id"], name: "index_workout_sets_on_exercise_id"
     t.index ["workout_id", "exercise_id"], name: "index_workout_sets_on_workout_id_and_exercise_id"
     t.index ["workout_id", "position"], name: "index_workout_sets_on_workout_id_and_position", unique: true
@@ -69,6 +73,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_03_153000) do
     t.datetime "created_at", null: false
     t.datetime "deleted_at"
     t.text "notes"
+    t.integer "personal_best_count", default: 0, null: false
     t.decimal "planned_total_difficulty", precision: 10, scale: 2, default: "0.0", null: false
     t.string "status", default: "draft", null: false
     t.string "title", null: false

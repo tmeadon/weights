@@ -191,6 +191,54 @@ class Workout < ApplicationRecord
     update_column(:total_difficulty, total)
   end
 
+  def recalculate_personal_bests_for_exercise!(exercise_id, affected_workout_ids: [])
+    exercise_id = exercise_id.to_i
+    return if exercise_id.zero?
+
+    sets = WorkoutSet.joins(:workout)
+      .includes(:workout)
+      .merge(self.class.active.where(user_id:))
+      .where(exercise_id:)
+      .where.not(actual_reps: nil)
+      .where.not(actual_weight: nil)
+      .order(Arel.sql("workouts.workout_on ASC, workouts.created_at ASC, workout_sets.position ASC, workout_sets.created_at ASC, workout_sets.id ASC"))
+      .to_a
+
+    best_so_far = BigDecimal("0")
+
+    sets.each do |workout_set|
+      current_value = workout_set.actual_difficulty.to_d
+      personal_best = current_value > best_so_far
+      previous_best_value = personal_best ? best_so_far : nil
+      best_so_far = current_value if personal_best
+
+      workout_set.update_columns(
+        personal_best:,
+        personal_best_value: personal_best ? current_value : nil,
+        personal_best_previous_value: previous_best_value
+      )
+    end
+
+    (Array(affected_workout_ids).map(&:to_i) + sets.map(&:workout_id)).uniq.each do |workout_id|
+      next if workout_id.zero?
+
+      count = WorkoutSet.where(workout_id:, personal_best: true).count
+      Workout.where(id: workout_id).update_all(personal_best_count: count)
+    end
+  end
+
+  def previous_personal_best_set_for_exercise(exercise_id, previous_best_value:)
+    value = previous_best_value.to_d
+    return nil if exercise_id.blank? || value.zero?
+
+    WorkoutSet.joins(:workout)
+      .includes(:exercise)
+      .merge(self.class.active.where(user_id:))
+      .where(exercise_id:, personal_best: true, personal_best_value: value)
+      .order(Arel.sql("workouts.workout_on ASC, workouts.created_at ASC, workout_sets.position ASC, workout_sets.created_at ASC, workout_sets.id ASC"))
+      .last
+  end
+
   def planned_total_difficulty
     return super unless status == "draft"
 
