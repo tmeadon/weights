@@ -1,0 +1,39 @@
+<% if current_pb_rows.any? %>
+  <div class="progression-table-wrap progression-table-desktop">
+    <table class="progression-table">
+      <thead>
+        <tr>
+          <th>Exercise</th>
+          <th>Current PB</th>
+          <th>Workout</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% current_pb_rows.each do |row| %>
+          <tr>
+            <td><%= row[:exercise].name %></td>
+            <td><%= row[:label] %> · <%= number_with_precision(row[:score], precision: 1) %></td>
+            <td><%= link_to row[:workout].title, workout_path(row[:workout]), data: { turbo_frame: "_top" } %></td>
+            <td><%= row[:workout].workout_on.to_fs(:short) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="progression-mobile-list">
+    <% current_pb_rows.each do |row| %>
+      <article class="progression-mobile-row">
+        <div class="progression-mobile-head">
+          <span class="progression-mobile-title"><%= row[:exercise].name %></span>
+          <span class="progression-mobile-date"><%= row[:workout].workout_on.to_fs(:short) %></span>
+        </div>
+        <p class="progression-mobile-meta"><%= row[:label] %> · <%= number_with_precision(row[:score], precision: 1) %></p>
+        <p class="progression-mobile-meta"><%= link_to row[:workout].title, workout_path(row[:workout]), data: { turbo_frame: "_top" } %></p>
+      </article>
+    <% end %>
+  </div>
+<% else %>
+  <p class="supporting-text">No personal bests recorded yet.</p>
+<% end %>

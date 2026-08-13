@@ -11,6 +11,7 @@
   <%= turbo_frame_tag "progression_panel", data: { turbo_action: "advance" } do %>
     <nav class="progression-tabs" aria-label="Progression sections">
       <%= link_to "Workouts", progressions_path(tab: "workouts", workout_type: @selected_workout_type, chart_mode: @chart_mode), class: ["topbar-pill", (@tab == "workouts" ? "topbar-pill-active" : nil)], data: { turbo_frame: "progression_panel" } %>
+      <%= link_to "PBs", progressions_path(tab: "pbs"), class: ["topbar-pill", (@tab == "pbs" ? "topbar-pill-active" : nil)], data: { turbo_frame: "progression_panel" } %>
       <%= link_to "Exercises", progressions_path(tab: "exercises", exercise_id: @selected_exercise_id, exercise_chart_mode: @exercise_chart_mode), class: ["topbar-pill", (@tab == "exercises" ? "topbar-pill-active" : nil)], data: { turbo_frame: "progression_panel" } %>
     </nav>
 
@@ -146,6 +147,30 @@
         <% else %>
           <p class="supporting-text">No matching logged workouts yet.</p>
         <% end %>
+      </section>
+    <% end %>
+
+    <% if @tab == "pbs" %>
+      <section class="progression-panel-section">
+        <div class="section-heading">
+          <div>
+            <p class="panel-label">Personal bests</p>
+            <h2>PBs this period</h2>
+            <p class="supporting-text progression-timeframe">See the PB count chart and the current best set for each exercise.</p>
+          </div>
+        </div>
+
+        <% if @pb_chart_points.any? %>
+          <div class="progression-history-block">
+            <%= render "progressions/trend_chart", points: @pb_chart_points, mode: "absolute", aria_label: "PBs per workout trend", legend_label: "PBs achieved" %>
+          </div>
+        <% end %>
+
+        <div class="progression-history-block">
+          <h3 class="progression-history-heading">Current personal bests</h3>
+          <p class="supporting-text progression-history-subtitle">One row per exercise with the current best set.</p>
+          <%= render "progressions/current_pbs", current_pb_rows: @current_pb_rows %>
+        </div>
       </section>
     <% end %>
 

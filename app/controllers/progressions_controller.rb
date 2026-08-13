@@ -11,7 +11,9 @@ class ProgressionsController < ApplicationController
     @workout_progress_rows = build_workout_progress_rows(@progress_workouts)
     @difficulty_summary = build_difficulty_summary(@workout_progress_rows)
     @workout_chart_points = build_workout_chart_points(@workout_progress_rows)
+    @pb_chart_points = build_pb_chart_points(@workout_progress_rows)
     all_exercise_stats = build_exercise_stats(@progress_workouts)
+    @current_pb_rows = build_current_pb_rows
     @exercise_filter_options = all_exercise_stats
 
     @selected_exercise_id = params[:exercise_id].presence&.to_i
@@ -44,6 +46,7 @@ class ProgressionsController < ApplicationController
     def normalized_tab(value)
       tab = value.to_s.strip.downcase
       return "exercises" if tab == "exercises"
+      return "pbs" if tab == "pbs"
 
       "workouts"
     end
@@ -159,6 +162,38 @@ class ProgressionsController < ApplicationController
           relative: row[:relative_percent]&.to_d&.to_f
         }
       end
+    end
+
+    def build_pb_chart_points(rows)
+      rows.last(24).map do |row|
+        {
+          label: row[:workout].workout_on.to_fs(:short),
+          absolute: row[:workout].personal_best_count.to_d.to_f,
+          relative: nil
+        }
+      end
+    end
+
+    def build_current_pb_rows
+      WorkoutSet.joins(:workout, :exercise)
+        .includes(:workout, :exercise)
+        .merge(Current.user.workouts.active.where(status: "completed"))
+        .merge(Exercise.active)
+        .personal_bests
+        .where.not(personal_best_value: nil)
+        .to_a
+        .group_by(&:exercise_id)
+        .map do |_exercise_id, sets|
+          set = sets.max_by { |workout_set| [ workout_set.personal_best_value.to_d, workout_set.workout.workout_on, workout_set.workout.created_at, workout_set.position, workout_set.created_at, workout_set.id ] }
+          {
+            exercise: set.exercise,
+            set:,
+            workout: set.workout,
+            label: set.compact_logged_summary,
+            score: set.personal_best_value
+          }
+        end
+        .sort_by { |row| row[:exercise].name }
     end
 
     def build_exercise_chart_points(rows)

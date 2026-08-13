@@ -22,6 +22,7 @@ class ProgressionsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a", "Absolute"
     assert_select "a", "Relative"
     assert_select "a", "Workouts"
+    assert_select "a", "PBs"
     assert_select "a", "Exercises"
   end
 
@@ -105,6 +106,43 @@ class ProgressionsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".progression-chart-svg", count: 1
     assert_select "a", text: "Absolute"
     assert_select "a", text: "Relative"
+  end
+
+  test "pbs tab shows pb chart and current list" do
+    first = @user.workouts.create!(
+      title: "PB One",
+      workout_on: Date.new(2026, 4, 1),
+      workout_type: "push",
+      status: "completed"
+    )
+    first.workout_sets.create!(
+      exercise: exercises(:bench_press),
+      position: 1,
+      actual_reps: 8,
+      actual_weight: 20
+    )
+
+    second = @user.workouts.create!(
+      title: "PB Two",
+      workout_on: Date.new(2026, 4, 8),
+      workout_type: "push",
+      status: "completed"
+    )
+    second.workout_sets.create!(
+      exercise: exercises(:bench_press),
+      position: 1,
+      actual_reps: 10,
+      actual_weight: 25
+    )
+
+    get progressions_path, params: { tab: "pbs" }
+
+    assert_response :success
+    assert_select "h2", "PBs this period"
+    assert_select "h3", "Current personal bests"
+    assert_select ".progression-chart-legend-item", text: /PBs achieved/
+    assert_match "Dumbbell Bench Press", response.body
+    assert_match "10x25kg", response.body
   end
 
   test "exercise filter narrows main exercise table" do

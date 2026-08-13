@@ -56,10 +56,12 @@ end %>
     end.join(" ")
   end %>
 
+  <% legend_label ||= "Relative change (%)" %>
+  <% trend_label ||= "Trend" %>
   <div class="progression-chart-legend">
-    <span class="progression-chart-legend-item"><span class="progression-chart-key progression-chart-key-delta"></span>Relative change (%)</span>
+    <span class="progression-chart-legend-item"><span class="progression-chart-key progression-chart-key-delta"></span><%= legend_label %></span>
     <% if relative_trend_points.present? %>
-      <span class="progression-chart-legend-item"><span class="progression-chart-key progression-chart-key-planned"></span>Trend</span>
+      <span class="progression-chart-legend-item"><span class="progression-chart-key progression-chart-key-planned"></span><%= trend_label %></span>
     <% end %>
   </div>
 
@@ -101,10 +103,12 @@ end %>
     end.join(" ")
   end %>
 
+  <% legend_label ||= "Absolute score" %>
+  <% trend_label ||= "Trend" %>
   <div class="progression-chart-legend">
-    <span class="progression-chart-legend-item"><span class="progression-chart-key progression-chart-key-actual"></span>Absolute score</span>
+    <span class="progression-chart-legend-item"><span class="progression-chart-key progression-chart-key-actual"></span><%= legend_label %></span>
     <% if absolute_trend_points.present? %>
-      <span class="progression-chart-legend-item"><span class="progression-chart-key progression-chart-key-planned"></span>Trend</span>
+      <span class="progression-chart-legend-item"><span class="progression-chart-key progression-chart-key-planned"></span><%= trend_label %></span>
     <% end %>
   </div>
 
