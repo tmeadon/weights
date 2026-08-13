@@ -135,13 +135,16 @@ class ProgressionsController < ApplicationController
 
         planned_total = sets.sum { |workout_set| workout_set.planned_difficulty.to_d }
         actual_total = sets.sum { |workout_set| workout_set.actual_difficulty.to_d }
+        pb = workout.workout_exercise_best_for(exercise_id)
 
         {
           workout:,
           sets:,
           planned_total:,
           actual_total:,
-          actual_summary: workout.summarize_recent_logged_sets(sets)
+          actual_summary: workout.summarize_recent_logged_sets(sets),
+          pb:,
+          has_pb: pb.present?
         }
       end
 
@@ -175,22 +178,20 @@ class ProgressionsController < ApplicationController
     end
 
     def build_current_pb_rows
-      WorkoutSet.joins(:workout, :exercise)
+      WorkoutExerciseBest.joins(:workout, :exercise)
         .includes(:workout, :exercise)
         .merge(Current.user.workouts.active.where(status: "completed"))
         .merge(Exercise.active)
-        .personal_bests
-        .where.not(personal_best_value: nil)
         .to_a
         .group_by(&:exercise_id)
-        .map do |_exercise_id, sets|
-          set = sets.max_by { |workout_set| [ workout_set.personal_best_value.to_d, workout_set.workout.workout_on, workout_set.workout.created_at, workout_set.position, workout_set.created_at, workout_set.id ] }
+        .map do |_exercise_id, rows|
+          row = rows.max_by { |best| [ best.personal_best_value.to_d, best.workout.workout_on, best.workout.created_at, best.created_at, best.id ] }
           {
-            exercise: set.exercise,
-            set:,
-            workout: set.workout,
-            label: set.compact_logged_summary,
-            score: set.personal_best_value
+            exercise: row.exercise,
+            row:,
+            workout: row.workout,
+            label: row.current_summary,
+            score: row.personal_best_value
           }
         end
         .sort_by { |row| row[:exercise].name }

@@ -259,8 +259,7 @@
                       <th>Workout</th>
                       <th>Absolute</th>
                       <th>Relative</th>
-                      <th>PBs</th>
-                      <th>Actual sets</th>
+                      <th></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -271,8 +270,7 @@
                         <td><%= number_with_precision(row[:actual_total], precision: 1) %></td>
                         <% relative = row[:relative_percent] %>
                         <td class="progression-delta <%= relative.to_d >= 0 ? "progression-delta-positive" : "progression-delta-negative" %>"><%= relative.present? ? number_with_precision(relative, precision: 1) + "%" : "-" %></td>
-                        <td><%= row[:workout].personal_best_count %></td>
-                        <td><%= row[:actual_summary] %></td>
+                        <td class="exercise-history-pb-cell"><%= row[:has_pb] ? "🏆" : "" %></td>
                       </tr>
                     <% end %>
                   </tbody>
@@ -297,11 +295,11 @@
                         <p class="progression-mobile-value progression-delta <%= relative.to_d >= 0 ? "progression-delta-positive" : "progression-delta-negative" %>"><%= relative.present? ? number_with_precision(relative, precision: 1) + "%" : "-" %></p>
                       </div>
                       <div>
-                        <p class="progression-mobile-label">PBs</p>
-                        <p class="progression-mobile-value"><%= row[:workout].personal_best_count %></p>
+                        <p class="progression-mobile-label">PB</p>
+                        <p class="progression-mobile-value"><%= row[:has_pb] ? "🏆" : "-" %></p>
                       </div>
                     </div>
-                    <p class="progression-mobile-meta"><strong>Sets:</strong> <%= row[:actual_summary] %></p>
+                    <p class="progression-mobile-meta"><strong>Sets:</strong> <%= row[:actual_summary] %> <%= row[:has_pb] ? "· 🏆" : "" %></p>
                   </article>
                 <% end %>
               </div>

@@ -142,7 +142,41 @@ class ProgressionsControllerTest < ActionDispatch::IntegrationTest
     assert_select "h3", "Current personal bests"
     assert_select ".progression-chart-legend-item", text: /PBs achieved/
     assert_match "Dumbbell Bench Press", response.body
-    assert_match "10x25kg", response.body
+    assert_match "1 x 10 x 25kg", response.body
+  end
+
+  test "exercise history shows pb indicator" do
+    first = @user.workouts.create!(
+      title: "PB One",
+      workout_on: Date.new(2026, 4, 1),
+      workout_type: "push",
+      status: "completed"
+    )
+    first.workout_sets.create!(
+      exercise: exercises(:bench_press),
+      position: 1,
+      actual_reps: 8,
+      actual_weight: 20
+    )
+
+    second = @user.workouts.create!(
+      title: "PB Two",
+      workout_on: Date.new(2026, 4, 8),
+      workout_type: "push",
+      status: "completed"
+    )
+    second.workout_sets.create!(
+      exercise: exercises(:bench_press),
+      position: 1,
+      actual_reps: 10,
+      actual_weight: 25
+    )
+
+    get progressions_path, params: { tab: "exercises", exercise_id: exercises(:bench_press).id }
+
+    assert_response :success
+    assert_select ".exercise-history-pb-cell", text: "🏆", count: 1
+    assert_select "th", text: "PBs", count: 0
   end
 
   test "exercise filter narrows main exercise table" do
