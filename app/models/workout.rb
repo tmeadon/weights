@@ -4,6 +4,7 @@ class Workout < ApplicationRecord
 
   belongs_to :user
   has_many :workout_sets, -> { ordered }, dependent: :destroy
+  has_many :workout_exercise_bests, dependent: :destroy
   has_many :exercises, through: :workout_sets
 
   normalizes :title, with: ->(value) { value.to_s.strip.squeeze(" ") }
@@ -195,7 +196,7 @@ class Workout < ApplicationRecord
     exercise_id = exercise_id.to_i
     return if exercise_id.zero?
 
-    sets = WorkoutSet.joins(:workout)
+    totals_by_workout = WorkoutSet.joins(:workout)
       .includes(:workout)
       .merge(self.class.active.where(user_id:))
       .where(exercise_id:)
@@ -203,40 +204,64 @@ class Workout < ApplicationRecord
       .where.not(actual_weight: nil)
       .order(Arel.sql("workouts.workout_on ASC, workouts.created_at ASC, workout_sets.position ASC, workout_sets.created_at ASC, workout_sets.id ASC"))
       .to_a
+      .group_by(&:workout)
+      .map do |workout, sets|
+        [ workout, sets.sum { |workout_set| workout_set.actual_difficulty.to_d } ]
+      end
+      .sort_by { |workout, _total| [ workout.workout_on, workout.created_at ] }
 
+    WorkoutExerciseBest.joins(:workout)
+      .merge(self.class.active.where(user_id:))
+      .where(exercise_id:)
+      .delete_all
+
+    rows = []
     best_so_far = BigDecimal("0")
 
-    sets.each do |workout_set|
-      current_value = workout_set.actual_difficulty.to_d
-      personal_best = current_value > best_so_far
-      previous_best_value = personal_best ? best_so_far : nil
-      best_so_far = current_value if personal_best
+    totals_by_workout.each do |workout, total|
+      next unless total > best_so_far
 
-      workout_set.update_columns(
-        personal_best:,
-        personal_best_value: personal_best ? current_value : nil,
-        personal_best_previous_value: previous_best_value
-      )
+      rows << {
+        workout_id: workout.id,
+        exercise_id:,
+        personal_best_value: total,
+        personal_best_previous_value: best_so_far.zero? ? nil : best_so_far,
+        created_at: Time.current,
+        updated_at: Time.current
+      }
+      best_so_far = total
     end
 
-    (Array(affected_workout_ids).map(&:to_i) + sets.map(&:workout_id)).uniq.each do |workout_id|
+    WorkoutExerciseBest.insert_all!(rows) if rows.any?
+
+    all_workout_ids = self.class.active.where(user_id:).pluck(:id)
+    counts_by_workout_id = WorkoutExerciseBest.where(workout_id: all_workout_ids).group(:workout_id).count
+
+    (Array(affected_workout_ids).map(&:to_i) + totals_by_workout.map { |workout, _| workout.id } + all_workout_ids).uniq.each do |workout_id|
       next if workout_id.zero?
 
-      count = WorkoutSet.where(workout_id:, personal_best: true).count
-      Workout.where(id: workout_id).update_all(personal_best_count: count)
+      Workout.where(id: workout_id).update_all(personal_best_count: counts_by_workout_id[workout_id] || 0)
     end
   end
 
-  def previous_personal_best_set_for_exercise(exercise_id, previous_best_value:)
+  def workout_exercise_best_for(exercise_id)
+    workout_exercise_bests.find_by(exercise_id:)
+  end
+
+  def previous_personal_best_row_for_exercise(exercise_id, previous_best_value:)
     value = previous_best_value.to_d
     return nil if exercise_id.blank? || value.zero?
 
-    WorkoutSet.joins(:workout)
-      .includes(:exercise)
+    WorkoutExerciseBest.joins(:workout)
+      .includes(:exercise, :workout)
       .merge(self.class.active.where(user_id:))
-      .where(exercise_id:, personal_best: true, personal_best_value: value)
-      .order(Arel.sql("workouts.workout_on ASC, workouts.created_at ASC, workout_sets.position ASC, workout_sets.created_at ASC, workout_sets.id ASC"))
+      .where(exercise_id:, personal_best_value: value)
+      .order(Arel.sql("workouts.workout_on ASC, workouts.created_at ASC, workout_exercise_bests.created_at ASC, workout_exercise_bests.id ASC"))
       .last
+  end
+
+  def previous_personal_best_set_for_exercise(exercise_id, previous_best_value:)
+    previous_personal_best_row_for_exercise(exercise_id, previous_best_value:)
   end
 
   def planned_total_difficulty

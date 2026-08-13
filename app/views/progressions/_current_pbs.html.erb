@@ -12,7 +12,7 @@
       <tbody>
         <% current_pb_rows.each do |row| %>
           <tr>
-            <td><%= row[:exercise].name %></td>
+            <td><%= link_to row[:exercise].name, progressions_path(tab: "exercises", exercise_id: row[:exercise].id), data: { turbo_frame: "progression_panel" } %></td>
             <td><%= row[:label] %> · <%= number_with_precision(row[:score], precision: 1) %></td>
             <td><%= link_to row[:workout].title, workout_path(row[:workout]), data: { turbo_frame: "_top" } %></td>
             <td><%= row[:workout].workout_on.to_fs(:short) %></td>
@@ -26,7 +26,7 @@
     <% current_pb_rows.each do |row| %>
       <article class="progression-mobile-row">
         <div class="progression-mobile-head">
-          <span class="progression-mobile-title"><%= row[:exercise].name %></span>
+          <%= link_to row[:exercise].name, progressions_path(tab: "exercises", exercise_id: row[:exercise].id), class: "progression-mobile-title", data: { turbo_frame: "progression_panel" } %>
           <span class="progression-mobile-date"><%= row[:workout].workout_on.to_fs(:short) %></span>
         </div>
         <p class="progression-mobile-meta"><%= row[:label] %> · <%= number_with_precision(row[:score], precision: 1) %></p>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_04_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_04_150000) do
   create_table "exercises", force: :cascade do |t|
     t.datetime "archived_at"
     t.datetime "created_at", null: false
@@ -46,6 +46,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_04_120000) do
     t.datetime "updated_at", null: false
     t.index ["api_key"], name: "index_users_on_api_key", unique: true
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
+  end
+
+  create_table "workout_exercise_bests", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "exercise_id", null: false
+    t.decimal "personal_best_previous_value", precision: 10, scale: 2
+    t.decimal "personal_best_value", precision: 10, scale: 2, null: false
+    t.datetime "updated_at", null: false
+    t.integer "workout_id", null: false
+    t.index ["exercise_id"], name: "index_workout_exercise_bests_on_exercise_id"
+    t.index ["workout_id", "exercise_id"], name: "index_workout_exercise_bests_on_workout_id_and_exercise_id", unique: true
+    t.index ["workout_id"], name: "index_workout_exercise_bests_on_workout_id"
   end
 
   create_table "workout_sets", force: :cascade do |t|
@@ -90,6 +102,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_04_120000) do
   end
 
   add_foreign_key "sessions", "users"
+  add_foreign_key "workout_exercise_bests", "exercises"
+  add_foreign_key "workout_exercise_bests", "workouts"
   add_foreign_key "workout_sets", "exercises"
   add_foreign_key "workout_sets", "workouts"
   add_foreign_key "workouts", "users"

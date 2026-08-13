@@ -12,7 +12,6 @@ class WorkoutSet < ApplicationRecord
   validates :actual_weight, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
 
   scope :ordered, -> { includes(:exercise).order(:position, :created_at) }
-  scope :personal_bests, -> { where(personal_best: true) }
 
   before_validation :assign_position, on: :create
   after_commit :refresh_workout_difficulty, on: %i[create update destroy]
@@ -37,17 +36,11 @@ class WorkoutSet < ApplicationRecord
   end
 
   def personal_best_previous_set
-    return @personal_best_previous_set if defined?(@personal_best_previous_set)
-    return @personal_best_previous_set = nil if personal_best_previous_value.blank?
-
-    @personal_best_previous_set = workout.previous_personal_best_set_for_exercise(exercise_id, previous_best_value: personal_best_previous_value)
+    workout.workout_exercise_best_for(exercise_id)&.previous_row
   end
 
   def personal_best_previous_label
-    previous_set = personal_best_previous_set
-    return if previous_set.blank?
-
-    "#{previous_set.compact_logged_summary} (#{format_score(previous_set.personal_best_value)})"
+    workout.workout_exercise_best_for(exercise_id)&.previous_label
   end
 
   def compact_logged_summary

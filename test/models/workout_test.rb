@@ -218,7 +218,7 @@ class WorkoutTest < ActiveSupport::TestCase
     assert_equal "No logged sets", workout.summarize_recent_logged_sets([ first ])
   end
 
-  test "recalculates personal bests and session counts for logged sets" do
+  test "recalculates personal bests and session counts for logged workouts" do
     user = users(:one)
     exercise = exercises(:bench_press)
 
@@ -227,7 +227,7 @@ class WorkoutTest < ActiveSupport::TestCase
       workout_on: Date.new(2026, 3, 12),
       status: "completed"
     )
-    first_set = first_workout.workout_sets.create!(
+    first_workout.workout_sets.create!(
       exercise:,
       position: 1,
       actual_reps: 8,
@@ -239,16 +239,35 @@ class WorkoutTest < ActiveSupport::TestCase
       workout_on: Date.new(2026, 3, 13),
       status: "completed"
     )
-    second_set = second_workout.workout_sets.create!(
+    second_workout.workout_sets.create!(
       exercise:,
       position: 1,
       actual_reps: 8,
       actual_weight: 32
     )
 
-    assert first_set.reload.personal_best
-    assert second_set.reload.personal_best
     assert_equal 1, first_workout.reload.personal_best_count
     assert_equal 1, second_workout.reload.personal_best_count
+    assert_equal 1, first_workout.workout_exercise_bests.count
+    assert_equal 1, second_workout.workout_exercise_bests.count
+    assert_equal exercise.id, first_workout.workout_exercise_bests.first.exercise_id
+    assert_equal exercise.id, second_workout.workout_exercise_bests.first.exercise_id
+  end
+
+  test "counts one pb per exercise per workout even with multiple sets" do
+    user = users(:one)
+    exercise = exercises(:lat_pulldown)
+
+    workout = user.workouts.create!(
+      title: "PB Session",
+      workout_on: Date.new(2026, 3, 14),
+      status: "completed"
+    )
+    workout.workout_sets.create!(exercise:, position: 1, actual_reps: 5, actual_weight: 20)
+    workout.workout_sets.create!(exercise:, position: 2, actual_reps: 4, actual_weight: 22)
+
+    assert_equal 1, workout.reload.personal_best_count
+    assert_equal 1, workout.workout_exercise_bests.count
+    assert_equal exercise.id, workout.workout_exercise_bests.first.exercise_id
   end
 end

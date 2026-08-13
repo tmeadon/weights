@@ -195,10 +195,12 @@ class WorkoutSetsController < ApplicationController
         @workout_set.reload
         respond_to do |format|
           format.json do
+            personal_best_row = @workout.workout_exercise_best_for(@workout_set.exercise_id)
             render json: {
               workout_set: serialize_workout_set(@workout_set),
               workout: serialize_workout(@workout, include_sets: true),
-              exercise_has_personal_best: @workout.workout_sets.where(exercise_id: @workout_set.exercise_id, personal_best: true).exists?
+              exercise_has_personal_best: personal_best_row.present?,
+              personal_best_text: personal_best_row&.previous_label.present? ? "Previous PB: #{personal_best_row.previous_label}" : "New PB"
             }
           end
           format.turbo_stream do

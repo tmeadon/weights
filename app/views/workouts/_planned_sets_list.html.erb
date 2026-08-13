@@ -21,12 +21,12 @@
           </div>
         </div>
 
-        <% personal_best_set = grouped_sets.select(&:personal_best?).max_by { |workout_set| [ workout_set.position, workout_set.created_at ] } %>
+        <% personal_best_row = workout.workout_exercise_best_for(exercise.id) %>
         <%= render "workouts/personal_best_badge",
           workout: workout,
           exercise: exercise,
-          has_personal_best: personal_best_set.present?,
-          personal_best_text: personal_best_set&.personal_best_previous_label.present? ? "Previous PB: #{personal_best_set.personal_best_previous_label}" : "New PB" %>
+          has_personal_best: personal_best_row.present?,
+          personal_best_text: personal_best_row&.previous_label.present? ? "Previous PB: #{personal_best_row.previous_label}" : "New PB" %>
 
         <% notes = grouped_sets.map(&:coach_notes).compact.uniq %>
         <% if notes.any? %>

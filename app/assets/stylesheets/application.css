@@ -760,6 +760,11 @@ select:focus {
   font-variant-numeric: tabular-nums;
 }
 
+.exercise-history-pb-cell {
+  width: 2rem;
+  text-align: center;
+}
+
 .progression-delta-positive {
   color: #55735e;
 }

@@ -16,6 +16,8 @@ module ApiSerialization
     end
 
     def serialize_workout_set(workout_set)
+      best_row = workout_set.workout.workout_exercise_best_for(workout_set.exercise_id)
+
       {
         id: workout_set.id,
         workout_id: workout_set.workout_id,
@@ -30,10 +32,10 @@ module ApiSerialization
         planned_difficulty: decimal(workout_set.planned_difficulty),
         actual_difficulty: decimal(workout_set.actual_difficulty),
         difficulty: decimal(workout_set.difficulty),
-        personal_best: workout_set.personal_best,
-        personal_best_value: decimal_or_nil(workout_set.personal_best_value),
-        personal_best_previous_value: decimal_or_nil(workout_set.personal_best_previous_value),
-        personal_best_previous_label: workout_set.personal_best_previous_label,
+        personal_best: best_row.present?,
+        personal_best_value: decimal_or_nil(best_row&.personal_best_value),
+        personal_best_previous_value: decimal_or_nil(best_row&.personal_best_previous_value),
+        personal_best_previous_label: best_row&.previous_label,
         created_at: workout_set.created_at,
         updated_at: workout_set.updated_at
       }

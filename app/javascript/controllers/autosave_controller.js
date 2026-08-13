@@ -110,16 +110,10 @@ export default class extends Controller {
   }
 
   applySaveResult(payload) {
-    if (!payload?.workout?.workout_sets) return
+    if (!Object.prototype.hasOwnProperty.call(payload || {}, "exercise_has_personal_best")) return
 
     const groupRow = this.element.closest(".planned-group-row")
     if (!groupRow) return
-
-    const exerciseId = Number(this.element.querySelector("select[name='execution[exercise_id]']")?.value)
-    if (!Number.isFinite(exerciseId)) return
-
-    const exerciseSets = payload.workout.workout_sets.filter((workoutSet) => Number(workoutSet.exercise_id) === exerciseId)
-    const pbSets = exerciseSets.filter((workoutSet) => workoutSet.personal_best)
 
     const summary = groupRow.querySelector(".exercise-pb-summary")
     const badge = groupRow.querySelector(".personal-best-badge")
@@ -127,16 +121,10 @@ export default class extends Controller {
 
     if (!summary || !badge || !text) return
 
-    const latestPb = pbSets.sort((a, b) => (a.position - b.position) || ((a.created_at || "").localeCompare(b.created_at || ""))).at(-1)
-    const visible = Boolean(latestPb)
-
+    const visible = Boolean(payload.exercise_has_personal_best)
     summary.classList.toggle("exercise-pb-summary-visible", visible)
     badge.textContent = visible ? "🏆" : ""
-    text.textContent = visible
-      ? (latestPb.personal_best_previous_label
-        ? `Previous PB: ${latestPb.personal_best_previous_label}`
-        : "New PB")
-      : ""
+    text.textContent = visible ? (payload.personal_best_text || "New PB") : ""
   }
 
   formSignature() {
