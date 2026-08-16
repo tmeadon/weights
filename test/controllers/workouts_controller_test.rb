@@ -94,12 +94,22 @@ class WorkoutsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "show" do
+    user = @workout.user
+    user.workouts.create!(title: "PB Session", workout_on: Date.new(2026, 3, 22), status: "completed")
+      .workout_sets.create!(exercise: exercises(:bench_press), position: 1, actual_reps: 10, actual_weight: 32)
+    user.workouts.create!(title: "Lat PB", workout_on: Date.new(2026, 3, 24), status: "completed")
+      .workout_sets.create!(exercise: exercises(:lat_pulldown), position: 1, actual_reps: 8, actual_weight: 42)
+    @workout.workout_sets.create!(exercise: exercises(:squat), position: 3, target_reps: 5, target_weight: 60)
+
     get workout_path(@workout)
 
     assert_response :success
     assert_select "h1", "Upper Body A"
     assert_select "h2", /set/
     assert_select "h3", /Dumbbell Bench Press/
+    assert_select ".exercise-history-inline", text: /Active PB:/, count: 2
+    assert_select ".exercise-history-inline", text: /Active PB: none yet/, count: 1
+    assert_select ".exercise-history-inline", text: /Difficulty/
     assert_select "summary", /Add note/
     assert_select "input[value='Add']"
     assert_select ".planned-set-row", /Planned/

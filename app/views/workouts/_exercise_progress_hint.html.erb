@@ -3,6 +3,7 @@
 <% previous_difficulty = if previous_history.present?
   previous_history[:sets].sum { |workout_set| workout_set.actual_difficulty.to_d }
 end %>
+<% active_pb = workout.current_personal_best_row_for_exercise(exercise.id) %>
 
 <div
   id="exercise_progress_hint_<%= exercise.id %>"
@@ -25,5 +26,15 @@ end %>
       <%= workout.summarize_recent_logged_sets(previous_history[:sets]) %>
       · Difficulty <%= number_with_precision(previous_difficulty, precision: 1, strip_insignificant_zeros: true) %>
     </p>
+  <% end %>
+
+  <% if active_pb.present? %>
+    <p class="exercise-history-inline">
+      Active PB:
+      <%= active_pb.current_summary %>
+      · Difficulty <%= number_with_precision(active_pb.personal_best_value, precision: 1, strip_insignificant_zeros: true) %>
+    </p>
+  <% else %>
+    <p class="exercise-history-inline supporting-text">Active PB: none yet</p>
   <% end %>
 </div>

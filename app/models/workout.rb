@@ -248,6 +248,15 @@ class Workout < ApplicationRecord
     workout_exercise_bests.find_by(exercise_id:)
   end
 
+  def current_personal_best_row_for_exercise(exercise_id)
+    WorkoutExerciseBest.joins(:workout)
+      .includes(:exercise, :workout)
+      .merge(self.class.active.where(user_id:))
+      .where(exercise_id:)
+      .order(Arel.sql("workout_exercise_bests.personal_best_value DESC, workouts.workout_on DESC, workouts.created_at DESC, workout_exercise_bests.created_at DESC, workout_exercise_bests.id DESC"))
+      .first
+  end
+
   def previous_personal_best_row_for_exercise(exercise_id, previous_best_value:)
     value = previous_best_value.to_d
     return nil if exercise_id.blank? || value.zero?
