@@ -29,10 +29,10 @@
     <div class="field">
       <%= form.label :workout_types, "Workout types" %>
       <div class="export-checklist">
-        <% Workout::WORKOUT_TYPES.each do |workout_type| %>
+        <% @workout_type_options.each do |workout_type| %>
           <label>
-            <%= check_box_tag "export[workout_types][]", workout_type, @submitted ? @selected_types.include?(workout_type) : true %>
-            <span><%= workout_type.humanize %></span>
+            <%= check_box_tag "export[workout_types][]", workout_type.key, @submitted ? @selected_types.include?(workout_type.key) : true %>
+            <span><%= workout_type.program.name %> / <%= workout_type.label %></span>
           </label>
         <% end %>
         <label>

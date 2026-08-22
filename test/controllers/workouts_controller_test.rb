@@ -107,7 +107,7 @@ class WorkoutsControllerTest < ActionDispatch::IntegrationTest
     assert_select "h1", "Upper Body A"
     assert_select "h2", /set/
     assert_select "h3", /Dumbbell Bench Press/
-    assert_select ".exercise-history-inline", text: /Active PB:/, count: 2
+    assert_select ".exercise-history-inline", text: /Active PB:/, count: 3
     assert_select ".exercise-history-inline", text: /Active PB: none yet/, count: 1
     assert_select ".exercise-history-inline", text: /Difficulty/
     assert_select "summary", /Add note/

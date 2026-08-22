@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_04_150000) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_05_120000) do
   create_table "exercises", force: :cascade do |t|
     t.datetime "archived_at"
     t.datetime "created_at", null: false
@@ -27,6 +27,30 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_04_150000) do
     t.index ["name"], name: "index_exercises_on_name", unique: true
     t.index ["primary_muscle_group"], name: "index_exercises_on_primary_muscle_group"
     t.index ["public_id"], name: "index_exercises_on_public_id", unique: true
+  end
+
+  create_table "program_workout_types", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "key", null: false
+    t.string "name", null: false
+    t.integer "program_id", null: false
+    t.integer "sort_order", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["key"], name: "index_program_workout_types_on_key"
+    t.index ["program_id", "key"], name: "index_program_workout_types_on_program_id_and_key", unique: true
+    t.index ["program_id"], name: "index_program_workout_types_on_program_id"
+  end
+
+  create_table "programs", force: :cascade do |t|
+    t.boolean "active", default: false, null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["user_id", "active"], name: "index_programs_on_user_id_and_active"
+    t.index ["user_id", "name"], name: "index_programs_on_user_id_and_name", unique: true
+    t.index ["user_id"], name: "index_programs_on_user_id"
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -87,6 +111,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_04_150000) do
     t.text "notes"
     t.integer "personal_best_count", default: 0, null: false
     t.decimal "planned_total_difficulty", precision: 10, scale: 2, default: "0.0", null: false
+    t.integer "program_workout_type_id"
     t.string "status", default: "draft", null: false
     t.string "title", null: false
     t.decimal "total_difficulty", precision: 10, scale: 2, default: "0.0", null: false
@@ -95,16 +120,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_04_150000) do
     t.date "workout_on", null: false
     t.string "workout_type"
     t.index ["deleted_at"], name: "index_workouts_on_deleted_at"
+    t.index ["program_workout_type_id"], name: "index_workouts_on_program_workout_type_id"
     t.index ["user_id", "status"], name: "index_workouts_on_user_id_and_status"
     t.index ["user_id", "workout_on"], name: "index_workouts_on_user_id_and_workout_on"
     t.index ["user_id", "workout_type"], name: "index_workouts_on_user_id_and_workout_type"
     t.index ["user_id"], name: "index_workouts_on_user_id"
   end
 
+  add_foreign_key "program_workout_types", "programs"
+  add_foreign_key "programs", "users"
   add_foreign_key "sessions", "users"
   add_foreign_key "workout_exercise_bests", "exercises"
   add_foreign_key "workout_exercise_bests", "workouts"
   add_foreign_key "workout_sets", "exercises"
   add_foreign_key "workout_sets", "workouts"
+  add_foreign_key "workouts", "program_workout_types"
   add_foreign_key "workouts", "users"
 end

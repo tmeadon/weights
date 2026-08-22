@@ -1,11 +1,4 @@
 class WorkoutExportMarkdown
-  TYPE_LABELS = {
-    "push" => "Push",
-    "pull" => "Pull",
-    "legs" => "Legs",
-    "unspecified" => "Unspecified"
-  }.freeze
-
   def initialize(workouts:, selected_types:, include_unspecified:, group_by_workout_type:, include_planned_values:, show_workout_notes:, start_date: nil, end_date: nil)
     @workouts = Array(workouts).sort_by { |workout| [ workout.workout_on, workout.created_at ] }
     @selected_types = Array(selected_types).map { |value| normalize_type(value) }.uniq
@@ -57,7 +50,7 @@ class WorkoutExportMarkdown
         type_workouts = workouts.select { |workout| type_for(workout) == type }
         next if type_workouts.empty?
 
-        [ "## #{type_label(type)}", type_workouts.map { |workout| workout_section(workout) }.join("\n\n") ].join("\n\n")
+        [ "## #{type_label(type, type_workouts)}", type_workouts.map { |workout| workout_section(workout) }.join("\n\n") ].join("\n\n")
       end
 
       sections.join("\n\n")
@@ -112,8 +105,10 @@ class WorkoutExportMarkdown
       workout.workout_type.presence || "unspecified"
     end
 
-    def type_label(type)
-      TYPE_LABELS.fetch(type, type.to_s.humanize)
+    def type_label(type, matching_workouts = workouts)
+      return "Unspecified" if type == "unspecified"
+
+      matching_workouts.find { |workout| type_for(workout) == type }&.workout_type_label || type.to_s.humanize
     end
 
     def selected_type_labels

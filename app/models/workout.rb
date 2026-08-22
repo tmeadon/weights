@@ -3,6 +3,8 @@ class Workout < ApplicationRecord
   WORKOUT_TYPES = %w[push pull legs].freeze
 
   belongs_to :user
+  belongs_to :program_workout_type, optional: true
+  has_one :program, through: :program_workout_type
   has_many :workout_sets, -> { ordered }, dependent: :destroy
   has_many :workout_exercise_bests, dependent: :destroy
   has_many :exercises, through: :workout_sets
@@ -14,12 +16,14 @@ class Workout < ApplicationRecord
   validates :title, presence: true
   validates :workout_on, presence: true
   validates :status, inclusion: { in: STATUSES }
-  validates :workout_type, inclusion: { in: WORKOUT_TYPES }, allow_nil: true
+  validate :program_workout_type_belongs_to_user
   validates :total_difficulty, numericality: { greater_than_or_equal_to: 0 }
   validates :planned_total_difficulty, numericality: { greater_than_or_equal_to: 0 }
   validate :status_transition_is_allowed, if: :will_save_change_to_status?
   validate :single_active_workout_per_user, if: :status_in_progress?
 
+  before_validation :assign_program_workout_type_from_legacy_type
+  before_validation :sync_legacy_workout_type
   before_update :snapshot_planned_difficulty, if: :starting_workout?
 
   scope :active, -> { where(deleted_at: nil) }
@@ -35,7 +39,7 @@ class Workout < ApplicationRecord
   end
 
   def workout_type_label
-    workout_type&.humanize || "Unspecified"
+    program_workout_type&.label || workout_type&.humanize || "Unspecified"
   end
 
   def discarded?
@@ -285,10 +289,16 @@ class Workout < ApplicationRecord
 
   def previous_workout_of_type
     return @previous_workout_of_type if defined?(@previous_workout_of_type)
-    return @previous_workout_of_type = nil if workout_type.blank?
+    return @previous_workout_of_type = nil if program_workout_type_id.blank? && workout_type.blank?
 
-    @previous_workout_of_type = self.class.active
-      .where(user_id:, workout_type:)
+    scope = self.class.active.where(user_id:)
+    scope = if program_workout_type_id.present?
+      scope.where(program_workout_type_id:)
+    else
+      scope.where(workout_type:)
+    end
+
+    @previous_workout_of_type = scope
       .where.not(id:)
       .where(
         "workout_on < :workout_on OR (workout_on = :workout_on AND created_at < :created_at)",
@@ -379,6 +389,23 @@ class Workout < ApplicationRecord
   end
 
   private
+    def program_workout_type_belongs_to_user
+      return if program_workout_type.blank? || user.blank?
+      return if program_workout_type.program.user_id == user.id
+
+      errors.add(:program_workout_type, "is not available for this user")
+    end
+
+    def assign_program_workout_type_from_legacy_type
+      return if program_workout_type_id.present? || workout_type.blank? || user.blank?
+
+      self.program_workout_type = user.program_workout_types.find_by(key: workout_type)
+    end
+
+    def sync_legacy_workout_type
+      self.workout_type = program_workout_type.key if program_workout_type.present?
+    end
+
     def apply_exercise_order(exercise_ids)
       sets_by_exercise = workout_sets.ordered.group_by(&:exercise_id)
       next_position = 1

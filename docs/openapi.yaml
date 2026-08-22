@@ -1000,10 +1000,13 @@ components:
       properties:
         title: { type: string }
         workout_on: { type: string, format: date }
+        program_workout_type_id:
+          type: integer
+          nullable: true
         workout_type:
           type: string
-          enum: [push, pull, legs]
           nullable: true
+          description: Legacy workout type key. Prefer program_workout_type_id for new clients.
         notes: { type: string, nullable: true }
         status:
           type: string
@@ -1017,7 +1020,11 @@ components:
         user_id: { type: integer }
         title: { type: string }
         workout_on: { type: string, format: date }
-        workout_type: { type: string, enum: [push, pull, legs], nullable: true }
+        workout_type: { type: string, nullable: true }
+        workout_type_label: { type: string }
+        program_workout_type_id: { type: integer, nullable: true }
+        program_id: { type: integer, nullable: true }
+        program_name: { type: string, nullable: true }
         notes: { type: string, nullable: true }
         status: { type: string, enum: [draft, in_progress, completed, cancelled] }
         deleted_at: { type: string, format: date-time, nullable: true }

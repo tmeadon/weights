@@ -1,0 +1,19 @@
+ppl_one:
+  user: one
+  name: Push / Pull / Legs
+  active: false
+
+abc_one:
+  user: one
+  name: Full Body ABC
+  active: true
+
+ppl_two:
+  user: two
+  name: Push / Pull / Legs
+  active: false
+
+abc_two:
+  user: two
+  name: Full Body ABC
+  active: true

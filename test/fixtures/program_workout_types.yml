@@ -1,0 +1,44 @@
+push_one:
+  program: ppl_one
+  key: push
+  name: Push
+  sort_order: 1
+
+pull_one:
+  program: ppl_one
+  key: pull
+  name: Pull
+  sort_order: 2
+
+legs_one:
+  program: ppl_one
+  key: legs
+  name: Legs
+  sort_order: 3
+
+full_body_a_one:
+  program: abc_one
+  key: a
+  name: A
+  description: Full Body A
+  sort_order: 1
+
+full_body_b_one:
+  program: abc_one
+  key: b
+  name: B
+  description: Full Body B
+  sort_order: 2
+
+full_body_c_one:
+  program: abc_one
+  key: c
+  name: C
+  description: Full Body C
+  sort_order: 3
+
+pull_two:
+  program: ppl_two
+  key: pull
+  name: Pull
+  sort_order: 2

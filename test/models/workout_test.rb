@@ -15,16 +15,16 @@ class WorkoutTest < ActiveSupport::TestCase
     assert_equal "Keep the pace up.", workout.notes
   end
 
-  test "validates workout type options" do
-    workout = users(:one).workouts.new(
-      title: "Odd split",
+  test "assigns program workout type from legacy workout type" do
+    workout = users(:one).workouts.create!(
+      title: "Full Body A",
       workout_on: Date.new(2026, 4, 1),
-      workout_type: "conditioning",
+      workout_type: "a",
       status: "draft"
     )
 
-    assert_not workout.valid?
-    assert_includes workout.errors[:workout_type], "is not included in the list"
+    assert_equal program_workout_types(:full_body_a_one), workout.program_workout_type
+    assert_equal "Full Body A", workout.workout_type_label
   end
 
   test "allows only one in-progress workout per user" do

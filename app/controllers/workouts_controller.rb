@@ -19,7 +19,8 @@ class WorkoutsController < ApplicationController
 
   def export
     @submitted = params[:export].present?
-    @selected_types = @submitted ? selected_workout_types : Workout::WORKOUT_TYPES
+    @workout_type_options = workout_type_options
+    @selected_types = @submitted ? selected_workout_types : @workout_type_options.map(&:key)
     @include_unspecified = @submitted ? export_boolean_param(:include_unspecified) : true
     @group_by_workout_type = @submitted ? export_boolean_param(:group_by_workout_type) : true
     @include_planned_values = @submitted ? export_boolean_param(:include_planned_values) : true
@@ -92,7 +93,7 @@ class WorkoutsController < ApplicationController
     end
 
     def workout_params
-      params.require(:workout).permit(:title, :workout_on, :workout_type, :notes, :status)
+      params.require(:workout).permit(:title, :workout_on, :program_workout_type_id, :workout_type, :notes, :status)
     end
 
     def load_exercises
@@ -127,7 +128,11 @@ class WorkoutsController < ApplicationController
 
     def selected_workout_types
       values = Array(params.dig(:export, :workout_types)).map { |value| value.to_s.strip.downcase.presence }.compact
-      values & Workout::WORKOUT_TYPES
+      values & workout_type_options.map(&:key)
+    end
+
+    def workout_type_options
+      Current.user.program_workout_types.includes(:program).ordered.to_a
     end
 
     def export_boolean_param(key)

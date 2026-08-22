@@ -17,8 +17,9 @@
     </div>
 
     <div class="field">
-      <%= form.label :workout_type, "Workout type" %>
-      <%= form.select :workout_type, options_for_select([["Unspecified", ""]] + Workout::WORKOUT_TYPES.map { |value| [value.humanize, value] }, workout.workout_type) %>
+      <%= form.label :program_workout_type_id, "Workout type" %>
+      <% grouped_workout_types = Current.user.programs.includes(:program_workout_types).ordered.map { |program| [program.name, program.program_workout_types.map { |type| [type.label, type.id] }] } %>
+      <%= form.select :program_workout_type_id, grouped_options_for_select(grouped_workout_types, workout.program_workout_type_id), include_blank: "Unspecified" %>
     </div>
 
     <div class="field">
