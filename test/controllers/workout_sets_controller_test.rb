@@ -198,4 +198,9 @@ class WorkoutSetsControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to new_session_path
   end
+
+  private
+    def json_response
+      JSON.parse(response.body)
+    end
 end

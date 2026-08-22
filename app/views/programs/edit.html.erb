@@ -1,0 +1,18 @@
+<% content_for :title, "Edit #{@program.name}" %>
+
+<section class="card panel-card">
+  <div class="section-heading">
+    <div>
+      <p class="panel-label">Programs</p>
+      <h1>Edit <%= @program.name %></h1>
+    </div>
+  </div>
+
+  <%= render "form", program: @program %>
+
+  <hr>
+
+  <div class="button-row">
+    <%= button_to "Delete program", program_path(@program), method: :delete, class: "button button-danger", form: { data: { turbo_confirm: "Delete this program? Workout history will be preserved." } } %>
+  </div>
+</section>

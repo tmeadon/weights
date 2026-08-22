@@ -1,0 +1,79 @@
+<% content_for :title, @program.name %>
+
+<section class="card panel-card">
+  <div class="section-heading">
+    <div>
+      <p class="panel-label">Program</p>
+      <h1><%= @program.name %></h1>
+      <p class="supporting-text"><%= @program.active? ? "Active program" : "Inactive program" %></p>
+    </div>
+
+    <div class="button-row">
+      <% unless @program.active? %>
+        <%= button_to "Make active", activate_program_path(@program), method: :patch, class: "button button-ghost" %>
+      <% end %>
+      <%= link_to "Edit program", edit_program_path(@program), class: "button button-ghost" %>
+      <%= link_to "Programs", programs_path, class: "button button-ghost" %>
+    </div>
+  </div>
+</section>
+
+<section class="library-grid">
+  <div class="card panel-card">
+    <div class="section-heading">
+      <div>
+        <p class="panel-label">Workout types</p>
+        <h2><%= pluralize(@program_workout_types.count, "type") %></h2>
+      </div>
+    </div>
+
+    <% if @program_workout_types.any? %>
+      <div class="exercise-list">
+        <% @program_workout_types.each do |workout_type| %>
+          <article class="exercise-row">
+            <div class="exercise-heading">
+              <h3><%= workout_type.label %></h3>
+              <span>
+                <%= button_to "Create workout", create_workout_program_program_workout_type_path(@program, workout_type), class: "button button-ghost button-small" %>
+                <%= link_to "Edit template", edit_program_program_workout_type_path(@program, workout_type), class: "exercise-edit-link" %>
+              </span>
+            </div>
+            <p class="exercise-meta">Key: <%= workout_type.key %> / Sort: <%= workout_type.sort_order %> / <%= pluralize(workout_type.program_workout_type_exercises.count, "template exercise") %></p>
+          </article>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="supporting-text">No workout types yet.</p>
+    <% end %>
+  </div>
+
+  <div class="card panel-card">
+    <p class="panel-label">Add workout type</p>
+    <%= render "program_workout_types/form", program: @program, workout_type: @workout_type %>
+  </div>
+</section>
+
+<section class="card panel-card">
+  <div class="section-heading">
+    <div>
+      <p class="panel-label">Recent workouts</p>
+      <h2><%= pluralize(@recent_workouts.count, "workout") %></h2>
+    </div>
+  </div>
+
+  <% if @recent_workouts.any? %>
+    <div class="exercise-list workout-list">
+      <% @recent_workouts.each do |workout| %>
+        <article class="workout-row">
+          <div class="exercise-heading">
+            <h3><%= link_to workout.title, workout_path(workout) %></h3>
+            <%= link_to "Edit", edit_workout_path(workout), class: "exercise-edit-link" %>
+          </div>
+          <p class="exercise-meta"><%= workout.workout_on.to_fs(:long) %> / <%= workout.workout_type_label %> / <%= workout.status.humanize %></p>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="supporting-text">No workouts have been logged against this program yet.</p>
+  <% end %>
+</section>

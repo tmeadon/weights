@@ -1,0 +1,53 @@
+<% content_for :title, "Programs" %>
+
+<section class="page-header card">
+  <div>
+    <p class="eyebrow">Weights</p>
+    <h1>Programs</h1>
+    <p class="supporting-text">Manage training programs and the workout types inside them.</p>
+  </div>
+
+  <div class="hero-actions page-header-actions">
+    <%= link_to "New program", new_program_path, class: "button" %>
+  </div>
+</section>
+
+<section class="card panel-card">
+  <div class="section-heading">
+    <div>
+      <p class="panel-label">Programs</p>
+      <h2><%= pluralize(@programs.count, "program") %></h2>
+    </div>
+  </div>
+
+  <% if @programs.any? %>
+    <div class="exercise-list">
+      <% @programs.each do |program| %>
+        <article class="exercise-row">
+          <div class="exercise-heading">
+            <h3>
+              <%= link_to program.name, program_path(program) %>
+              <% if program.active? %>
+                <span class="status-pill">Active</span>
+              <% end %>
+            </h3>
+
+            <%= link_to "Edit", edit_program_path(program), class: "exercise-edit-link" %>
+          </div>
+
+          <p class="exercise-meta">
+            <%= program.program_workout_types.map(&:label).join(" / ").presence || "No workout types yet" %>
+          </p>
+
+          <% unless program.active? %>
+            <div class="row-actions">
+              <%= button_to "Make active", activate_program_path(program), method: :patch, class: "button button-ghost button-small" %>
+            </div>
+          <% end %>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="supporting-text">No programs yet. Create one to start grouping workout types.</p>
+  <% end %>
+</section>

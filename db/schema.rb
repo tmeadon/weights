@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_05_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_06_120000) do
   create_table "exercises", force: :cascade do |t|
     t.datetime "archived_at"
     t.datetime "created_at", null: false
@@ -27,6 +27,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_05_120000) do
     t.index ["name"], name: "index_exercises_on_name", unique: true
     t.index ["primary_muscle_group"], name: "index_exercises_on_primary_muscle_group"
     t.index ["public_id"], name: "index_exercises_on_public_id", unique: true
+  end
+
+  create_table "program_workout_type_exercises", force: :cascade do |t|
+    t.text "coach_notes"
+    t.datetime "created_at", null: false
+    t.integer "exercise_id", null: false
+    t.integer "position", null: false
+    t.integer "program_workout_type_id", null: false
+    t.string "rep_pattern", null: false
+    t.datetime "updated_at", null: false
+    t.index ["exercise_id"], name: "index_program_workout_type_exercises_on_exercise_id"
+    t.index ["program_workout_type_id", "position"], name: "index_template_exercises_on_type_and_position", unique: true
+    t.index ["program_workout_type_id"], name: "idx_on_program_workout_type_id_f4876901cb"
   end
 
   create_table "program_workout_types", force: :cascade do |t|
@@ -127,6 +140,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_05_120000) do
     t.index ["user_id"], name: "index_workouts_on_user_id"
   end
 
+  add_foreign_key "program_workout_type_exercises", "exercises"
+  add_foreign_key "program_workout_type_exercises", "program_workout_types"
   add_foreign_key "program_workout_types", "programs"
   add_foreign_key "programs", "users"
   add_foreign_key "sessions", "users"

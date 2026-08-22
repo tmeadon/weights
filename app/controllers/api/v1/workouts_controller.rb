@@ -25,6 +25,7 @@ module Api
         workout = Current.user.workouts.new(workout_params)
 
         if workout.save
+          workout.program_workout_type&.apply_template_to_workout!(workout) if workout.workout_sets.empty?
           render json: { workout: serialize_workout(workout, include_sets: true) }, status: :created
         else
           render_model_errors(workout)

@@ -1,0 +1,18 @@
+<% content_for :title, "Edit template exercise" %>
+
+<section class="card panel-card">
+  <div class="section-heading">
+    <div>
+      <p class="panel-label"><%= @workout_type.label %></p>
+      <h1>Edit template exercise</h1>
+    </div>
+  </div>
+
+  <%= render "form", program: @program, workout_type: @workout_type, template_exercise: @template_exercise, exercises: @exercises %>
+
+  <hr>
+
+  <div class="button-row">
+    <%= button_to "Remove from template", program_program_workout_type_program_workout_type_exercise_path(@program, @workout_type, @template_exercise), method: :delete, class: "button button-danger", form: { data: { turbo_confirm: "Remove this exercise from the template? Existing workouts will be preserved." } } %>
+  </div>
+</section>

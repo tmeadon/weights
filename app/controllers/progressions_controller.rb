@@ -3,9 +3,8 @@ class ProgressionsController < ApplicationController
     @tab = normalized_tab(params[:tab])
     @chart_mode = normalized_chart_mode(params[:chart_mode])
     @exercise_chart_mode = normalized_chart_mode(params[:exercise_chart_mode])
-    @workout_types = Current.user.workouts.active.where.not(workout_type: nil).distinct.order(:workout_type).pluck(:workout_type)
+    @workout_types = Current.user.program_workout_types.includes(:program).ordered.to_a
     @selected_workout_type = @tab == "workouts" ? normalized_workout_type(params[:workout_type]) : nil
-    @selected_workout_type = nil unless @workout_types.include?(@selected_workout_type)
 
     @progress_workouts = progress_workouts_scope.to_a.sort_by { |workout| [ workout.workout_on, workout.created_at ] }
     @workout_progress_rows = build_workout_progress_rows(@progress_workouts)
@@ -36,11 +35,14 @@ class ProgressionsController < ApplicationController
 
       return scope unless @selected_workout_type
 
-      scope.where(workout_type: @selected_workout_type)
+      scope.where(program_workout_type_id: @selected_workout_type)
     end
 
     def normalized_workout_type(value)
-      value.to_s.strip.downcase.presence
+      candidate = value.to_s.strip.downcase.presence
+      return nil if candidate.blank?
+
+      @workout_types.find { |type| type.id.to_s == candidate }&.id&.to_s || @workout_types.find { |type| type.key == candidate }&.id&.to_s
     end
 
     def normalized_tab(value)

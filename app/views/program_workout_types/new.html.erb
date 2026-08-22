@@ -1,0 +1,12 @@
+<% content_for :title, "New workout type" %>
+
+<section class="card panel-card">
+  <div class="section-heading">
+    <div>
+      <p class="panel-label"><%= @program.name %></p>
+      <h1>New workout type</h1>
+    </div>
+  </div>
+
+  <%= render "form", program: @program, workout_type: @workout_type %>
+</section>

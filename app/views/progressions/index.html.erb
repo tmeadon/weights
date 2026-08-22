@@ -28,7 +28,7 @@
               ⟲
             <% end %>
           </div>
-          <%= select_tag :workout_type, options_for_select([["All types", ""]] + @workout_types.map { |type| [type.humanize, type] }, @selected_workout_type), onchange: "this.form.requestSubmit()" %>
+          <%= select_tag :workout_type, options_for_select([["All types", ""]] + @workout_types.map { |type| ["#{type.program.name} / #{type.label}", type.id] }, @selected_workout_type), onchange: "this.form.requestSubmit()" %>
         </div>
       <% end %>
 

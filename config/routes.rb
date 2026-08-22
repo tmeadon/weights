@@ -16,6 +16,19 @@ Rails.application.routes.draw do
     end
   end
   resources :progressions, only: :index
+  resources :programs do
+    member do
+      patch :activate
+    end
+
+    resources :program_workout_types, path: :workout_types, except: %i[index show] do
+      member do
+        post :create_workout
+      end
+
+      resources :program_workout_type_exercises, path: :template_exercises, except: %i[index show]
+    end
+  end
   resources :workouts do
     collection do
       get :export
@@ -47,6 +60,21 @@ Rails.application.routes.draw do
 
         member do
           patch :restore
+        end
+      end
+
+      resources :programs, except: %i[new edit] do
+        member do
+          patch :activate
+        end
+
+        resources :program_workout_types, path: :workout_types, except: %i[new edit] do
+          member do
+            post :create_workout
+            get :comparable_history
+          end
+
+          resources :program_workout_type_exercises, path: :template_exercises, except: %i[new edit]
         end
       end
 

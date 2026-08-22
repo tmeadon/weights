@@ -1,0 +1,35 @@
+<%= form_with model: [program, workout_type], class: "stack-form" do |form| %>
+  <% if workout_type.errors.any? %>
+    <div class="flash flash-alert">
+      <%= workout_type.errors.full_messages.to_sentence %>
+    </div>
+  <% end %>
+
+  <div class="form-grid-two">
+    <div class="field">
+      <%= form.label :name, "Display name" %>
+      <%= form.text_field :name, required: true, placeholder: "A" %>
+    </div>
+
+    <div class="field">
+      <%= form.label :key, "Key" %>
+      <%= form.text_field :key, required: true, placeholder: "a" %>
+      <p class="field-hint">Short stable key used by API/export filters.</p>
+    </div>
+
+    <div class="field">
+      <%= form.label :sort_order, "Sort order" %>
+      <%= form.number_field :sort_order, min: 0, step: 1 %>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= form.label :description, "Description" %>
+    <%= form.text_area :description, rows: 3, placeholder: "Full Body A" %>
+  </div>
+
+  <div class="button-row">
+    <%= form.submit class: "button" %>
+    <%= link_to "Cancel", program_path(program), class: "button button-ghost" %>
+  </div>
+<% end %>

@@ -1,0 +1,12 @@
+full_body_a_bench:
+  program_workout_type: full_body_a_one
+  exercise: bench_press
+  position: 1
+  rep_pattern: 8
+  coach_notes: Smooth reps.
+
+full_body_a_lat:
+  program_workout_type: full_body_a_one
+  exercise: lat_pulldown
+  position: 2
+  rep_pattern: 10

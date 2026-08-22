@@ -15,6 +15,8 @@ class WorkoutsController < ApplicationController
 
   def new
     @workout = Current.user.workouts.new(workout_on: Date.current)
+    @workout.program_workout_type = Current.user.program_workout_types.find_by(id: params[:program_workout_type_id]) if params[:program_workout_type_id].present?
+    @workout.title = @workout.program_workout_type.default_workout_title if @workout.program_workout_type.present?
   end
 
   def export
@@ -54,6 +56,7 @@ class WorkoutsController < ApplicationController
     @workout = Current.user.workouts.new(workout_params)
 
     if @workout.save
+      @workout.program_workout_type&.apply_template_to_workout!(@workout) if @workout.workout_sets.empty?
       redirect_to workout_path(@workout), notice: "Workout created."
     else
       render :new, status: :unprocessable_entity

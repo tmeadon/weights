@@ -198,6 +198,13 @@ class WorkoutsControllerTest < ActionDispatch::IntegrationTest
     assert_match "No logged history for Lat Pulldown yet.", response.body
   end
 
+  test "new workout can preselect a program workout type" do
+    get new_workout_path, params: { program_workout_type_id: program_workout_types(:full_body_a_one).id }
+
+    assert_response :success
+    assert_select "select[name='workout[program_workout_type_id]'] option[selected='selected']", "Full Body A"
+  end
+
   test "create workout" do
     assert_difference("Workout.count", 1) do
       post workouts_path, params: {

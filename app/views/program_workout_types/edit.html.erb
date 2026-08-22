@@ -1,0 +1,54 @@
+<% content_for :title, "Edit #{@workout_type.label}" %>
+
+<section class="card panel-card">
+  <div class="section-heading">
+    <div>
+      <p class="panel-label"><%= @program.name %></p>
+      <h1>Edit <%= @workout_type.label %></h1>
+    </div>
+  </div>
+
+  <%= render "form", program: @program, workout_type: @workout_type %>
+</section>
+
+<section class="card panel-card">
+  <div class="section-heading">
+    <div>
+      <p class="panel-label">Template</p>
+      <h2><%= pluralize(@workout_type.program_workout_type_exercises.count, "exercise") %></h2>
+      <p class="supporting-text">New workouts created from this type will copy these planned exercises and sets.</p>
+    </div>
+
+    <div class="button-row">
+      <%= button_to "Create workout", create_workout_program_program_workout_type_path(@program, @workout_type), class: "button button-ghost" %>
+      <%= link_to "Add exercise", new_program_program_workout_type_program_workout_type_exercise_path(@program, @workout_type), class: "button" %>
+    </div>
+  </div>
+
+  <% if @workout_type.program_workout_type_exercises.any? %>
+    <div class="exercise-list">
+      <% @workout_type.program_workout_type_exercises.each do |template_exercise| %>
+        <article class="exercise-row">
+          <div class="exercise-heading">
+            <h3><%= template_exercise.position %>. <%= template_exercise.exercise.name %></h3>
+            <%= link_to "Edit", edit_program_program_workout_type_program_workout_type_exercise_path(@program, @workout_type, template_exercise), class: "exercise-edit-link" %>
+          </div>
+          <p class="exercise-meta">
+            Reps <%= template_exercise.rep_pattern %>
+            <% if template_exercise.coach_notes.present? %>
+              / <%= template_exercise.coach_notes %>
+            <% end %>
+          </p>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="supporting-text">No template exercises yet. Add the planned movements for this workout type.</p>
+  <% end %>
+</section>
+
+<section class="card panel-card">
+  <div class="button-row">
+    <%= button_to "Delete workout type", program_program_workout_type_path(@program, @workout_type), method: :delete, class: "button button-danger", form: { data: { turbo_confirm: "Delete this workout type? Workout history will be preserved." } } %>
+  </div>
+</section>

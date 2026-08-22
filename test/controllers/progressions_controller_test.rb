@@ -142,7 +142,7 @@ class ProgressionsControllerTest < ActionDispatch::IntegrationTest
     assert_select "h3", "Current personal bests"
     assert_select ".progression-chart-legend-item", text: /PBs achieved/
     assert_match "Dumbbell Bench Press", response.body
-    assert_match "1 x 10 x 25kg", response.body
+    assert_match "3 x 8 x 24kg", response.body
   end
 
   test "exercise history shows pb indicator" do

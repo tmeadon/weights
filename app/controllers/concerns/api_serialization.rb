@@ -41,6 +41,57 @@ module ApiSerialization
       }
     end
 
+    def serialize_program(program, include_workout_types: false)
+      payload = {
+        id: program.id,
+        user_id: program.user_id,
+        name: program.name,
+        active: program.active,
+        created_at: program.created_at,
+        updated_at: program.updated_at
+      }
+
+      if include_workout_types
+        payload[:workout_types] = program.program_workout_types.map { |workout_type| serialize_program_workout_type(workout_type, include_template_exercises: true) }
+      end
+
+      payload
+    end
+
+    def serialize_program_workout_type(workout_type, include_template_exercises: false)
+      payload = {
+        id: workout_type.id,
+        program_id: workout_type.program_id,
+        key: workout_type.key,
+        name: workout_type.name,
+        description: workout_type.description,
+        label: workout_type.label,
+        sort_order: workout_type.sort_order,
+        created_at: workout_type.created_at,
+        updated_at: workout_type.updated_at
+      }
+
+      if include_template_exercises
+        payload[:template_exercises] = workout_type.program_workout_type_exercises.map { |template_exercise| serialize_program_workout_type_exercise(template_exercise) }
+      end
+
+      payload
+    end
+
+    def serialize_program_workout_type_exercise(template_exercise)
+      {
+        id: template_exercise.id,
+        program_workout_type_id: template_exercise.program_workout_type_id,
+        exercise_id: template_exercise.exercise_id,
+        exercise_name: template_exercise.exercise.name,
+        position: template_exercise.position,
+        rep_pattern: template_exercise.rep_pattern,
+        coach_notes: template_exercise.coach_notes,
+        created_at: template_exercise.created_at,
+        updated_at: template_exercise.updated_at
+      }
+    end
+
     def serialize_workout(workout, include_sets: false)
       payload = {
         id: workout.id,

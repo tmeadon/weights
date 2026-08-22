@@ -1,0 +1,34 @@
+<%= form_with model: [program, workout_type, template_exercise], class: "stack-form" do |form| %>
+  <% if template_exercise.errors.any? %>
+    <div class="flash flash-alert">
+      <%= template_exercise.errors.full_messages.to_sentence %>
+    </div>
+  <% end %>
+
+  <div class="form-grid-two">
+    <div class="field">
+      <%= form.label :exercise_id, "Exercise" %>
+      <%= form.select :exercise_id, options_from_collection_for_select(exercises, :id, :name, template_exercise.exercise_id), { include_blank: "Choose exercise" }, required: true %>
+    </div>
+
+    <div class="field">
+      <%= form.label :position, "Position" %>
+      <%= form.number_field :position, min: 1, step: 1, required: true %>
+    </div>
+
+    <div class="field">
+      <%= form.label :rep_pattern, "Reps" %>
+      <%= form.text_field :rep_pattern, required: true, placeholder: "8" %>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= form.label :coach_notes, "Coach notes" %>
+    <%= form.text_area :coach_notes, rows: 3 %>
+  </div>
+
+  <div class="button-row">
+    <%= form.submit class: "button" %>
+    <%= link_to "Cancel", edit_program_program_workout_type_path(program, workout_type), class: "button button-ghost" %>
+  </div>
+<% end %>
